@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   prompt.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:53:10 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/09 13:35:23 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/11 13:01:49 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,5 +25,5 @@
  */
 char	*read_prompt(void)
 {
-	return (readline("minishell$ "));
+	return (readline(COLOR_Y COLOR_BOLD"minishell$ "COLOR_X));
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:20:42 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/10 16:14:43 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/11 13:14:30 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,18 @@
 int main(int argc, char **argv, char **envp)
 {
 	char *line; // Input line from user
-	char **args = NULL; // Parsed command arguments
-	int i;
+	char **args; // Parsed command arguments
 	int status = 0; // Exit status of last command
-	t_shell shell; // Custom struct holding shell state
+	t_shell *shell; // Custom struct holding shell state
 
 	(void)argc; // Marking unused parameters to avoid warnings
 	(void)argv;
+	shell = get_shell();
+	args = NULL;
 	setup_signals(); // Setup handlers for signals like Ctrl+C
-	//disable_ctrl_echo(); // Disable echoing of ^C or ^\ in terminal
-	shell.envp = copy_env(envp); // Create a copy of the environment
-	shell.last_exit_status = 0; // Initialize exit status
+	disable_ctrl_echo(); // Disable echoing of ^C or ^\ in terminal
+	shell->envp = copy_env(envp); // Create a copy of the environment
+	shell->last_exit_status = 0; // Initialize exit status
 	while (1)
 	{
 		line = read_prompt(); // Display prompt and get user input
@@ -46,24 +47,13 @@ int main(int argc, char **argv, char **envp)
 			add_history(line);
 		args = parse_input(line);  // Tokenize the input string
 		if (args && args[0]) // If we have a valid command
-			status = handle_command(&shell, args); // Dispatch command
+			status = handle_command(shell, args); // Dispatch command
 		free(line);
-		if (args) // Free argument array
-		{
-			i = 0;
-			while (args[i])
-				free(args[i++]);
-			free(args);
-		}
+		ft_free_split(args);
 	}
 	// Cleanup environment variables
-	if (shell.envp)
-	{
-		i = 0;
-		while (shell.envp[i])
-			free(shell.envp[i++]);
-		free(shell.envp);
-	}
+	ft_free_split(shell->envp);
+	clear_history();
 	return status; // Return last command's status
 }
 

@@ -1,32 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   built_exit.c                                       :+:      :+:    :+:   */
+/*   u_shell.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/07 18:36:40 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/11 13:14:41 by psmolin          ###   ########.fr       */
+/*   Created: 2025/07/11 12:47:25 by psmolin           #+#    #+#             */
+/*   Updated: 2025/07/11 13:08:09 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/**
- * @brief Implements the `exit` built-in command.
- *
- * Terminates the shell process. This is a direct call to `exit(0)`,
- * which stops the program immediately.
- *
- * @return int This function never returns, it exits the program.
- *
- * @example
- *   exit → closes the minishell
- */
-int built_exit(char **args)
+int	ft_free_split(char **split)
 {
-	ft_free_split(args);
-	ft_free_split(get_shell()->envp);
-	clear_history();
-	exit(0);
+	int	i;
+
+	if (!split)
+		return (0);
+	i = 0;
+	while (split[i])
+	{
+		free(split[i]);
+		i++;
+	}
+	printf(COLOR_G"freeing\n"COLOR_X);
+	free(split);
+	return (0);
+}
+
+t_shell *get_shell(void)
+{
+	static t_shell sh;
+
+	return(&sh);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/10 16:37:30 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/11 13:11:38 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ int handle_command(t_shell *shell, char **args)
 	else if (!ft_strcmp(args[0], "env"))
 		return built_env(shell);
 	else if (!ft_strcmp(args[0], "exit"))
-		built_exit();
+		built_exit(args);
 	// If it's not a built-in command, try executing it from disk
 	return execute_command(shell, args);
 }
