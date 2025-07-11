@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 12:47:25 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/11 13:08:09 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/11 13:20:22 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	ft_free_split(char **split)
 		free(split[i]);
 		i++;
 	}
-	printf(COLOR_G"freeing\n"COLOR_X);
+	//printf(COLOR_G"freeing\n"COLOR_X);
 	free(split);
 	return (0);
 }

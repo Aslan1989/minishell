@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/11 13:11:38 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/11 13:38:52 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ int execute_command(t_shell *shell, char **args)
 	else
 	{
 		// Parent process: wait for child to finish
-		//waitpid(pid, &status, 0);
+		waitpid(pid, &status, 0);
 		free(path);
 		return WEXITSTATUS(status); // Return child's exit code
 	}

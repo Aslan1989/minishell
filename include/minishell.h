@@ -6,12 +6,12 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/11 13:13:14 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/11 13:40:33 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
-#define MINISHELL_H
+# define MINISHELL_H
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -22,9 +22,10 @@
 # include <string.h>
 # include "libft.h"
 # include "ft_printf.h"
-#include <termios.h>
-#include <errno.h>
-#include <limits.h>
+# include <termios.h>
+# include <errno.h>
+# include <limits.h>
+# include <sys/wait.h>
 
 
 # define COLOR_R "\033[31m"
