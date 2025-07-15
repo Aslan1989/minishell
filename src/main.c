@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:20:42 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/11 13:14:30 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/15 23:42:12 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@
  */
 int main(int argc, char **argv, char **envp)
 {
-	char *line; // Input line from user
-	char **args; // Parsed command arguments
-	int status = 0; // Exit status of last command
-	t_shell *shell; // Custom struct holding shell state
+	char	*line; // Input line from user
+	char	**args; // Parsed command arguments
+	int		status = 0; // Exit status of last command
+	t_shell	*shell;
+	//t_cmd	comms; // Custom struct holding shell state
 
 	(void)argc; // Marking unused parameters to avoid warnings
 	(void)argv;
@@ -45,14 +46,17 @@ int main(int argc, char **argv, char **envp)
 			break;
 		if (*line) // Add non-empty lines to history
 			add_history(line);
+		//ft_generate_commands(line, &comms); // Generate commands from input
 		args = parse_input(line);  // Tokenize the input string
+		free(line); // Free the input line after parsing for it not to be stored on exit
 		if (args && args[0]) // If we have a valid command
 			status = handle_command(shell, args); // Dispatch command
-		free(line);
-		ft_free_split(args);
+		free_gc_cat(CAT_ARGS); // Free the arguments array
+		// ft_free_split(args);
 	}
-	// Cleanup environment variables
-	ft_free_split(shell->envp);
+	// Cleanup everything before exiting
+	free_gc();
+	//ft_free_split(shell->envp);
 	clear_history();
 	return status; // Return last command's status
 }

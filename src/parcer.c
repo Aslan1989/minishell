@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parcer.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/09 13:16:44 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/15 23:30:28 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ char	**parse_input(const char *line)
 	if (!line || !*line)
 		return (NULL);
 	argc = count_args(line);
-	args = malloc(sizeof(char *) * (argc + 1));
+	// args = malloc(sizeof(char *) * (argc + 1));
+	args = ft_gcmalloc(CAT_ARGS, sizeof(char *) * (argc + 1));
 	if (!args)
 		return (NULL);
 	i = 0;

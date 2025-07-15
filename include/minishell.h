@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/11 13:40:33 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/15 23:41:04 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,31 @@
 # define COLOR_BOLD "\033[1m"
 # define COLOR_X "\033[0m"
 
+typedef enum {
+	TOK_WORD,
+	TOK_PIPE,
+	TOK_AND,
+	TOK_OR,
+	TOK_LPAREN,
+	TOK_RPAREN,
+	TOK_EOF
+}	e_token;
+
+typedef enum {
+	CAT_ENV,
+	CAT_ARGS,
+	CAT_TOKEN,
+	CAT_MEM,
+	CAT_MAX
+}	e_gccat;
+
+typedef struct s_garbage	t_garbage;
+
+struct s_garbage {
+	void				*ptr; // Pointer to the allocated memory
+	struct s_garbage	*next; // Pointer to the next garbage node
+};
+
 /**
  * @brief Custom structure to hold shell state.
  *
@@ -56,6 +81,18 @@ typedef struct s_shell
 	char	**envp;	// A copy of the environment variables (like PATH, HOME, etc.)
 	int		last_exit_status;	// Stores the exit code of the last executed command, used for $?
 } t_shell;
+
+typedef struct s_cmd	t_cmd;
+
+struct s_cmd
+{
+	e_token	type; // Type of token (word, pipe, etc.)
+	char	**commands;
+	char	*path;
+	t_cmd	*next_a;
+	t_cmd	*next_b; // For handling || and &&.
+	pid_t	pid;
+};
 
 void	setup_signals(void);
 void	disable_ctrl_echo(void);
@@ -87,5 +124,15 @@ char	*extract_arg(const char **line);
 //free utils
 int		ft_free_split(char **env);
 t_shell	*get_shell(void);
+
+//pipes utils
+char	**ft_split_pipes(char *str, char div);
+
+//our malloc and garbage collector
+t_garbage	**get_gc(e_gccat cat);
+void		free_gc_cat(e_gccat cat);
+void		free_gc(void);
+void		*ft_gcmalloc(e_gccat cat, ssize_t size);
+char		*ft_gcstrdup(e_gccat cat, char *src);
 
 #endif

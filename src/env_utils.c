@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 11:20:16 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/09 13:36:56 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/15 23:24:26 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,18 @@ char	**copy_env(char **envp)
 	while (envp[count])
 		count++;
 // Allocate memory for the new environment array (plus one for the NULL at the end)
-	copy = malloc(sizeof(char *) * (count + 1));
+
+	//////////////////!
+	//copy = malloc(sizeof(char *) * (count + 1));
+	copy = ft_gcmalloc(CAT_ENV, sizeof(char *) * (count + 1));
 	if (!copy)
 		return NULL;
 	// Duplicate each string using strdup (which copies string into new memory)
 	i = 0;
 	while (i < count)
 	{
-		copy[i] = ft_strdup(envp[i]); // "PATH=/usr/bin" → copy[i] = "PATH=/usr/bin"
+		// copy[i] = ft_strdup(envp[i]); // "PATH=/usr/bin" → copy[i] = "PATH=/usr/bin"
+		copy[i] = ft_gcstrdup(CAT_ENV, envp[i]);
 		i++;
 	}
 	copy[count] = NULL; // Important: NULL terminator for arrays of strings
@@ -57,7 +61,7 @@ char	**copy_env(char **envp)
 void	free_env(char **envp)
 {
 	int	i;
-	
+
 	i = 0;
 	if (!envp)
 		return;

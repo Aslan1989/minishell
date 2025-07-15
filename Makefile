@@ -6,7 +6,7 @@
 #    By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/04 12:19:44 by aisaev            #+#    #+#              #
-#    Updated: 2025/07/11 13:08:02 by psmolin          ###   ########.fr        #
+#    Updated: 2025/07/15 17:24:32 by psmolin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,23 +25,31 @@ INCLUDES =	-I$(LIB_DIR)/libft/includes \
 			-I$(LIB_DIR)/get_next_line/includes \
 			-Iinclude
 
-SRC = src/main.c \
-	src/prompt.c \
-	src/signals.c \
-	src/builtins/built_echo.c \
-	src/builtins/built_unset.c \
-	src/builtins/built_cd.c \
-	src/builtins/built_env.c \
-	src/builtins/built_exit.c \
-	src/builtins/built_export.c \
-	src/builtins/built_pwd.c \
-	src/parcer.c \
-	src/executor.c \
-	src/env_utils.c \
-	src/find_executable.c \
-	src/parcer_utils.c \
-	src/u_shell.c
-OBJ = $(SRC:.c=.o)
+SRC_DIR		= src/
+OBJ_DIR		= obj/
+
+SRC = $(SRC_DIR)main.c \
+	$(SRC_DIR)prompt.c \
+	$(SRC_DIR)signals.c \
+	$(SRC_DIR)builtins/built_echo.c \
+	$(SRC_DIR)builtins/built_unset.c \
+	$(SRC_DIR)builtins/built_cd.c \
+	$(SRC_DIR)builtins/built_env.c \
+	$(SRC_DIR)builtins/built_exit.c \
+	$(SRC_DIR)builtins/built_export.c \
+	$(SRC_DIR)builtins/built_pwd.c \
+	$(SRC_DIR)parcer.c \
+	$(SRC_DIR)executor.c \
+	$(SRC_DIR)env_utils.c \
+	$(SRC_DIR)find_executable.c \
+	$(SRC_DIR)parcer_utils.c \
+	$(SRC_DIR)u_comms.c \
+	$(SRC_DIR)u_malloc.c \
+	$(SRC_DIR)u_shell.c \
+	$(SRC_DIR)u_pipex.c
+
+# Changing all SRC_DIR to OBJ_DIR for objects
+OBJ	= $(patsubst $(SRC_DIR)%.c, $(OBJ_DIR)%.o, $(SRC))
 
 all: $(LIB) $(NAME)
 
@@ -51,7 +59,9 @@ $(NAME): $(OBJ)
 $(LIB):
 	$(MAKE) -C $(LIB_DIR)
 
-%.o: %.c
+# Creating OBJ files and creating subfolders when necessary
+$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
