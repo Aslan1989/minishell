@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:55:49 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/15 23:38:39 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/16 00:15:10 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,8 @@ t_garbage **get_gc(e_gccat cat)
 {
 	static t_garbage *gc[CAT_MAX];
 
-	if (cat < 0 || cat >CAT_MAX)
-	{
-		write(2, "Error: Invalid garbage collector category\n", 42);
+	if (cat < 0 || cat > CAT_MAX)
 		return (NULL);
-	}
 	return (&gc[cat]);
 }
 
@@ -52,18 +49,21 @@ void	free_gc_cat(e_gccat cat)
 {
 	t_garbage *current;
 	t_garbage *next;
+	t_garbage **gc_list;
 
-	if (cat < 0 || cat > CAT_MAX)
+	gc_list = get_gc(cat);
+	if (!gc_list || !*gc_list)
 		return ;
-	current = *get_gc(cat);
+	current = *gc_list;
 	while (current)
 	{
 		next = current->next;
-		free(current->ptr);
+		if (current->ptr)
+			free(current->ptr);
 		free(current);
 		current = next;
 	}
-	*get_gc(cat) = NULL; // Clear the garbage collector for this category
+	*gc_list = NULL; // Clear the garbage collector for this category
 }
 
 void	free_gc(void)
@@ -71,7 +71,7 @@ void	free_gc(void)
 	int i;
 
 	i = 0;
-	while (i <= CAT_MAX)
+	while (i < CAT_MAX)
 	{
 		free_gc_cat(i);
 		i++;
