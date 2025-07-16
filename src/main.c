@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:20:42 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/16 00:17:06 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/16 14:30:56 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,12 @@ int main(int argc, char **argv, char **envp)
 	char	*line; // Input line from user
 	char	**args; // Parsed command arguments
 	int		status = 0; // Exit status of last command
-	t_shell	*shell;
-	//t_cmd	comms; // Custom struct holding shell state
+	t_shell	*shell; // Custom struct holding shell state
+	t_cmd	*comms;
 
 	(void)argc; // Marking unused parameters to avoid warnings
 	(void)argv;
+	comms = NULL;
 	shell = get_shell();
 	args = NULL;
 	setup_signals(); // Setup handlers for signals like Ctrl+C
@@ -46,12 +47,13 @@ int main(int argc, char **argv, char **envp)
 			break;
 		if (*line) // Add non-empty lines to history
 			add_history(line);
-		//ft_generate_commands(line, &comms); // Generate commands from input
+		ft_generate_commands(line, &comms); // Generate commands from input
 		args = parse_input(line);  // Tokenize the input string
 		free(line); // Free the input line after parsing for it not to be stored on exit
 		if (args && args[0]) // If we have a valid command
 			status = handle_command(shell, args); // Dispatch command
-		free_gc_cat(CAT_ARGS); // Free the arguments array
+		free_gc_cat(CAT_ARGS);
+		free_gc_cat(CAT_TOKEN); // Free the arguments array
 		// ft_free_split(args);
 	}
 	// Cleanup everything before exiting

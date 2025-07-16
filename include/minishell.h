@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/15 23:41:04 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/16 14:43:44 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@
 # define COLOR_X "\033[0m"
 
 typedef enum {
+	TOK_START,
 	TOK_WORD,
 	TOK_PIPE,
 	TOK_AND,
@@ -89,8 +90,11 @@ struct s_cmd
 	e_token	type; // Type of token (word, pipe, etc.)
 	char	**commands;
 	char	*path;
+	char	*value; // Input string for the command
 	t_cmd	*next_a;
 	t_cmd	*next_b; // For handling || and &&.
+	t_cmd	*parent;
+	int		depth;
 	pid_t	pid;
 };
 
@@ -128,11 +132,15 @@ t_shell	*get_shell(void);
 //pipes utils
 char	**ft_split_pipes(char *str, char div);
 
+//commands
+void	ft_generate_commands(char *line, t_cmd **comms);
+
 //our malloc and garbage collector
 t_garbage	**get_gc(e_gccat cat);
 void		free_gc_cat(e_gccat cat);
 void		free_gc(void);
 void		*ft_gcmalloc(e_gccat cat, ssize_t size);
 char		*ft_gcstrdup(e_gccat cat, char *src);
+char		*ft_gcstrndup(e_gccat cat, char *src, ssize_t n);
 
 #endif
