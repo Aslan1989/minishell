@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/17 19:24:49 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/17 19:33:50 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,12 +69,12 @@ static void ft_add_word(char **line, t_token **head)
 static t_token	*ft_tokenize(char *line)
 {
 	t_token	*head;
-	// char	*start;
-	// char	quote;
 
 	head = NULL;
 	while (*line)
 	{
+		while (ft_isspace(*line))
+			line++;
 		if (!*line)
 			break;
 		if (line[0] == '&' && line[1] == '&')
@@ -102,6 +102,7 @@ void	ft_print_tokens_nested(t_cmd *comms, int depth, int branch)
 	current = comms;
 	if (!current)
 		return ;
+	printf(COLOR_G);
 	i = 0;
 	while (i++ < depth - 1)
 		printf("..");
@@ -112,6 +113,19 @@ void	ft_print_tokens_nested(t_cmd *comms, int depth, int branch)
 	printf("%s\n", current->token->value);
 	ft_print_tokens_nested(current->next_a, depth + 1, 0);
 	ft_print_tokens_nested(current->next_b, depth + 1, 1);
+	printf(COLOR_X);
+}
+
+void ft_print_token_list(t_token *head)
+{
+	t_token *current;
+
+	current = head;
+	while (current)
+	{
+		printf(COLOR_Y"%s\n"COLOR_X, current->value);
+		current = current->next;
+	}
 }
 
 void	ft_generate_commands(char *line, t_cmd **comms)
@@ -122,6 +136,7 @@ void	ft_generate_commands(char *line, t_cmd **comms)
 	tokens = ft_tokenize(line);
 	if (!tokens)
 		return ;
+	//ft_print_token_list(tokens);
 	ast = ft_parse_tokens(&tokens);
 	ft_print_tokens_nested(ast, 0, 0);
 	*comms = ast;
