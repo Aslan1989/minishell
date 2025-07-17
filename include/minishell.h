@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/16 14:43:44 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/17 17:10:35 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,14 @@ typedef enum {
 	CAT_ENV,
 	CAT_ARGS,
 	CAT_TOKEN,
+	CAT_CMD,
 	CAT_MEM,
 	CAT_MAX
 }	e_gccat;
 
 typedef struct s_garbage	t_garbage;
+typedef struct s_cmd	t_cmd;
+typedef struct s_token	t_token;
 
 struct s_garbage {
 	void				*ptr; // Pointer to the allocated memory
@@ -83,19 +86,26 @@ typedef struct s_shell
 	int		last_exit_status;	// Stores the exit code of the last executed command, used for $?
 } t_shell;
 
-typedef struct s_cmd	t_cmd;
 
 struct s_cmd
 {
-	e_token	type; // Type of token (word, pipe, etc.)
+	e_token	type;
+	t_token	*token;
+	// char	*value;
+	t_cmd	*next_a;
+	t_cmd	*next_b;
 	char	**commands;
 	char	*path;
-	char	*value; // Input string for the command
-	t_cmd	*next_a;
-	t_cmd	*next_b; // For handling || and &&.
 	t_cmd	*parent;
-	int		depth;
 	pid_t	pid;
+};
+
+struct	s_token
+{
+	e_token	type;
+	char	*value;
+	t_token	*next;
+	t_token *prev;
 };
 
 void	setup_signals(void);
@@ -134,6 +144,7 @@ char	**ft_split_pipes(char *str, char div);
 
 //commands
 void	ft_generate_commands(char *line, t_cmd **comms);
+t_cmd	*ft_parse_tokens(t_token **tokens);
 
 //our malloc and garbage collector
 t_garbage	**get_gc(e_gccat cat);
