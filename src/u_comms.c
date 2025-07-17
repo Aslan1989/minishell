@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/17 17:10:52 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/17 19:24:49 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,16 +46,35 @@ static int	add_token(t_token **head, e_token type, const char *value, int inc)
 	return (inc);
 }
 
+static void ft_add_word(char **line, t_token **head)
+{
+	char	*start;
+	char	quote;
+
+	start = *line;
+	quote = 0;
+	while (**line)
+	{
+		if ((**line == '"' || **line == '\'') && !quote)
+			quote = **line;
+		else if (**line == quote && quote)
+			quote = 0;
+		(*line)++;
+		if (**line == '|' || **line == '&' || **line == '(' || **line == ')')
+			break;
+	}
+	add_token(head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, *line - start), 1);
+}
+
 static t_token	*ft_tokenize(char *line)
 {
 	t_token	*head;
-	char	*start;
+	// char	*start;
+	// char	quote;
 
 	head = NULL;
 	while (*line)
 	{
-		while (ft_isspace(*line))
-			line++;
 		if (!*line)
 			break;
 		if (line[0] == '&' && line[1] == '&')
@@ -68,12 +87,8 @@ static t_token	*ft_tokenize(char *line)
 			line += add_token(&head, TOK_LPAREN, "(", 1);
 		else if (*line == ')')
 			line += add_token(&head, TOK_RPAREN, ")", 1);
-		else {
-			start = line;
-			while (*line && !ft_isspace(*line) && !strchr("|&()", *line))
-				line++;
-			add_token(&head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, line - start), 1);
-		}
+		else
+			ft_add_word(&line, &head);
 	}
 	add_token(&head, TOK_EOF, "EOF", 1);
 	return (head);

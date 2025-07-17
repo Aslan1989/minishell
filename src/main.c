@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:20:42 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/16 14:30:56 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/17 18:59:44 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,8 @@ int main(int argc, char **argv, char **envp)
 		if (args && args[0]) // If we have a valid command
 			status = handle_command(shell, args); // Dispatch command
 		free_gc_cat(CAT_ARGS);
-		free_gc_cat(CAT_TOKEN); // Free the arguments array
+		free_gc_cat(CAT_TOKEN);
+		free_gc_cat(CAT_CMD); // Free the arguments array
 		// ft_free_split(args);
 	}
 	// Cleanup everything before exiting

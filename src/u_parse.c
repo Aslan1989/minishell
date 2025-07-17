@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/17 17:51:18 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/17 18:59:19 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@ static t_cmd *parse_and(t_token **current);
 static t_cmd *parse_pipe(t_token **current);
 static t_cmd *parse_word(t_token **current);
 
-// static e_token check(t_token *current, e_token type)
-// {
-// 	if (!current)
-// 		return 0;
-// 	return current->type == type;
-// }
+static e_token check(t_token *current, e_token type)
+{
+	if (!current)
+		return 0;
+	return current->type == type;
+}
 
 static t_token *advance(t_token **current)
 {
@@ -35,36 +35,7 @@ static t_token *advance(t_token **current)
 	return (prev);
 }
 
-// static int is_at_end(t_token *current)
-// {
-// 	return (!current || current->type == TOK_EOF);
-// }
-
-// static t_token *peek(t_token *current)
-// {
-// 	return current;
-// }
-
-static t_token *previous(t_token *current)
-{
-	if (!current)
-		return NULL;
-	return current->prev;
-}
-
-static int match (t_token **current, e_token type)
-{
-	if (!current || !*current)
-		return (0);
-	if ((*current)->type == type)
-	{
-		*current = (*current)->next;
-		return (1);
-	}
-	return (0);
-}
-
-static t_cmd *parse_add_node(t_token *token, t_cmd *next_a, t_cmd *next_b)
+static t_cmd *add_node(t_token *token, t_cmd *next_a, t_cmd *next_b)
 {
 	t_cmd *node;
 
@@ -75,7 +46,6 @@ static t_cmd *parse_add_node(t_token *token, t_cmd *next_a, t_cmd *next_b)
 		return (NULL);
 	node->type = token->type;
 	node->token = token;
-	// node->value = ft_gcstrdup(CAT_CMD, token->value);
 	node->next_a = next_a;
 	node->next_b = next_b;
 	node->commands = NULL;
@@ -91,14 +61,13 @@ t_cmd *parse_or(t_token **current)
 	t_cmd *right;
 	t_token *operator;
 
-	printf ("Parsing OR\n");
-	printf ("Current token type: %d\n", (*current)->type);
 	expr = parse_and(current);
-	while (match(current, TOK_OR))
+	while (check(*current, TOK_OR))
 	{
-		operator = previous(*current);
+		operator = (*current);
+		advance(current);
 		right = parse_and(current);
-		expr = parse_add_node(operator, expr, right);
+		expr = add_node(operator, expr, right);
 	}
 	return (expr);
 }
@@ -109,14 +78,13 @@ static t_cmd *parse_and(t_token **current)
 	t_cmd *right;
 	t_token *operator;
 
-	printf ("Parsing AND\n");
-	printf ("Current token type: %d\n", (*current)->type);
 	expr = parse_pipe(current);
-	while (match(current, TOK_AND))
+	while (check(*current, TOK_AND))
 	{
-		operator = previous(*current);
+		operator = (*current);
+		advance(current);
 		right = parse_pipe(current);
-		expr = parse_add_node(operator, expr, right);
+		expr = add_node(operator, expr, right);
 	}
 	return (expr);
 }
@@ -127,14 +95,13 @@ static t_cmd *parse_pipe(t_token **current)
 	t_cmd *right;
 	t_token *operator;
 
-	printf ("Parsing PIPE\n");
-	printf ("Current token type: %d\n", (*current)->type);
 	expr = parse_word(current);
-	while (match(current, TOK_PIPE))
+	while (check(*current, TOK_PIPE))
 	{
-		operator = previous(*current);
+		operator = (*current);
+		advance(current);
 		right = parse_word(current);
-		expr = parse_add_node(operator, expr, right);
+		expr = add_node(operator, expr, right);
 	}
 	return (expr);
 }
@@ -148,17 +115,13 @@ static t_cmd *parse_word(t_token **current)
 
 	if (!current || !*current)
 		return NULL;
-	// if (match(current, TOK_WORD))
-	// {
-	// 	node = parse_add_node(previous(*current), NULL, NULL);
-	// 	return node;
-	// }
 	first = NULL;
 	last = NULL;
-	while (match(current, TOK_WORD))
+	while (check(*current, TOK_WORD))
 	{
-		token = previous(*current);
-		node = parse_add_node(token, NULL, NULL);
+		token = (*current);
+		advance(current);
+		node = add_node(token, NULL, NULL);
 		if (!first)
 			first = node;
 		else
@@ -169,10 +132,11 @@ static t_cmd *parse_word(t_token **current)
 	if (first)
 		return first;
 
-	if (match(current, TOK_LPAREN))
+	if (check(*current, TOK_LPAREN))
 	{
+		advance(current);
 		node = parse_or(current);
-		if (match(current, TOK_RPAREN))
+		if (check(*current, TOK_RPAREN))
 			advance(current);
 		return node;
 	}
