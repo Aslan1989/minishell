@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:20:42 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/17 18:59:44 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 00:29:04 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ int main(int argc, char **argv, char **envp)
 	comms = NULL;
 	shell = get_shell();
 	args = NULL;
+	(void)args;
 	setup_signals(); // Setup handlers for signals like Ctrl+C
 	disable_ctrl_echo(); // Disable echoing of ^C or ^\ in terminal
 	shell->envp = copy_env(envp); // Create a copy of the environment
@@ -48,10 +49,11 @@ int main(int argc, char **argv, char **envp)
 		if (*line) // Add non-empty lines to history
 			add_history(line);
 		ft_generate_commands(line, &comms); // Generate commands from input
-		args = parse_input(line);  // Tokenize the input string
+		//args = parse_input(line);  // Tokenize the input string
 		free(line); // Free the input line after parsing for it not to be stored on exit
-		if (args && args[0]) // If we have a valid command
-			status = handle_command(shell, args); // Dispatch command
+		ft_run_commands(comms);
+		// if (args && args[0]) // If we have a valid command
+		// 	status = handle_command(shell, args); // Dispatch command
 		free_gc_cat(CAT_ARGS);
 		free_gc_cat(CAT_TOKEN);
 		free_gc_cat(CAT_CMD); // Free the arguments array

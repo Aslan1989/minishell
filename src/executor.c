@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/15 23:42:35 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 01:49:42 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,11 @@ int execute_command(t_shell *shell, char **args)
  * @param args Array of strings where args[0] is command name and rest are arguments.
  * @return int Exit status of the executed command.
  */
-int handle_command(t_shell *shell, char **args)
+int handle_command(char **args)
 {
+	t_shell *shell;
+
+	shell = get_shell(); // Get the current shell state
 	if (!args || !args[0])
 		return 0;
 	if (!ft_strcmp(args[0], "echo"))
@@ -98,4 +101,68 @@ int handle_command(t_shell *shell, char **args)
 		built_exit(args);
 	// If it's not a built-in command, try executing it from disk
 	return execute_command(shell, args);
+}
+
+static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
+{
+	int p_fd[2];
+	pid_t pid_a;
+	pid_t pid_b;
+	int status_a;
+	int status_b;
+
+	if (pipe(p_fd) < 0)
+		return (perror("pipe"), 1);
+	pid_a = fork();
+	if (pid_a < 0)
+		return (perror("fork"), close(p_fd[0]), close(p_fd[1]), 1);
+	if (pid_a == 0)
+	{
+		dup2(p_fd[1], STDOUT_FILENO);
+		close(p_fd[0]);
+		close(p_fd[1]);
+		exit(ft_run_commands(command_1));
+	}
+	pid_b = fork();
+	if (pid_b < 0)
+		return (perror("fork"), close(p_fd[0]), close(p_fd[1]), 1);
+	if (pid_b == 0)
+	{
+		dup2(p_fd[0], STDIN_FILENO);
+		close(p_fd[0]);
+		close(p_fd[1]);
+		exit(ft_run_commands(command_2));
+	}
+	close(p_fd[1]);
+	close(p_fd[0]);
+	waitpid(pid_a, &status_a, 0);
+	waitpid(pid_b, &status_b, 0);
+	return (WEXITSTATUS(status_b));
+}
+
+int	ft_run_commands(t_cmd *com)
+{
+	int status;
+
+	if (!com)
+		return (0);
+	if (com->type == TOK_WORD)
+		return (handle_command(com->commands));
+	if (com->type == TOK_PIPE)
+		return (handle_pipe(com->next_a, com->next_b));
+	if (com->type == TOK_AND)
+	{
+		status = ft_run_commands(com->next_a);
+		if (status == 0)
+			return (ft_run_commands(com->next_b));
+		return (status);
+	}
+	if (com->type == TOK_OR)
+	{
+		status = ft_run_commands(com->next_a);
+		if (status != 0)
+			return (ft_run_commands(com->next_b));
+		return (status);
+	}
+	return (0);
 }

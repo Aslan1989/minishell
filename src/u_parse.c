@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/17 18:59:19 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 01:45:20 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,7 @@ static t_cmd *parse_word(t_token **current)
 		token = (*current);
 		advance(current);
 		node = add_node(token, NULL, NULL);
+		node->commands = parse_input(token->value);
 		if (!first)
 			first = node;
 		else

@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/17 19:33:50 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 01:05:46 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,6 +138,6 @@ void	ft_generate_commands(char *line, t_cmd **comms)
 		return ;
 	//ft_print_token_list(tokens);
 	ast = ft_parse_tokens(&tokens);
-	ft_print_tokens_nested(ast, 0, 0);
+	//ft_print_tokens_nested(ast, 0, 0);
 	*comms = ast;
 }

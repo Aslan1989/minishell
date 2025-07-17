@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/17 17:10:35 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 00:34:39 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,8 @@ int		built_exit(char **args);
 char	**parse_input(const char *line);
 
 int		execute_command(t_shell *shell, char **args);
-int		handle_command(t_shell *shell, char **args);
+int		handle_command(char **args);
+int		ft_run_commands(t_cmd *com);
 
 char	**copy_env(char **envp);
 void	free_env(char **envp);
