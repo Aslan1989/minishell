@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 14:31:46 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 17:42:44 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ int	parse_input(t_cmd *node, const char *line)
 {
 	int		argc;
 	int		i;
-	// char	**args;
 	char	*arg;
 
 	if (!line || !*line)
@@ -58,9 +57,12 @@ int	parse_input(t_cmd *node, const char *line)
 	if (!node->commands)
 		return (1);
 	i = 0;
+	// printf(COLOR_B"arg count: %d\n"COLOR_X, argc);
 	while (*line && i < argc)
 	{
 		arg = extract_arg(&line);
+		if (!arg)
+			break;
 		if (ft_strcmp(arg, "<") == 0)
 		{
 			node->infile = 1;
@@ -79,6 +81,7 @@ int	parse_input(t_cmd *node, const char *line)
 			node->heredoc = 1;
 		else
 			node->commands[i++] = arg; // Store the argument in the commands array
+		// printf(COLOR_G"arg[%d]: %s\n"COLOR_X, i, arg);
 	}
 	if ((node->infile && !node->infile_name)
 		|| (node->outfile && !node->outfile_name)
@@ -88,7 +91,18 @@ int	parse_input(t_cmd *node, const char *line)
 		node->commands = NULL;
 		return (1);
 	}
-	while (i < argc)
-		node->commands[i++] = NULL;
+	// while (i < argc)
+	// 	node->commands[i++] = NULL;
+	node->commands[i] = NULL; // NULL-terminate the commands array
+	while (i <= argc)
+	{
+		node->commands[i++] = NULL; // Fill remaining slots with NULL
+	}
+	// i = 0;
+	// while (i <= argc)
+	// {
+	// 	printf(COLOR_Y"commands[%d]: %s\n"COLOR_X, i, node->commands[i]);
+	// 	i++;
+	// }
 	return (0);
 }

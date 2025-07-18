@@ -6,11 +6,45 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 14:28:54 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 18:00:09 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+static void setup_redirections(t_cmd *command)
+{
+	int	in_fd;
+	int	out_fd;
+
+	in_fd = -1;
+	out_fd = -1;
+	if (command->infile && command->infile_name)
+	{
+		in_fd = open(command->infile_name, O_RDONLY);
+		if (in_fd < 0)
+		{
+			perror(command->infile_name);
+			exit (1);
+		}
+		dup2(in_fd, STDIN_FILENO);
+		close(in_fd);
+	}
+	if (command->outfile && command->outfile_name)
+	{
+		if (command->append)
+			out_fd = open(command->outfile_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		else
+			out_fd = open(command->outfile_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (out_fd < 0)
+		{
+			perror(command->outfile_name);
+			exit (1);
+		}
+		dup2(out_fd, STDOUT_FILENO);
+		close(out_fd);
+	}
+}
 
 /**
  * @brief Executes an external command (not a built-in).
@@ -23,17 +57,18 @@
  * @param args Arguments, where args[0] is the program name, rest are arguments.
  * @return int The exit status returned by the child process.
  */
-int execute_command(t_shell *shell, char **args)
+int execute_command(t_cmd *command, t_shell *shell, char **args)
 {
 	pid_t pid; // Process ID returned by fork()
 	int status; // Used to store child's exit status
 	char *path; // Full path to executable file
 
+	// printf("execute_command: %s\n", args[0]); // Debug output
 	// Check if the command is directly executable
 	if (!args || !args[0])
 		return 1;
 	if (access(args[0], X_OK) == 0)
-		path = ft_strdup(args[0]); // Command has absolute/relative path
+		path = ft_gcstrdup(CAT_ARGS, args[0]); // Command has absolute/relative path
 	else
 		path = find_executable(shell, args[0]); // Try to find it in $PATH
 	if (!path)
@@ -43,7 +78,7 @@ int execute_command(t_shell *shell, char **args)
 		// write(2, "\n", 1);
 		ft_print_error("minishell: command not found: ");
 		ft_print_error(args[0]);
-		write(2, "\n", 1);
+		ft_print_error("\n");
 		return 127; // Standard "command not found" return code
 	}
 	pid = fork(); // Create a child process
@@ -55,6 +90,8 @@ int execute_command(t_shell *shell, char **args)
 	}
 	else if (pid == 0)
 	{
+
+		setup_redirections(command);
 		// Child process: execute the command
 		execve(path, args, shell->envp); // Use your own environment
 		perror("execve failed");
@@ -63,6 +100,7 @@ int execute_command(t_shell *shell, char **args)
 	else
 	{
 		// Parent process: wait for child to finish
+		// printf("waiting for child %d\n", pid);
 		waitpid(pid, &status, 0);
 		free(path);
 		return WEXITSTATUS(status); // Return child's exit code
@@ -81,7 +119,7 @@ int execute_command(t_shell *shell, char **args)
  * @param args Array of strings where args[0] is command name and rest are arguments.
  * @return int Exit status of the executed command.
  */
-int handle_command(char **args)
+static int handle_command(t_cmd *command, char **args)
 {
 	t_shell *shell;
 
@@ -103,15 +141,20 @@ int handle_command(char **args)
 	else if (!ft_strcmp(args[0], "exit"))
 		built_exit(args);
 	// If it's not a built-in command, try executing it from disk
-	return execute_command(shell, args);
+	return execute_command(command, shell, args);
 }
 
 static void run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 {
+	int status;
+
+	// setup_redirections(command); // Setup input/output redirections if needed
 	dup2(fd, dup_fd);
 	close(p_fd[0]);
 	close(p_fd[1]);
-	exit(ft_run_commands(command));
+	status = ft_run_commands(command);
+	free_gc();
+	exit(status);
 }
 
 static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
@@ -145,10 +188,11 @@ int	ft_run_commands(t_cmd *com)
 {
 	int status;
 
+	//printf("run %s\n", com->token->value);
 	if (!com)
 		return (0);
 	if (com->type == TOK_WORD)
-		return (handle_command(com->commands));
+		return (handle_command(com, com->commands));
 	if (com->type == TOK_PIPE)
 		return (handle_pipe(com->next_a, com->next_b));
 	if (com->type == TOK_AND)

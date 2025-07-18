@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:20:42 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 00:29:04 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 18:00:27 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ int main(int argc, char **argv, char **envp)
 		ft_run_commands(comms);
 		// if (args && args[0]) // If we have a valid command
 		// 	status = handle_command(shell, args); // Dispatch command
+		// printf("executed\n");
 		free_gc_cat(CAT_ARGS);
 		free_gc_cat(CAT_TOKEN);
 		free_gc_cat(CAT_CMD); // Free the arguments array

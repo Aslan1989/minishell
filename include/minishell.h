@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 14:05:42 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 17:49:59 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # include <errno.h>
 # include <limits.h>
 # include <sys/wait.h>
+# include <fcntl.h>
 
 
 # define COLOR_R "\033[31m"
@@ -130,8 +131,8 @@ int		built_exit(char **args);
 // char	**parse_input(const char *line);
 int		parse_input(t_cmd *node, const char *line);
 
-int		execute_command(t_shell *shell, char **args);
-int		handle_command(char **args);
+int		execute_command(t_cmd *command, t_shell *shell, char **args);
+// int		handle_command(char **args);
 int		ft_run_commands(t_cmd *com);
 
 char	**copy_env(char **envp);
@@ -151,7 +152,7 @@ int		ft_free_split(char **env);
 t_shell	*get_shell(void);
 
 //pipes utils
-char	**ft_split_pipes(char *str, char div);
+// char	**ft_split_pipes(char *str, char div);
 
 //commands
 void	ft_generate_commands(char *line, t_cmd **comms);

@@ -6,7 +6,7 @@
 #    By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/04 12:19:44 by aisaev            #+#    #+#              #
-#    Updated: 2025/07/18 14:08:17 by psmolin          ###   ########.fr        #
+#    Updated: 2025/07/18 15:02:28 by psmolin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,8 +47,7 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)u_error.c \
 	$(SRC_DIR)u_malloc.c \
 	$(SRC_DIR)u_parse.c \
-	$(SRC_DIR)u_shell.c \
-	$(SRC_DIR)u_pipex.c
+	$(SRC_DIR)u_shell.c
 
 # Changing all SRC_DIR to OBJ_DIR for objects
 OBJ	= $(patsubst $(SRC_DIR)%.c, $(OBJ_DIR)%.o, $(SRC))
