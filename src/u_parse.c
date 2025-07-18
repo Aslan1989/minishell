@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/18 01:45:20 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 13:46:46 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,12 @@ static t_cmd *add_node(t_token *token, t_cmd *next_a, t_cmd *next_b)
 	node->token = token;
 	node->next_a = next_a;
 	node->next_b = next_b;
+	node->infile = 0;
+	node->infile_name = NULL;
+	node->outfile = 0;
+	node->outfile_name = NULL;
+	node->append = 0;
+	node->heredoc = 0;
 	node->commands = NULL;
 	node->path = NULL;
 	node->parent = NULL;
@@ -122,7 +128,7 @@ static t_cmd *parse_word(t_token **current)
 		token = (*current);
 		advance(current);
 		node = add_node(token, NULL, NULL);
-		node->commands = parse_input(token->value);
+		parse_input(node, token->value);
 		if (!first)
 			first = node;
 		else

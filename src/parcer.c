@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/15 23:30:28 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 14:31:46 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,22 +22,73 @@
  * @param line Input string typed by the user (e.g., "echo 'hi 42'")
  * @return char** NULL-terminated array of argument strings.
  */
-char	**parse_input(const char *line)
+// char	**parse_input(const char *line)
+// {
+// 	int		argc;
+// 	int		i;
+// 	char	**args;
+
+// 	if (!line || !*line)
+// 		return (NULL);
+// 	argc = count_args(line);
+// 	// args = malloc(sizeof(char *) * (argc + 1));
+// 	args = ft_gcmalloc(CAT_ARGS, sizeof(char *) * (argc + 1));
+// 	if (!args)
+// 		return (NULL);
+// 	i = 0;
+// 	while (*line && i < argc)
+// 	{
+// 		args[i++] = extract_arg(&line);
+// 	}
+// 	args[i] = NULL;
+// 	return (args);
+// }
+
+int	parse_input(t_cmd *node, const char *line)
 {
 	int		argc;
 	int		i;
-	char	**args;
+	// char	**args;
+	char	*arg;
 
 	if (!line || !*line)
-		return (NULL);
+		return (node->commands = NULL, 1);
 	argc = count_args(line);
-	// args = malloc(sizeof(char *) * (argc + 1));
-	args = ft_gcmalloc(CAT_ARGS, sizeof(char *) * (argc + 1));
-	if (!args)
-		return (NULL);
+	node->commands = ft_gcmalloc(CAT_ARGS, sizeof(char *) * (argc + 1));
+	if (!node->commands)
+		return (1);
 	i = 0;
 	while (*line && i < argc)
-		args[i++] = extract_arg(&line);
-	args[i] = NULL;
-	return (args);
+	{
+		arg = extract_arg(&line);
+		if (ft_strcmp(arg, "<") == 0)
+		{
+			node->infile = 1;
+			node->infile_name = extract_arg(&line);
+		} else if (ft_strcmp(arg, ">") == 0)
+		{
+			node->outfile = 1;
+			node->outfile_name = extract_arg(&line);
+		}
+		else if (ft_strcmp(arg, ">>") == 0)
+		{
+			node->append = 1;
+			node->outfile_name = extract_arg(&line);
+		}
+		else if (ft_strcmp(arg, "<<") == 0)
+			node->heredoc = 1;
+		else
+			node->commands[i++] = arg; // Store the argument in the commands array
+	}
+	if ((node->infile && !node->infile_name)
+		|| (node->outfile && !node->outfile_name)
+		|| (node->append && !node->outfile_name))
+	{
+		ft_print_error("minishell: syntax error near unexpected token `newline'\n");
+		node->commands = NULL;
+		return (1);
+	}
+	while (i < argc)
+		node->commands[i++] = NULL;
+	return (0);
 }

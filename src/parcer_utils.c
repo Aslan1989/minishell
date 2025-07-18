@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/15 23:31:02 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 14:10:13 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,8 @@ char	*extract_arg(const char **line)
 	start = *line;
 	len = calc_arg_len(line);
 	// arg = malloc(len + 1);
+	if (len <= 0)
+		return (NULL);
 	arg = ft_gcmalloc(CAT_ARGS, len + 1);
 	if (!arg)
 		return (NULL);

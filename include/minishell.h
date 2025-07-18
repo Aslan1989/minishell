@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 00:34:39 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 14:05:42 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,12 @@ struct s_cmd
 	// char	*value;
 	t_cmd	*next_a;
 	t_cmd	*next_b;
+	int		infile;
+	char	*infile_name;
+	int		outfile;
+	char	*outfile_name;
+	int		append;
+	int		heredoc;
 	char	**commands;
 	char	*path;
 	t_cmd	*parent;
@@ -121,7 +127,8 @@ int		built_unset(t_shell *shell, char **args);
 int		built_env(t_shell *shell);
 int		built_exit(char **args);
 
-char	**parse_input(const char *line);
+// char	**parse_input(const char *line);
+int		parse_input(t_cmd *node, const char *line);
 
 int		execute_command(t_shell *shell, char **args);
 int		handle_command(char **args);
@@ -131,6 +138,9 @@ char	**copy_env(char **envp);
 void	free_env(char **envp);
 
 char	*find_executable(t_shell *shell, const char *cmd);
+
+//errors
+int		ft_print_error(char *msg);
 
 //parcer_utils
 int		count_args(const char *line);

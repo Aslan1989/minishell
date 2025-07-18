@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 01:49:42 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/18 14:28:54 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,11 @@ int execute_command(t_shell *shell, char **args)
 		path = find_executable(shell, args[0]); // Try to find it in $PATH
 	if (!path)
 	{
-		write(2, "minishell: command not found: ", 30);
-		write(2, args[0], ft_strlen(args[0]));
+		// write(2, "minishell: command not found: ", 30);
+		// write(2, args[0], ft_strlen(args[0]));
+		// write(2, "\n", 1);
+		ft_print_error("minishell: command not found: ");
+		ft_print_error(args[0]);
 		write(2, "\n", 1);
 		return 127; // Standard "command not found" return code
 	}
@@ -103,6 +106,14 @@ int handle_command(char **args)
 	return execute_command(shell, args);
 }
 
+static void run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
+{
+	dup2(fd, dup_fd);
+	close(p_fd[0]);
+	close(p_fd[1]);
+	exit(ft_run_commands(command));
+}
+
 static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 {
 	int p_fd[2];
@@ -117,22 +128,12 @@ static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 	if (pid_a < 0)
 		return (perror("fork"), close(p_fd[0]), close(p_fd[1]), 1);
 	if (pid_a == 0)
-	{
-		dup2(p_fd[1], STDOUT_FILENO);
-		close(p_fd[0]);
-		close(p_fd[1]);
-		exit(ft_run_commands(command_1));
-	}
+		run_child_process(p_fd[1], p_fd, command_1, STDOUT_FILENO);
 	pid_b = fork();
 	if (pid_b < 0)
 		return (perror("fork"), close(p_fd[0]), close(p_fd[1]), 1);
 	if (pid_b == 0)
-	{
-		dup2(p_fd[0], STDIN_FILENO);
-		close(p_fd[0]);
-		close(p_fd[1]);
-		exit(ft_run_commands(command_2));
-	}
+		run_child_process(p_fd[0], p_fd, command_2, STDIN_FILENO);
 	close(p_fd[1]);
 	close(p_fd[0]);
 	waitpid(pid_a, &status_a, 0);
