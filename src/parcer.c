@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 17:42:44 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/22 18:05:22 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,14 +66,17 @@ int	parse_input(t_cmd *node, const char *line)
 		if (ft_strcmp(arg, "<") == 0)
 		{
 			node->infile = 1;
+			// printf(COLOR_R"infile: %s\n"COLOR_X, arg);
 			node->infile_name = extract_arg(&line);
 		} else if (ft_strcmp(arg, ">") == 0)
 		{
 			node->outfile = 1;
+			// printf(COLOR_R"outfile: %s\n"COLOR_X, arg);
 			node->outfile_name = extract_arg(&line);
 		}
 		else if (ft_strcmp(arg, ">>") == 0)
 		{
+			node->outfile = 1;
 			node->append = 1;
 			node->outfile_name = extract_arg(&line);
 		}
@@ -84,8 +87,7 @@ int	parse_input(t_cmd *node, const char *line)
 		// printf(COLOR_G"arg[%d]: %s\n"COLOR_X, i, arg);
 	}
 	if ((node->infile && !node->infile_name)
-		|| (node->outfile && !node->outfile_name)
-		|| (node->append && !node->outfile_name))
+		|| (node->outfile && !node->outfile_name))
 	{
 		ft_print_error("minishell: syntax error near unexpected token `newline'\n");
 		node->commands = NULL;

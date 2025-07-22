@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 11:20:16 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/15 23:24:26 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/22 19:36:10 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,15 +60,17 @@ char	**copy_env(char **envp)
  */
 void	free_env(char **envp)
 {
-	int	i;
+	(void)envp; // Avoid unused parameter warning
+	// int	i;
 
-	i = 0;
-	if (!envp)
-		return;
-	while (envp[i])
-	{
-		free(envp[i]); // Free each string
-		i++;
-	}
-	free(envp); // Finally, free the array of pointers
+	// i = 0;
+	// if (!envp)
+	// 	return;
+	// while (envp[i])
+	// {
+	// 	free(envp[i]); // Free each string
+	// 	i++;
+	// }
+	// free(envp); // Finally, free the array of pointers
+	free_gc_cat(CAT_ENV); // Free all environment variables in garbage collector
 }

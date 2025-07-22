@@ -6,13 +6,13 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 18:00:09 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/22 19:12:23 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void setup_redirections(t_cmd *command)
+void	setup_redirections(t_cmd *command)
 {
 	int	in_fd;
 	int	out_fd;
@@ -32,6 +32,7 @@ static void setup_redirections(t_cmd *command)
 	}
 	if (command->outfile && command->outfile_name)
 	{
+		// printf(COLOR_R"outfile: %s\n"COLOR_X, command->outfile_name);
 		if (command->append)
 			out_fd = open(command->outfile_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
 		else
@@ -67,43 +68,57 @@ int execute_command(t_cmd *command, t_shell *shell, char **args)
 	// Check if the command is directly executable
 	if (!args || !args[0])
 		return 1;
-	if (access(args[0], X_OK) == 0)
-		path = ft_gcstrdup(CAT_ARGS, args[0]); // Command has absolute/relative path
-	else
-		path = find_executable(shell, args[0]); // Try to find it in $PATH
-	if (!path)
+	path = NULL;
+	if (!command->isbuiltin)
 	{
-		// write(2, "minishell: command not found: ", 30);
-		// write(2, args[0], ft_strlen(args[0]));
-		// write(2, "\n", 1);
-		ft_print_error("minishell: command not found: ");
-		ft_print_error(args[0]);
-		ft_print_error("\n");
-		return 127; // Standard "command not found" return code
+		if (access(args[0], X_OK) == 0)
+			path = ft_gcstrdup(CAT_ARGS, args[0]); // Command has absolute/relative path
+		else
+			path = find_executable(shell, args[0]); // Try to find it in $PATH
+		if (!path)
+		{
+			ft_print_error("minishell: command not found: ");
+			ft_print_error(args[0]);
+			ft_print_error("\n");
+			return 127; // Standard "command not found" return code
+		}
 	}
 	pid = fork(); // Create a child process
 	if (pid == -1)
 	{
 		perror("fork");
-		free(path);
+		if (path)
+			free(path);
 		return 1;
 	}
 	else if (pid == 0)
 	{
-
 		setup_redirections(command);
-		// Child process: execute the command
-		execve(path, args, shell->envp); // Use your own environment
-		perror("execve failed");
+		if (!command->isbuiltin)
+		{
+			execve(path, args, shell->envp);
+			perror("execve failed");
+		}
+		else
+		{
+			if (!ft_strcmp(args[0], "echo"))
+				built_echo(args);
+			else if (!ft_strcmp(args[0], "pwd"))
+				built_pwd();
+			else if (!ft_strcmp(args[0], "env"))
+				built_env(shell);
+			free_gc();
+			clear_history();
+			exit(0);// Exit child process after running built-in
+		}
 		exit(1);
 	}
 	else
 	{
-		// Parent process: wait for child to finish
-		// printf("waiting for child %d\n", pid);
 		waitpid(pid, &status, 0);
-		free(path);
-		return WEXITSTATUS(status); // Return child's exit code
+		if (path)
+			free(path);
+		return WEXITSTATUS(status);
 	}
 	return (status);
 }
@@ -126,22 +141,18 @@ static int handle_command(t_cmd *command, char **args)
 	shell = get_shell(); // Get the current shell state
 	if (!args || !args[0])
 		return 0;
-	if (!ft_strcmp(args[0], "echo"))
-		return built_echo(args);
-	else if (!ft_strcmp(args[0], "cd"))
+	if (!ft_strcmp(args[0], "cd"))
 		return built_cd(args);
-	else if (!ft_strcmp(args[0], "pwd"))
-		return built_pwd();
 	else if (!ft_strcmp(args[0], "export"))
 		return built_export(shell, args);
 	else if (!ft_strcmp(args[0], "unset"))
 		return built_unset(shell, args);
-	else if (!ft_strcmp(args[0], "env"))
-		return built_env(shell);
 	else if (!ft_strcmp(args[0], "exit"))
-		built_exit(args);
-	// If it's not a built-in command, try executing it from disk
-	return execute_command(command, shell, args);
+		built_exit();
+	else if (ft_strcmp(args[0], "env") == 0
+		|| ft_strcmp(args[0], "echo") == 0 || ft_strcmp(args[0], "pwd") == 0)
+		command->isbuiltin = 1;
+	return (execute_command(command, shell, args));
 }
 
 static void run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)

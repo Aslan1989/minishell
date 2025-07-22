@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   built_unset.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:37:05 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/08 13:46:07 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/22 19:33:08 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int built_unset(t_shell *shell, char **args)
 		// Count how many env variables exist
 		while (shell->envp[count])
 			count++;
-		new_env = malloc(sizeof(char *) * count); // New env without 1 var
+		new_env = ft_gcmalloc(CAT_ENV, sizeof(char *) * count); // New env without 1 var
 		if (!new_env)
 			return 1;
 		j = 0; // index for old envp
@@ -54,14 +54,14 @@ int built_unset(t_shell *shell, char **args)
 			// If variable matches the key and has '=' immediately after
 			if (!ft_strncmp(shell->envp[j], key, key_len) && \
 			shell->envp[j][key_len] == '=')
-				free(shell->envp[j]); // Match found – free and skip this entry
+				ft_gcfree(CAT_ENV, shell->envp[j]); // Match found – free and skip this entry
 			else
 				new_env[k++] = shell->envp[j]; // Keep this variable
 			j++;
 		}
 		new_env[k] = NULL;
 		// Replace the old environment with the new one
-		free(shell->envp);
+		ft_gcfree(CAT_ENV, shell->envp);
 		shell->envp = new_env;
 		i++; // Move to next key
 	}

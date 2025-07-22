@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:55:49 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/16 14:08:34 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/22 19:35:22 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,34 @@ void	free_gc(void)
 	{
 		free_gc_cat(i);
 		i++;
+	}
+}
+
+void	ft_gcfree(e_gccat cat, void *ptr)
+{
+	t_garbage **gc_list;
+	t_garbage *cur;
+	t_garbage *prev;
+
+	gc_list = get_gc(cat);
+	if (!gc_list || !*gc_list || !ptr)
+		return ;
+	cur = *gc_list;
+	prev = NULL;
+	while (cur)
+	{
+		if (cur->ptr == ptr)
+		{
+			if (prev)
+				prev->next = cur->next;
+			else
+				*gc_list = cur->next;
+			free(cur->ptr);
+			free(cur);
+			return ;
+		}
+		prev = cur;
+		cur = cur->next;
 	}
 }
 

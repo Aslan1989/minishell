@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/18 13:46:46 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/22 16:05:06 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ static t_cmd *add_node(t_token *token, t_cmd *next_a, t_cmd *next_b)
 	node->token = token;
 	node->next_a = next_a;
 	node->next_b = next_b;
+	node->isbuiltin = 0;
 	node->infile = 0;
 	node->infile_name = NULL;
 	node->outfile = 0;

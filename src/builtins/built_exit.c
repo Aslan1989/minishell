@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:36:40 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/16 00:06:19 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/22 16:16:11 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,8 @@
  * @example
  *   exit → closes the minishell
  */
-int built_exit(char **args)
+int built_exit(void)
 {
-	(void)args; // Ignore arguments, as we don't handle them in this version
 	//ft_free_split(args);
 	// free_gc_cat(CAT_ARGS);
 	// free_gc_cat(CAT_ENV);

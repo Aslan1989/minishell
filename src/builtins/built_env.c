@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   built_env.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:35:02 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/08 13:48:41 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/22 18:09:53 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int built_env(t_shell *shell)
 		return 1;
 	while(shell->envp[i])
 	{
-		printf("%s\n", shell->envp[i]);
+		ft_printf("%s\n", shell->envp[i]);
 		i++;
 	}
 	return 0;

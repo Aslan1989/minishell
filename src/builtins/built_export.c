@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   built_export.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:37:58 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/08 13:42:18 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/22 19:15:07 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,9 @@ static char *make_env_string(const char *key, const char *value)
 
 	key_len = ft_strlen(key);
 	val_len = ft_strlen(value);
-	env_str = malloc(key_len + val_len + 2); // +1 for '=' and +1 for '\0'
+	// env_str = malloc(key_len + val_len + 2); // +1 for '=' and +1 for '\0'
+
+	env_str = ft_gcmalloc(CAT_ENV, key_len + val_len + 2);
 	i = 0;
 	j = 0;
 	if (!env_str)
@@ -70,7 +72,8 @@ static int replace_env_var(char **envp, const char *key, const char *value)
 	{
 		if (!ft_strncmp(envp[i], key, len) && envp[i][len] == '=')
 		{
-			free(envp[i]);
+			// free(envp[i]);
+			ft_gcfree(CAT_ENV, envp[i]);
 			envp[i] = make_env_string(key, value); // key=value
 			return 1;
 		}
@@ -101,7 +104,8 @@ static int add_env_var(t_shell *shell, const char *key, const char *value)
 	while (shell->envp[count])
 		count++;
 	// Allocate space for old + new + NULL
-	new_env = malloc(sizeof(char *) * (count + 2));
+	// new_env = malloc(sizeof(char *) * (count + 2));
+	new_env = ft_gcmalloc(CAT_ENV, sizeof(char *) * (count + 2));
 	if (!new_env)
 		return (1);
 	// Copy old values
@@ -115,7 +119,7 @@ static int add_env_var(t_shell *shell, const char *key, const char *value)
 	new_env[count] = make_env_string(key, value); // e.g., "USER=student"
 	new_env[count + 1] = NULL;
 	// Free the old pointer to the array (but not strings — they are moved)
-	free(shell->envp);
+	ft_gcfree(CAT_ENV, shell->envp);
 	shell->envp = new_env;
 	return (0);
 }

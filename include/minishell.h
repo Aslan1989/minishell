@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 17:49:59 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/22 18:37:24 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ struct s_cmd
 	// char	*value;
 	t_cmd	*next_a;
 	t_cmd	*next_b;
+	int		isbuiltin;
 	int		infile;
 	char	*infile_name;
 	int		outfile;
@@ -126,7 +127,7 @@ int		built_pwd(void);
 int		built_export(t_shell *shell, char **args);
 int		built_unset(t_shell *shell, char **args);
 int		built_env(t_shell *shell);
-int		built_exit(char **args);
+int		built_exit(void);
 
 // char	**parse_input(const char *line);
 int		parse_input(t_cmd *node, const char *line);
@@ -157,11 +158,13 @@ t_shell	*get_shell(void);
 //commands
 void	ft_generate_commands(char *line, t_cmd **comms);
 t_cmd	*ft_parse_tokens(t_token **tokens);
+void	setup_redirections(t_cmd *command);
 
 //our malloc and garbage collector
 t_garbage	**get_gc(e_gccat cat);
 void		free_gc_cat(e_gccat cat);
 void		free_gc(void);
+void		ft_gcfree(e_gccat cat, void *ptr);
 void		*ft_gcmalloc(e_gccat cat, ssize_t size);
 char		*ft_gcstrdup(e_gccat cat, char *src);
 char		*ft_gcstrndup(e_gccat cat, char *src, ssize_t n);
