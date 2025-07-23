@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/23 17:09:19 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/23 18:51:52 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@
 # include <limits.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+
+# include <glob.h>
 
 // DELETE!!
 # include <linux/limits.h>
@@ -168,8 +170,9 @@ char	*extract_arg(const char **line);
 int		ft_free_split(char **env);
 t_shell	*get_shell(void);
 
-//pipes utils
+//additional lib
 // char	**ft_split_pipes(char *str, char div);
+char	*ft_strpbrk(const char *s, const char *accept);
 
 //commands
 void	ft_generate_commands(char *line, t_cmd **comms);
@@ -177,6 +180,7 @@ t_cmd	*ft_parse_tokens(t_token **tokens);
 void	setup_redirections(t_cmd *command);
 int		ft_here_doc_input(char *limiter);
 int		ft_redir_add(t_cmd *cmd, e_redir type, char *filename);
+char	**ft_expand_wildcards(char **args);
 
 //our malloc and garbage collector
 t_garbage	**get_gc(e_gccat cat);
@@ -184,6 +188,7 @@ void		free_gc_cat(e_gccat cat);
 void		free_gc(void);
 void		ft_gcfree(e_gccat cat, void *ptr);
 void		*ft_gcmalloc(e_gccat cat, ssize_t size);
+void		*ft_gcrealloc(e_gccat cat, void *ptr, ssize_t size);
 char		*ft_gcstrdup(e_gccat cat, char *src);
 char		*ft_gcstrndup(e_gccat cat, char *src, ssize_t n);
 

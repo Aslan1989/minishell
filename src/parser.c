@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/23 16:51:37 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/23 19:06:32 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,51 @@
 // 	return (0);
 // }
 
+
+
+char	**ft_expand_wildcards(char **args)
+{
+	glob_t	globbuf;
+	char	**result;
+	int		count;
+	int		i;
+	size_t	j;
+
+	result = NULL;
+	i = 0;
+	count = 0;
+	while (args[i])
+	{
+		if (ft_strpbrk(args[i], "*?[") == NULL)
+		{
+			result = (char **)ft_gcrealloc(CAT_ARGS, result, sizeof(char*) * (count + 2));
+			result[count++] = ft_gcstrdup(CAT_ARGS, args[i]);
+		}
+		else
+		{
+			if (glob(args[i], 0, NULL, &globbuf) == 0)
+			{
+				j = 0;
+				while (j < globbuf.gl_pathc)
+				{
+					result = (char **)ft_gcrealloc(CAT_ARGS, result, sizeof(char*) * (count + 2));
+					result[count++] = ft_gcstrdup(CAT_ARGS, globbuf.gl_pathv[j]);
+					j++;
+				}
+			}
+			else
+			{
+				result = (char **)ft_gcrealloc(CAT_ARGS, result, sizeof(char*) * (count + 2));
+				result[count++] = ft_gcstrdup(CAT_ARGS, args[i]);
+			}
+			globfree(&globbuf);
+		}
+		i++;
+	}
+	result[count] = NULL;
+	return result;
+}
+
 int	parse_input(t_cmd *node, const char *line)
 {
 	int		argc;
@@ -135,5 +180,6 @@ int	parse_input(t_cmd *node, const char *line)
 	node->commands[i] = NULL;
 	while (i <= argc)
 		node->commands[i++] = NULL;
+	node->commands = ft_expand_wildcards(node->commands);
 	return (0);
 }

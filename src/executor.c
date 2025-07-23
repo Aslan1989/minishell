@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/23 17:33:54 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/23 18:22:04 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ int execute_command(t_cmd *command, t_shell *shell, char **args)
 	}
 	else if (pid == 0)
 	{
+
 		setup_redirections(command);
 		if (!command->isbuiltin)
 		{
