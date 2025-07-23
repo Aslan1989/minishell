@@ -6,44 +6,69 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/22 19:12:23 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/23 17:33:54 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	setup_redirections(t_cmd *command)
+void close_if_opened(int fd)
 {
-	int	in_fd;
-	int	out_fd;
+	if (fd >= 0)
+		close(fd);
+}
 
-	in_fd = -1;
-	out_fd = -1;
-	if (command->infile && command->infile_name)
+void close_with_error(char *msg)
+{
+	perror(msg);
+	exit(1);
+}
+
+void	setup_redirections(t_cmd *cmd)
+{	t_redir *current;
+
+	current = cmd->redir;
+	while (current)
 	{
-		in_fd = open(command->infile_name, O_RDONLY);
-		if (in_fd < 0)
+		if (current->type == REDIR_IN)
 		{
-			perror(command->infile_name);
-			exit (1);
+			close_if_opened(cmd->fd_in);
+			cmd->fd_in = open(current->value, O_RDONLY);
+			if (cmd->fd_in < 0)
+				close_with_error(current->value);
 		}
-		dup2(in_fd, STDIN_FILENO);
-		close(in_fd);
+		else if (current->type == REDIR_OUT)
+		{
+			close_if_opened(cmd->fd_out);
+			cmd->fd_out = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (cmd->fd_out < 0)
+				close_with_error(current->value);
+		}
+		else if (current->type == REDIR_APPEND)
+		{
+			close_if_opened(cmd->fd_out);
+			cmd->fd_out = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (cmd->fd_out < 0)
+				close_with_error(current->value);
+		}
+		else if (current->type == REDIR_HEREDOC)
+		{
+			close_if_opened(cmd->fd_in);
+			cmd->fd_in = current->fd; // Store heredoc fd
+		}
+		current = current->next;
 	}
-	if (command->outfile && command->outfile_name)
+	if (cmd->fd_in >= 0)
 	{
-		// printf(COLOR_R"outfile: %s\n"COLOR_X, command->outfile_name);
-		if (command->append)
-			out_fd = open(command->outfile_name, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		else
-			out_fd = open(command->outfile_name, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (out_fd < 0)
-		{
-			perror(command->outfile_name);
-			exit (1);
-		}
-		dup2(out_fd, STDOUT_FILENO);
-		close(out_fd);
+		if (dup2(cmd->fd_in, STDIN_FILENO) < 0)
+			close_with_error("dup2 failed for STDIN");
+		close(cmd->fd_in);
+	}
+	if (cmd->fd_out >= 0)
+	{
+		if (dup2(cmd->fd_out, STDOUT_FILENO) < 0)
+			close_with_error("dup2 failed for STDOUT");
+		close(cmd->fd_out);
 	}
 }
 

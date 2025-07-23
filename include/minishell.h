@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/22 18:37:24 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/23 17:09:19 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,15 @@
 # include <string.h>
 # include "libft.h"
 # include "ft_printf.h"
+# include "get_next_line.h"
 # include <termios.h>
 # include <errno.h>
 # include <limits.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+
+// DELETE!!
+# include <linux/limits.h>
 
 
 # define COLOR_R "\033[31m"
@@ -59,9 +63,24 @@ typedef enum {
 	CAT_MAX
 }	e_gccat;
 
+typedef enum {
+	REDIR_IN = 0, // Input redirection
+	REDIR_OUT = 1, // Output redirection
+	REDIR_APPEND = 2, // Append to output file
+	REDIR_HEREDOC = 3 // Here document input
+}	e_redir;
+
+typedef struct s_redir	t_redir;
 typedef struct s_garbage	t_garbage;
 typedef struct s_cmd	t_cmd;
 typedef struct s_token	t_token;
+
+struct s_redir {
+	int		type; // 0 for input, 1 for output, 2 for append, 3 for heredoc
+	char	*value;
+	int		fd; // File descriptor for the redirection
+	t_redir	*next; // Pointer to the next redirection in the list
+};
 
 struct s_garbage {
 	void				*ptr; // Pointer to the allocated memory
@@ -96,12 +115,9 @@ struct s_cmd
 	t_cmd	*next_a;
 	t_cmd	*next_b;
 	int		isbuiltin;
-	int		infile;
-	char	*infile_name;
-	int		outfile;
-	char	*outfile_name;
-	int		append;
-	int		heredoc;
+	t_redir	*redir; // List of redirections (input, output, append, heredoc)
+	int		fd_in;
+	int		fd_out;
 	char	**commands;
 	char	*path;
 	t_cmd	*parent;
@@ -159,6 +175,8 @@ t_shell	*get_shell(void);
 void	ft_generate_commands(char *line, t_cmd **comms);
 t_cmd	*ft_parse_tokens(t_token **tokens);
 void	setup_redirections(t_cmd *command);
+int		ft_here_doc_input(char *limiter);
+int		ft_redir_add(t_cmd *cmd, e_redir type, char *filename);
 
 //our malloc and garbage collector
 t_garbage	**get_gc(e_gccat cat);
