@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 13:48:05 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/24 13:31:31 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 14:19:00 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ int	ft_here_doc_input(char *limiter)
  * (e.g., file name / limiter).
  * @return int 0 on success, 1 on error.
  */
-int	ft_redir_add(t_cmd *cmd, e_redir type, char *next_token)
+int	ft_redir_add(t_cmd *cmd, t_eredir type, char *next_token)
 {
 	t_redir	*new_redir;
 	t_redir	*last;

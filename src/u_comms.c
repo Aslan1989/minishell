@@ -6,13 +6,13 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/24 11:52:17 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 14:17:27 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static t_token	*new_token(e_token type, const char *value)
+static t_token	*new_token(t_etoken type, const char *value)
 {
 	t_token	*tok;
 
@@ -26,7 +26,7 @@ static t_token	*new_token(e_token type, const char *value)
 	return (tok);
 }
 
-static int	add_token(t_token **head, e_token type, const char *value, int inc)
+static int	add_token(t_token **head, t_etoken type, const char *value, int inc)
 {
 	t_token	*last;
 	t_token	*new_tok;

@@ -6,13 +6,13 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:55:49 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/24 11:47:04 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 14:20:33 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_garbage	**get_gc(e_gccat cat)
+t_garbage	**get_gc(t_egccat cat)
 {
 	static t_garbage	*gc[CAT_MAX];
 
@@ -45,7 +45,7 @@ t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr)
 	return (new_node);
 }
 
-void	free_gc_cat(e_gccat cat)
+void	free_gc_cat(t_egccat cat)
 {
 	t_garbage	*current;
 	t_garbage	*next;

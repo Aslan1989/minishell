@@ -6,13 +6,13 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:55:49 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/24 11:45:54 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 14:20:29 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	*ft_gcmalloc(e_gccat cat, ssize_t size)
+void	*ft_gcmalloc(t_egccat cat, ssize_t size)
 {
 	void		*ptr;
 	t_garbage	*new_node;
@@ -31,7 +31,7 @@ void	*ft_gcmalloc(e_gccat cat, ssize_t size)
 	return (ptr);
 }
 
-void	*ft_gcrealloc(e_gccat cat, void *ptr, ssize_t size)
+void	*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size)
 {
 	void	*new_ptr;
 
@@ -47,7 +47,7 @@ void	*ft_gcrealloc(e_gccat cat, void *ptr, ssize_t size)
 	return (new_ptr);
 }
 
-void	ft_gcfree(e_gccat cat, void *ptr)
+void	ft_gcfree(t_egccat cat, void *ptr)
 {
 	t_garbage	**gc_list;
 	t_garbage	*cur;
@@ -75,7 +75,7 @@ void	ft_gcfree(e_gccat cat, void *ptr)
 	}
 }
 
-char	*ft_gcstrdup(e_gccat cat, char *src)
+char	*ft_gcstrdup(t_egccat cat, char *src)
 {
 	int		i;
 	char	*copy;
@@ -100,7 +100,7 @@ char	*ft_gcstrdup(e_gccat cat, char *src)
 	return (copy);
 }
 
-char	*ft_gcstrndup(e_gccat cat, char *src, ssize_t n)
+char	*ft_gcstrndup(t_egccat cat, char *src, ssize_t n)
 {
 	int		i;
 	char	*copy;
