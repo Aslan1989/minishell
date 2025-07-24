@@ -6,7 +6,7 @@
 #    By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/04 12:19:44 by aisaev            #+#    #+#              #
-#    Updated: 2025/07/24 13:46:08 by psmolin          ###   ########.fr        #
+#    Updated: 2025/07/24 14:59:25 by psmolin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,6 +40,7 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)builtins/built_pwd.c \
 	$(SRC_DIR)executor.c \
 	$(SRC_DIR)find_executable.c \
+	$(SRC_DIR)u_avas.c \
 	$(SRC_DIR)u_comms.c \
 	$(SRC_DIR)u_env.c \
 	$(SRC_DIR)u_error.c \

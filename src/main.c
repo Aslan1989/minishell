@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:20:42 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 18:00:27 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 15:00:45 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int main(int argc, char **argv, char **envp)
 	t_shell	*shell; // Custom struct holding shell state
 	t_cmd	*comms;
 
+	ft_print_banner();
 	(void)argc; // Marking unused parameters to avoid warnings
 	(void)argv;
 	comms = NULL;

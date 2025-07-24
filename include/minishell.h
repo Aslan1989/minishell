@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/24 14:23:07 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 14:59:57 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,5 +200,7 @@ void		*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size);
 char		*ft_gcstrdup(t_egccat cat, char *src);
 char		*ft_gcstrndup(t_egccat cat, char *src, ssize_t n);
 t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr);
+
+void		ft_print_banner(void);
 
 #endif
