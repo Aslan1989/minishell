@@ -6,17 +6,27 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 13:48:05 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/23 17:12:24 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 13:31:31 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int ft_redir_check_next(char *next_token)
+/**
+ * @brief Checks if the next token is a valid redirection target.
+ *
+ * This function checks if the next token is a valid file name or
+ * redirection operator. If not, it prints an error message and returns 1.
+ *
+ * @param next_token The next token to check.
+ * @return int 0 if valid, 1 if invalid.
+ */
+int	ft_redir_check_next(char *next_token)
 {
 	if (!next_token || !*next_token)
 	{
-		ft_print_error("minishell: syntax error near unexpected token `newline'");
+		ft_print_error("minishell: syntax error near \
+				unexpected token `newline'");
 		return (1);
 	}
 	if (ft_strcmp(next_token, "<") == 0
@@ -33,6 +43,16 @@ int ft_redir_check_next(char *next_token)
 	return (0);
 }
 
+/**
+ * @brief Handles input for a heredoc redirection.
+ *
+ * This function reads lines from standard input until it encounters
+ * a line that matches the specified delimiter. It writes the input to a
+ * pipe, which can be used as input for a command.
+ *
+ * @param limiter The delimiter to stop reading input.
+ * @return int The file descriptor of the pipe that contains the heredoc input.
+ */
 int	ft_here_doc_input(char *limiter)
 {
 	int		pipe_fd[2];
@@ -62,10 +82,24 @@ int	ft_here_doc_input(char *limiter)
 	return (pipe_fd[0]);
 }
 
+/**
+ * @brief Adds a redirection to the command's redirection list.
+ *
+ * This function creates a new redirection node and adds it to the end of the
+ * command's redirection list. It handles different types of redirections
+ * (input, output, append, heredoc).
+ *
+ * @param cmd The command structure to which the redirection will be added.
+ * @param type The type of redirection (REDIR_IN, REDIR_OUT,
+ * REDIR_APPEND, REDIR_HEREDOC).
+ * @param next_token The token value for the redirection
+ * (e.g., file name / limiter).
+ * @return int 0 on success, 1 on error.
+ */
 int	ft_redir_add(t_cmd *cmd, e_redir type, char *next_token)
 {
-	t_redir *new_redir;
-	t_redir *last;
+	t_redir	*new_redir;
+	t_redir	*last;
 
 	if (!cmd || ft_redir_check_next(next_token))
 		return (1);

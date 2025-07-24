@@ -1,34 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parcer_utils.c                                     :+:      :+:    :+:   */
+/*   u_parse4.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/18 14:10:13 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 12:07:45 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-// static void	skip_quotes(const char **line, int *in_quote, char *quote)
-// {
-// 	while (*line && (!isspace(**line) || *in_quote))
-// 	{
-// 		if ((**line == '\'' || **line == '"') && !*in_quote)
-// 		{
-// 			*in_quote = 1;
-// 			*quote = **line;
-// 		}
-// 		else if (**line == *quote && *in_quote)
-// 		{
-// 			*in_quote = 0;
-// 			*quote = 0;
-// 		}
-// 		(*line)++;
-// 	}
-// }
 
 /**
  * @brief Counts the number of arguments in the input line.
@@ -42,24 +24,6 @@
  */
 int	count_args(const char *line)
 {
-	// int		count;
-	// int		in_quote;
-	// char	quote;
-
-	// count = 0;
-	// in_quote = 0;
-	// quote = 0;
-	// while (*line)
-	// {
-	// 	while (ft_isspace(*line))
-	// 		line++;
-	// 	if (*line == '\0')
-	// 		break ;
-	// 	count++;
-	// 	skip_quotes(&line, &in_quote, &quote);
-	// }
-	// return (count);
-
 	int	count;
 	int	in_word;
 	int	quote;
@@ -122,7 +86,8 @@ static int	calc_arg_len(const char **line)
  *
  * @param start Pointer to the start of the argument in the input line.
  * @param len Length of the argument to copy.
- * @param arg Pointer to the destination string where the argument will be copied.
+ * @param arg Pointer to the destination string where the argument will
+ * be copied.
  * @return char* Pointer to the copied argument string (unquoted).
  */
 static char	*copy_arg(const char *start, int len, char *arg)
@@ -176,7 +141,6 @@ char	*extract_arg(const char **line)
 		(*line)++;
 	start = *line;
 	len = calc_arg_len(line);
-	// arg = malloc(len + 1);
 	if (len <= 0)
 		return (NULL);
 	arg = ft_gcmalloc(CAT_ARGS, len + 1);

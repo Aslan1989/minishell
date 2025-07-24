@@ -6,83 +6,52 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:55:49 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/23 19:06:03 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 11:45:54 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr)
+void	*ft_gcmalloc(e_gccat cat, ssize_t size)
 {
-	t_garbage	*last;
+	void		*ptr;
 	t_garbage	*new_node;
 
-	if (!lst || !ptr)
+	if (cat < 0 || cat > CAT_MAX || size <= 0)
 		return (NULL);
-	new_node = malloc(sizeof(t_garbage));
+	ptr = malloc(size);
+	if (!ptr)
+		return (NULL);
+	new_node = ft_gc_addback(get_gc(cat), ptr);
 	if (!new_node)
+	{
+		free(ptr);
 		return (NULL);
-	new_node->ptr = ptr;
-	new_node->next = NULL;
-	if (*lst == NULL)
-	{
-		*lst = new_node;
-		return (new_node);
 	}
-	last = *lst;
-	while (last->next)
-		last = last->next;
-	last->next = new_node;
-	return (new_node);
+	return (ptr);
 }
 
-t_garbage **get_gc(e_gccat cat)
+void	*ft_gcrealloc(e_gccat cat, void *ptr, ssize_t size)
 {
-	static t_garbage *gc[CAT_MAX];
+	void	*new_ptr;
 
-	if (cat < 0 || cat > CAT_MAX)
+	if (cat < 0 || cat > CAT_MAX || size <= 0)
 		return (NULL);
-	return (&gc[cat]);
-}
-
-void	free_gc_cat(e_gccat cat)
-{
-	t_garbage *current;
-	t_garbage *next;
-	t_garbage **gc_list;
-
-	gc_list = get_gc(cat);
-	if (!gc_list || !*gc_list)
-		return ;
-	current = *gc_list;
-	while (current)
-	{
-		next = current->next;
-		if (current->ptr)
-			free(current->ptr);
-		free(current);
-		current = next;
-	}
-	*gc_list = NULL; // Clear the garbage collector for this category
-}
-
-void	free_gc(void)
-{
-	int i;
-
-	i = 0;
-	while (i < CAT_MAX)
-	{
-		free_gc_cat(i);
-		i++;
-	}
+	if (!ptr)
+		return (ft_gcmalloc(cat, size));
+	new_ptr = ft_gcmalloc(cat, size);
+	if (!new_ptr)
+		return (NULL);
+	ft_memcpy(new_ptr, ptr, size);
+	ft_gcfree(cat, ptr);
+	return (new_ptr);
 }
 
 void	ft_gcfree(e_gccat cat, void *ptr)
 {
-	t_garbage **gc_list;
-	t_garbage *cur;
-	t_garbage *prev;
+	t_garbage	**gc_list;
+	t_garbage	*cur;
+	t_garbage	*prev;
 
 	gc_list = get_gc(cat);
 	if (!gc_list || !*gc_list || !ptr)
@@ -151,39 +120,4 @@ char	*ft_gcstrndup(e_gccat cat, char *src, ssize_t n)
 	}
 	copy[len] = '\0';
 	return (copy);
-}
-
-void	*ft_gcrealloc(e_gccat cat, void *ptr, ssize_t size)
-{
-	void	*new_ptr;
-
-	if (cat < 0 || cat > CAT_MAX || size <= 0)
-		return (NULL);
-	if (!ptr)
-		return (ft_gcmalloc(cat, size));
-	new_ptr = ft_gcmalloc(cat, size);
-	if (!new_ptr)
-		return (NULL);
-	ft_memcpy(new_ptr, ptr, size);
-	ft_gcfree(cat, ptr);
-	return (new_ptr);
-}
-
-void	*ft_gcmalloc(e_gccat cat, ssize_t size)
-{
-	void		*ptr;
-	t_garbage	*new_node;
-
-	if (cat < 0 || cat > CAT_MAX || size <= 0)
-		return (NULL);
-	ptr = malloc(size);
-	if (!ptr)
-		return (NULL);
-	new_node = ft_gc_addback(get_gc(cat), ptr);
-	if (!new_node)
-	{
-		free(ptr);
-		return (NULL);
-	}
-	return (ptr);
 }

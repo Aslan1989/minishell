@@ -6,14 +6,15 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/18 01:05:46 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 11:52:17 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static t_token	*new_token(e_token type, const char *value) {
-	t_token *tok;
+static t_token	*new_token(e_token type, const char *value)
+{
+	t_token	*tok;
 
 	tok = ft_gcmalloc(CAT_TOKEN, sizeof(t_token));
 	if (!tok)
@@ -27,8 +28,8 @@ static t_token	*new_token(e_token type, const char *value) {
 
 static int	add_token(t_token **head, e_token type, const char *value, int inc)
 {
-	t_token *last;
-	t_token *new_tok;
+	t_token	*last;
+	t_token	*new_tok;
 
 	new_tok = new_token(type, value);
 	if (!new_tok)
@@ -42,11 +43,11 @@ static int	add_token(t_token **head, e_token type, const char *value, int inc)
 	while (last->next)
 		last = last->next;
 	last->next = new_tok;
-	new_tok->prev = last; // Set parent to the last token
+	new_tok->prev = last;
 	return (inc);
 }
 
-static void ft_add_word(char **line, t_token **head)
+static void	ft_add_word(char **line, t_token **head)
 {
 	char	*start;
 	char	quote;
@@ -61,7 +62,7 @@ static void ft_add_word(char **line, t_token **head)
 			quote = 0;
 		(*line)++;
 		if (**line == '|' || **line == '&' || **line == '(' || **line == ')')
-			break;
+			break ;
 	}
 	add_token(head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, *line - start), 1);
 }
@@ -76,7 +77,7 @@ static t_token	*ft_tokenize(char *line)
 		while (ft_isspace(*line))
 			line++;
 		if (!*line)
-			break;
+			break ;
 		if (line[0] == '&' && line[1] == '&')
 			line += add_token(&head, TOK_AND, "&&", 2);
 		else if (line[0] == '|' && line[1] == '|')
@@ -94,39 +95,39 @@ static t_token	*ft_tokenize(char *line)
 	return (head);
 }
 
-void	ft_print_tokens_nested(t_cmd *comms, int depth, int branch)
-{
-	t_cmd *current;
-	int i;
+// void	ft_print_tokens_nested(t_cmd *comms, int depth, int branch)
+// {
+// 	t_cmd *current;
+// 	int i;
 
-	current = comms;
-	if (!current)
-		return ;
-	printf(COLOR_G);
-	i = 0;
-	while (i++ < depth - 1)
-		printf("..");
-	if (depth > 0 && branch == 0)
-		printf("-");
-	if (depth > 0 && branch == 1)
-		printf("=");
-	printf("%s\n", current->token->value);
-	ft_print_tokens_nested(current->next_a, depth + 1, 0);
-	ft_print_tokens_nested(current->next_b, depth + 1, 1);
-	printf(COLOR_X);
-}
+// 	current = comms;
+// 	if (!current)
+// 		return ;
+// 	printf(COLOR_G);
+// 	i = 0;
+// 	while (i++ < depth - 1)
+// 		printf("..");
+// 	if (depth > 0 && branch == 0)
+// 		printf("-");
+// 	if (depth > 0 && branch == 1)
+// 		printf("=");
+// 	printf("%s\n", current->token->value);
+// 	ft_print_tokens_nested(current->next_a, depth + 1, 0);
+// 	ft_print_tokens_nested(current->next_b, depth + 1, 1);
+// 	printf(COLOR_X);
+// }
 
-void ft_print_token_list(t_token *head)
-{
-	t_token *current;
+// void	ft_print_token_list(t_token *head)
+// {
+// 	t_token	*current;
 
-	current = head;
-	while (current)
-	{
-		printf(COLOR_Y"%s\n"COLOR_X, current->value);
-		current = current->next;
-	}
-}
+// 	current = head;
+// 	while (current)
+// 	{
+// 		printf(COLOR_Y"%s\n"COLOR_X, current->value);
+// 		current = current->next;
+// 	}
+// }
 
 void	ft_generate_commands(char *line, t_cmd **comms)
 {
@@ -136,8 +137,6 @@ void	ft_generate_commands(char *line, t_cmd **comms)
 	tokens = ft_tokenize(line);
 	if (!tokens)
 		return ;
-	//ft_print_token_list(tokens);
 	ast = ft_parse_tokens(&tokens);
-	//ft_print_tokens_nested(ast, 0, 0);
 	*comms = ast;
 }

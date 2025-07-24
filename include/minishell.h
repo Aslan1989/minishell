@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/23 18:51:52 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 13:51:29 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,11 +113,10 @@ struct s_cmd
 {
 	e_token	type;
 	t_token	*token;
-	// char	*value;
 	t_cmd	*next_a;
 	t_cmd	*next_b;
 	int		isbuiltin;
-	t_redir	*redir; // List of redirections (input, output, append, heredoc)
+	t_redir	*redir;
 	int		fd_in;
 	int		fd_out;
 	char	**commands;
@@ -158,13 +157,21 @@ char	**copy_env(char **envp);
 void	free_env(char **envp);
 
 char	*find_executable(t_shell *shell, const char *cmd);
+void	setup_redirections(t_cmd *cmd);
 
 //errors
 int		ft_print_error(char *msg);
 
-//parcer_utils
+//parser_utils
 int		count_args(const char *line);
 char	*extract_arg(const char **line);
+t_cmd	*parse_or(t_token **current);
+t_cmd	*parse_and(t_token **current);
+t_cmd	*parse_pipe(t_token **current);
+t_cmd	*parse_word(t_token **current);
+e_token	ft_p_check(t_token *current, e_token type);
+t_token	*ft_p_advance(t_token **current);
+t_cmd	*ft_p_add_node(t_token *token, t_cmd *next_a, t_cmd *next_b);
 
 //free utils
 int		ft_free_split(char **env);
@@ -191,5 +198,6 @@ void		*ft_gcmalloc(e_gccat cat, ssize_t size);
 void		*ft_gcrealloc(e_gccat cat, void *ptr, ssize_t size);
 char		*ft_gcstrdup(e_gccat cat, char *src);
 char		*ft_gcstrndup(e_gccat cat, char *src, ssize_t n);
+t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr);
 
 #endif

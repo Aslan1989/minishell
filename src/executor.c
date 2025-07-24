@@ -6,173 +6,37 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/23 18:22:04 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 13:46:54 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void close_if_opened(int fd)
-{
-	if (fd >= 0)
-		close(fd);
-}
-
-void close_with_error(char *msg)
-{
-	perror(msg);
-	exit(1);
-}
-
-void	setup_redirections(t_cmd *cmd)
-{	t_redir *current;
-
-	current = cmd->redir;
-	while (current)
-	{
-		if (current->type == REDIR_IN)
-		{
-			close_if_opened(cmd->fd_in);
-			cmd->fd_in = open(current->value, O_RDONLY);
-			if (cmd->fd_in < 0)
-				close_with_error(current->value);
-		}
-		else if (current->type == REDIR_OUT)
-		{
-			close_if_opened(cmd->fd_out);
-			cmd->fd_out = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			if (cmd->fd_out < 0)
-				close_with_error(current->value);
-		}
-		else if (current->type == REDIR_APPEND)
-		{
-			close_if_opened(cmd->fd_out);
-			cmd->fd_out = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			if (cmd->fd_out < 0)
-				close_with_error(current->value);
-		}
-		else if (current->type == REDIR_HEREDOC)
-		{
-			close_if_opened(cmd->fd_in);
-			cmd->fd_in = current->fd; // Store heredoc fd
-		}
-		current = current->next;
-	}
-	if (cmd->fd_in >= 0)
-	{
-		if (dup2(cmd->fd_in, STDIN_FILENO) < 0)
-			close_with_error("dup2 failed for STDIN");
-		close(cmd->fd_in);
-	}
-	if (cmd->fd_out >= 0)
-	{
-		if (dup2(cmd->fd_out, STDOUT_FILENO) < 0)
-			close_with_error("dup2 failed for STDOUT");
-		close(cmd->fd_out);
-	}
-}
-
 /**
- * @brief Executes an external command (not a built-in).
+ * @brief Handles the execution of a command.
  *
- * This function uses `fork()` to create a child process, and then calls
- * `execve()` in the child to run the external program. The parent process
- * waits until the child process finishes.
+ * This function checks if the command is a built-in that doesn't require
+ * special handling (like redirections or pipes). If it is, it calls the
+ * appropriate built-in function. It calls `execute_command` for
+ * external commands or built-ins that require execution.
  *
- * @param shell Pointer to shell structure with environment variables.
- * @param args Arguments, where args[0] is the program name, rest are arguments.
- * @return int The exit status returned by the child process.
- */
-int execute_command(t_cmd *command, t_shell *shell, char **args)
-{
-	pid_t pid; // Process ID returned by fork()
-	int status; // Used to store child's exit status
-	char *path; // Full path to executable file
-
-	// printf("execute_command: %s\n", args[0]); // Debug output
-	// Check if the command is directly executable
-	if (!args || !args[0])
-		return 1;
-	path = NULL;
-	if (!command->isbuiltin)
-	{
-		if (access(args[0], X_OK) == 0)
-			path = ft_gcstrdup(CAT_ARGS, args[0]); // Command has absolute/relative path
-		else
-			path = find_executable(shell, args[0]); // Try to find it in $PATH
-		if (!path)
-		{
-			ft_print_error("minishell: command not found: ");
-			ft_print_error(args[0]);
-			ft_print_error("\n");
-			return 127; // Standard "command not found" return code
-		}
-	}
-	pid = fork(); // Create a child process
-	if (pid == -1)
-	{
-		perror("fork");
-		if (path)
-			free(path);
-		return 1;
-	}
-	else if (pid == 0)
-	{
-
-		setup_redirections(command);
-		if (!command->isbuiltin)
-		{
-			execve(path, args, shell->envp);
-			perror("execve failed");
-		}
-		else
-		{
-			if (!ft_strcmp(args[0], "echo"))
-				built_echo(args);
-			else if (!ft_strcmp(args[0], "pwd"))
-				built_pwd();
-			else if (!ft_strcmp(args[0], "env"))
-				built_env(shell);
-			free_gc();
-			clear_history();
-			exit(0);// Exit child process after running built-in
-		}
-		exit(1);
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-		if (path)
-			free(path);
-		return WEXITSTATUS(status);
-	}
-	return (status);
-}
-
-/**
- * @brief Decides what to do with a parsed command: run a built-in or external command.
- *
- * This is the "brain" that figures out what kind of command the user typed.
- * If it's a known built-in like `cd` or `echo`, it runs the appropriate function.
- * If it's not a built-in, it tries to run it as an external command via execve.
- *
- * @param shell Pointer to shell state (environment, etc.).
- * @param args Array of strings where args[0] is command name and rest are arguments.
+ * @param command Pointer to the command structure containing command details.
+ * @param args Array of arguments, where args[0] is the command name.
  * @return int Exit status of the executed command.
  */
-static int handle_command(t_cmd *command, char **args)
+static int	handle_command(t_cmd *command, char **args)
 {
-	t_shell *shell;
+	t_shell	*shell;
 
-	shell = get_shell(); // Get the current shell state
+	shell = get_shell();
 	if (!args || !args[0])
-		return 0;
+		return (0);
 	if (!ft_strcmp(args[0], "cd"))
-		return built_cd(args);
+		return (built_cd(args));
 	else if (!ft_strcmp(args[0], "export"))
-		return built_export(shell, args);
+		return (built_export(shell, args));
 	else if (!ft_strcmp(args[0], "unset"))
-		return built_unset(shell, args);
+		return (built_unset(shell, args));
 	else if (!ft_strcmp(args[0], "exit"))
 		built_exit();
 	else if (ft_strcmp(args[0], "env") == 0
@@ -181,11 +45,21 @@ static int handle_command(t_cmd *command, char **args)
 	return (execute_command(command, shell, args));
 }
 
-static void run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
+/**
+ * @brief Runs a child process with the specified file descriptors.
+ *
+ * This function sets up the necessary file descriptors for the child process
+ * and then executes the command.
+ *
+ * @param fd File descriptor to duplicate.
+ * @param p_fd Pipe file descriptors.
+ * @param command Pointer to the command structure.
+ * @param dup_fd File descriptor to duplicate to (e.g., STDOUT_FILENO).
+ */
+static void	run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 {
-	int status;
+	int	status;
 
-	// setup_redirections(command); // Setup input/output redirections if needed
 	dup2(fd, dup_fd);
 	close(p_fd[0]);
 	close(p_fd[1]);
@@ -194,13 +68,23 @@ static void run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 	exit(status);
 }
 
+/**
+ * @brief Handles the execution of a command with pipes.
+ *
+ * This function creates a pipe, forks two child processes, and sets up
+ * the necessary file descriptors for each child to communicate through the pipe.
+ *
+ * @param command_1 First command structure to execute.
+ * @param command_2 Second command structure to execute.
+ * @return int Exit status of the second command.
+ */
 static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 {
-	int p_fd[2];
-	pid_t pid_a;
-	pid_t pid_b;
-	int status_a;
-	int status_b;
+	int		p_fd[2];
+	pid_t	pid_a;
+	pid_t	pid_b;
+	int		status_a;
+	int		status_b;
 
 	if (pipe(p_fd) < 0)
 		return (perror("pipe"), 1);
@@ -221,11 +105,20 @@ static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 	return (WEXITSTATUS(status_b));
 }
 
+/**
+ * @brief Runs a list of commands, handling pipes and built-ins.
+ *
+ * This function iterates through the command list, executing each command
+ * in the appropriate way (built-in or external). It handles pipes between
+ * commands and sets up redirections as needed.
+ *
+ * @param com Pointer to the first command in the list.
+ * @return int Exit status of the last executed command.
+ */
 int	ft_run_commands(t_cmd *com)
 {
-	int status;
+	int	status;
 
-	//printf("run %s\n", com->token->value);
 	if (!com)
 		return (0);
 	if (com->type == TOK_WORD)

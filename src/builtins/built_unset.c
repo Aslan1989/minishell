@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:37:05 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/22 19:33:08 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 11:10:26 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,5 @@ int built_unset(t_shell *shell, char **args)
 		shell->envp = new_env;
 		i++; // Move to next key
 	}
-	return 0;
+	return (0);
 }

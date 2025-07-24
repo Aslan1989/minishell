@@ -6,32 +6,23 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 12:47:25 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/11 13:20:22 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/24 12:02:44 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_free_split(char **split)
+/**
+ * @brief Returns a pointer to the global shell structure.
+ *
+ * This function provides access to the shell's environment variables and
+ * last exit status. It is used throughout the shell to manage state.
+ *
+ * @return t_shell* Pointer to the global shell structure.
+ */
+t_shell	*get_shell(void)
 {
-	int	i;
+	static t_shell	sh;
 
-	if (!split)
-		return (0);
-	i = 0;
-	while (split[i])
-	{
-		free(split[i]);
-		i++;
-	}
-	//printf(COLOR_G"freeing\n"COLOR_X);
-	free(split);
-	return (0);
-}
-
-t_shell *get_shell(void)
-{
-	static t_shell sh;
-
-	return(&sh);
+	return (&sh);
 }
