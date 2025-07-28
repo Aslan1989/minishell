@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:24:58 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/22 15:50:32 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/28 15:31:22 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,10 @@
  * @example
  *   cd /home/user → changes to that directory
  */
-int built_cd(char **args)
+int	built_cd(char **args)
 {
 	if (!args[1])
 	{
-		// No argument provided: cd requires a path
 		write(2, "minishell: cd: missing argument\n", 32);
 		return (1);
 	}

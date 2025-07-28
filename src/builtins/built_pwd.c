@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:31:51 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/22 22:49:58 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/28 16:01:55 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@
  * @example
  *   pwd → prints "/home/user/projects"
  */
-int built_pwd(void)
+int	built_pwd(void)
 {
-	char cwd[PATH_MAX]; // Buffer for current working directory
+	char	cwd[PATH_MAX];
 
 	if (getcwd(cwd, sizeof(cwd)))
-		printf("%s\n", cwd); // Print path to stdout
+		ft_printf("%s\n", cwd);
 	else
-		perror("minishell: pwd"); // Print error if getcwd fails
-	return 0;
+		perror("minishell: pwd");
+	return (0);
 }

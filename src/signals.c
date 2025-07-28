@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:53:40 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/09 13:35:03 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/07/28 16:30:58 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ void	disable_ctrl_echo(void)
 {
 	struct termios	term;
 
-	tcgetattr(STDIN_FILENO, &term); // Get current terminal attributes
-	term.c_lflag &= ~ECHOCTL; // Disable echoing of control characters
-	tcsetattr(STDIN_FILENO, TCSANOW, &term); // Apply changes immediately
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag &= ~ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }

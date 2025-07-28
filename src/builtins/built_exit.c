@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:36:40 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/22 16:16:11 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/28 15:55:57 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,9 @@
  * @example
  *   exit → closes the minishell
  */
-int built_exit(void)
+int	built_exit(void)
 {
-	//ft_free_split(args);
-	// free_gc_cat(CAT_ARGS);
-	// free_gc_cat(CAT_ENV);
-	free_gc(); // Free all allocated memory in garbage collector
-	//ft_free_split(get_shell()->envp);
+	free_gc();
 	clear_history();
 	exit(0);
 }

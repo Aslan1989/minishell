@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/24 14:59:57 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/28 16:29:47 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,6 +181,8 @@ t_shell		*get_shell(void);
 
 //additional lib
 char		*ft_strpbrk(const char *s, const char *accept);
+size_t		ft_strspn(const char *s, const char *accept);
+void		ft_ignore_ac_av(int argc, char **argv);
 
 //commands
 void		ft_generate_commands(char *line, t_cmd **comms);

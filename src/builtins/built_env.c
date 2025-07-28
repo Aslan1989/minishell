@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 18:35:02 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/22 18:09:53 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/28 15:55:41 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,17 @@
  * @example
  *   env → prints list like "PATH=/usr/bin", etc.
  */
-int built_env(t_shell *shell)
+int	built_env(t_shell *shell)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!shell || !shell->envp)
-		return 1;
-	while(shell->envp[i])
+		return (1);
+	while (shell->envp[i])
 	{
 		ft_printf("%s\n", shell->envp[i]);
 		i++;
 	}
-	return 0;
+	return (0);
 }
