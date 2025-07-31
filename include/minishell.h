@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/28 16:29:47 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/31 13:23:27 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,6 @@
 # include <fcntl.h>
 
 # include <glob.h>
-
-// DELETE!!
-# include <linux/limits.h>
 
 # define COLOR_R "\033[31m"
 # define COLOR_G "\033[32m"

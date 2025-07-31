@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/24 14:02:21 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/07/31 13:45:16 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,5 +115,5 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 			free(command->path);
 		return (WEXITSTATUS(status));
 	}
-	return (status);
+	return (0);
 }
