@@ -6,11 +6,64 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/24 12:45:21 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/03 21:38:46 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+static char	*ft_getenv(const char *var)
+{
+	t_shell	*shell;
+	char	*env_value;
+	int		i;
+	int		len;
+
+
+	shell = get_shell();
+	if (!shell || !shell->envp)
+		return (NULL);
+	if (ft_strncmp(var, "?", 2) == 0)
+		return (ft_gcstrdup(CAT_ARGS, ft_itoa(shell->last_exit_status)));
+	i = 0;
+	len = ft_strlen(var);
+	env_value = NULL;
+	while (shell->envp[i])
+	{
+		if (ft_strncmp(shell->envp[i], var, len) == 0 && shell->envp[i][len] == '=')
+		{
+			env_value = shell->envp[i] + len + 1;
+			return (ft_gcstrdup(CAT_ARGS, env_value));
+		}
+		i++;
+	}
+	return (NULL);
+}
+
+static void	ft_expand_env(char **args)
+{
+	int i;
+
+	i = 0;
+	while (args[i])
+	{
+		if (args[i][0] == '$')
+		{
+			char *env_value = ft_getenv(args[i] + 1);
+			if (env_value)
+			{
+				ft_gcfree(CAT_ARGS, args[i]);
+				args[i] = env_value;
+			}
+			else
+			{
+				ft_gcfree(CAT_ARGS, args[i]);
+				args[i] = ft_gcstrdup(CAT_ARGS, "");
+			}
+		}
+		i++;
+	}
+}
 
 /**
  * @brief Expands single wildcard
@@ -61,7 +114,7 @@ char	**ft_expand_wildcards(char **args)
 	count = 0;
 	while (args[i])
 	{
-		if (ft_strpbrk(args[i], "*?[") == NULL)
+		if (ft_strpbrk(args[i], "*") == NULL)
 		{
 			result = (char **)ft_gcrealloc(CAT_ARGS, result,
 					sizeof(char*) * (count + 2));
@@ -134,6 +187,7 @@ int	parse_input(t_cmd *node, const char *line)
 	node->commands[i] = NULL;
 	while (i <= argc)
 		node->commands[i++] = NULL;
+	ft_expand_env(node->commands);
 	node->commands = ft_expand_wildcards(node->commands);
 	return (0);
 }

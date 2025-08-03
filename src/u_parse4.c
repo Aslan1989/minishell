@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/24 12:07:45 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/03 21:27:14 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ int	count_args(const char *line)
 			quote = line[i];
 		else if (line[i] == quote && i > 1 && (line[i - 1] != '\\'))
 			quote = 0;
-		else if (!quote && (line[i] == ' ' || line[i] == '\t'))
+		else if (!quote && (line[i] == ' ' || line[i] == '\t' || line[i] == '>'
+				|| line[i] == '<' || line[i] == '$'))
 			in_word = 0;
 		else if (!in_word)
 		{
@@ -51,16 +52,40 @@ int	count_args(const char *line)
 	return (count);
 }
 
+static int ft_check_redir(const char **line)
+{
+	if (!(**line))
+		return (0);
+	if ((**line) == '<')
+	{
+		(*line)++;
+		if (**line == '<')
+			return ((*line)++, 2);
+		return (1);
+	}
+	else if ((**line) == '>')
+	{
+		(*line)++;
+		if (**line == '>')
+			return ((*line)++, 2);
+		return (1);
+	}
+	return (0);
+}
+
 static int	calc_arg_len(const char **line)
 {
 	int		len;
 	int		in_quote;
 	char	quote;
 
-	len = 0;
+	len = ft_check_redir(line);
 	in_quote = 0;
 	quote = 0;
-	while (**line && (!ft_isspace(**line) || in_quote))
+	if (len > 0)
+		return (len);
+	while (**line && (!ft_isspace(**line) || in_quote) && !(**line == '$' && len != 0)
+			&& **line != '>' && **line != '<')
 	{
 		if ((**line == '"' || **line == '\'') && !in_quote)
 		{
@@ -141,6 +166,7 @@ char	*extract_arg(const char **line)
 		(*line)++;
 	start = *line;
 	len = calc_arg_len(line);
+	// printf("Arg length: %d\n", len);
 	if (len <= 0)
 		return (NULL);
 	arg = ft_gcmalloc(CAT_ARGS, len + 1);
