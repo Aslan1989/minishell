@@ -174,4 +174,3 @@ char	*extract_arg(const char **line)
 		return (NULL);
 	return (copy_arg(start, len, arg));
 }
->>>>>>> 19747713d51dfe8d65f06b0d405a1f6e96110f6b

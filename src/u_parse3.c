@@ -191,4 +191,3 @@ int	parse_input(t_cmd *node, const char *line)
 	node->commands = ft_expand_wildcards(node->commands);
 	return (0);
 }
->>>>>>> 19747713d51dfe8d65f06b0d405a1f6e96110f6b
