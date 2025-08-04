@@ -20,6 +20,7 @@ static void	ft_initialize_shell(char **envp)
 	shell->envp = copy_env(envp);
 	shell->last_exit_status = 0;
 	setup_signals();
+	disable_ctrl_echo();
 	ft_print_banner();
 }
 
