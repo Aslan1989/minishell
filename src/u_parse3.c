@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   u_parse3.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
 /*   Updated: 2025/08/04 23:23:45 by psmolin          ###   ########.fr       */
