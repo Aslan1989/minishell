@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/23 18:51:01 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/28 16:30:31 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/04 21:45:05 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,4 +81,15 @@ void	ft_ignore_ac_av(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
+}
+
+int	ft_char_is_good_for_env(char c)
+{
+	if (c == '_')
+		return (1);
+	if (ft_isalnum(c))
+		return (1);
+	if (ft_isalpha(c))
+		return (1);
+	return (0);
 }

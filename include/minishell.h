@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/31 13:23:27 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/04 22:47:53 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ typedef struct s_redir		t_redir;
 typedef struct s_garbage	t_garbage;
 typedef struct s_cmd		t_cmd;
 typedef struct s_token		t_token;
+typedef struct s_arg		t_arg;
 
 struct s_redir
 {
@@ -86,8 +87,15 @@ struct s_redir
 
 struct s_garbage
 {
-	void				*ptr;
-	struct s_garbage	*next;
+	void		*ptr;
+	size_t		size;
+	t_garbage	*next;
+};
+
+struct s_arg
+{
+	char	*arg;
+	int		wildcard;
 };
 
 /**
@@ -120,6 +128,7 @@ struct s_cmd
 	int			fd_in;
 	int			fd_out;
 	char		**commands;
+	t_arg		**args;
 	char		*path;
 	t_cmd		*parent;
 	pid_t		pid;
@@ -163,7 +172,7 @@ int			ft_print_error(char *msg);
 
 //parser_utils
 int			count_args(const char *line);
-char		*extract_arg(const char **line);
+t_arg		*extract_arg(const char **line);
 t_cmd		*parse_or(t_token **current);
 t_cmd		*parse_and(t_token **current);
 t_cmd		*parse_pipe(t_token **current);
@@ -187,18 +196,23 @@ t_cmd		*ft_parse_tokens(t_token **tokens);
 void		setup_redirections(t_cmd *command);
 int			ft_here_doc_input(char *limiter);
 int			ft_redir_add(t_cmd *cmd, t_eredir type, char *filename);
-char		**ft_expand_wildcards(char **args);
+char		**ft_expand_wildcards(t_arg **args);
+
+void		ft_open_quotes(t_arg *arg);
+int			ft_char_is_good_for_env(char c);
 
 //our malloc and garbage collector
 t_garbage	**get_gc(t_egccat cat);
 void		free_gc_cat(t_egccat cat);
 void		free_gc(void);
 void		ft_gcfree(t_egccat cat, void *ptr);
+size_t		ft_gc_getsize(t_egccat cat, void *ptr);
 void		*ft_gcmalloc(t_egccat cat, ssize_t size);
 void		*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size);
 char		*ft_gcstrdup(t_egccat cat, char *src);
 char		*ft_gcstrndup(t_egccat cat, char *src, ssize_t n);
 t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr);
+char		*ft_gcstrjoin(t_egccat cat, char *s1, char *s2);
 
 void		ft_print_banner(void);
 

@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/11 15:26:34 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/24 14:17:27 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/04 15:13:04 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,25 +26,27 @@ static t_token	*new_token(t_etoken type, const char *value)
 	return (tok);
 }
 
-static int	add_token(t_token **head, t_etoken type, const char *value, int inc)
+static int	add_token(t_token **head, t_etoken type, const char *value)
 {
 	t_token	*last;
 	t_token	*new_tok;
+	int		len;
 
+	len = ft_strlen(value);
 	new_tok = new_token(type, value);
 	if (!new_tok)
-		return (inc);
+		return (len);
 	if (!*head)
 	{
 		*head = new_tok;
-		return (inc);
+		return (len);
 	}
 	last = *head;
 	while (last->next)
 		last = last->next;
 	last->next = new_tok;
 	new_tok->prev = last;
-	return (inc);
+	return (len);
 }
 
 static void	ft_add_word(char **line, t_token **head)
@@ -64,7 +66,7 @@ static void	ft_add_word(char **line, t_token **head)
 		if (**line == '|' || **line == '&' || **line == '(' || **line == ')')
 			break ;
 	}
-	add_token(head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, *line - start), 1);
+	add_token(head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, *line - start));
 }
 
 static t_token	*ft_tokenize(char *line)
@@ -79,55 +81,21 @@ static t_token	*ft_tokenize(char *line)
 		if (!*line)
 			break ;
 		if (line[0] == '&' && line[1] == '&')
-			line += add_token(&head, TOK_AND, "&&", 2);
+			line += add_token(&head, TOK_AND, "&&");
 		else if (line[0] == '|' && line[1] == '|')
-			line += add_token(&head, TOK_OR, "||", 2);
+			line += add_token(&head, TOK_OR, "||");
 		else if (*line == '|')
-			line += add_token(&head, TOK_PIPE, "|", 1);
+			line += add_token(&head, TOK_PIPE, "|");
 		else if (*line == '(')
-			line += add_token(&head, TOK_LPAREN, "(", 1);
+			line += add_token(&head, TOK_LPAREN, "(");
 		else if (*line == ')')
-			line += add_token(&head, TOK_RPAREN, ")", 1);
+			line += add_token(&head, TOK_RPAREN, ")");
 		else
 			ft_add_word(&line, &head);
 	}
-	add_token(&head, TOK_EOF, "EOF", 1);
+	add_token(&head, TOK_EOF, "EOF");
 	return (head);
 }
-
-// void	ft_print_tokens_nested(t_cmd *comms, int depth, int branch)
-// {
-// 	t_cmd *current;
-// 	int i;
-
-// 	current = comms;
-// 	if (!current)
-// 		return ;
-// 	printf(COLOR_G);
-// 	i = 0;
-// 	while (i++ < depth - 1)
-// 		printf("..");
-// 	if (depth > 0 && branch == 0)
-// 		printf("-");
-// 	if (depth > 0 && branch == 1)
-// 		printf("=");
-// 	printf("%s\n", current->token->value);
-// 	ft_print_tokens_nested(current->next_a, depth + 1, 0);
-// 	ft_print_tokens_nested(current->next_b, depth + 1, 1);
-// 	printf(COLOR_X);
-// }
-
-// void	ft_print_token_list(t_token *head)
-// {
-// 	t_token	*current;
-
-// 	current = head;
-// 	while (current)
-// 	{
-// 		printf(COLOR_Y"%s\n"COLOR_X, current->value);
-// 		current = current->next;
-// 	}
-// }
 
 void	ft_generate_commands(char *line, t_cmd **comms)
 {
