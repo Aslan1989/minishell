@@ -48,6 +48,7 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)u_lib.c \
 	$(SRC_DIR)u_malloc.c \
 	$(SRC_DIR)u_malloc2.c \
+	$(SRC_DIR)u_malloc3.c \
 	$(SRC_DIR)u_parse.c \
 	$(SRC_DIR)u_parse2.c \
 	$(SRC_DIR)u_parse3.c \
