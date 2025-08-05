@@ -65,7 +65,7 @@ static void	print_sorted_env(char **envp)
  * @param value Value of the variable.
  * @return char* Newly allocated string in the form key=value.
  */
-static char	*make_env_string(const char *key, const char *value)
+char	*make_env_string(const char *key, const char *value)
 {
 	size_t	key_len;
 	size_t	val_len;
@@ -103,7 +103,7 @@ static char	*make_env_string(const char *key, const char *value)
  * @param value New value to assign.
  * @return int 1 if replaced, 0 if not found.
  */
-static int	replace_env_var(char **envp, const char *key, const char *value)
+int	replace_env_var(char **envp, const char *key, const char *value)
 {
 	size_t	len;
 	int		i;

@@ -50,7 +50,6 @@ int	built_cd(char **args)
 	}
 
 	// update OLDPWD
-	char *old_env = make_env_string("OLDPWD", oldpwd);
 	replace_env_var(sh->envp, "OLDPWD", oldpwd);
 
 	// update PWD
