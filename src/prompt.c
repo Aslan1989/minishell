@@ -30,5 +30,5 @@ char	*read_prompt(void)
 	shell = get_shell();
 	if (shell->is_interactive)
 		return (readline(COLOR_Y COLOR_BOLD"minishell$ "COLOR_X));
-	return (readline(NULL));
+	return (get_next_line(STDIN_FILENO));
 }

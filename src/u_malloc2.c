@@ -12,15 +12,9 @@
 
 #include "minishell.h"
 
-t_garbage	**get_gc(t_egccat cat)
-{
-	static t_garbage	*gc[CAT_MAX];
-
-	if (cat < 0 || cat > CAT_MAX)
-		return (NULL);
-	return (&gc[cat]);
-}
-
+/**
+ * @brief Adds a new node to the garbage collector list.
+ */
 t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr)
 {
 	t_garbage	*last;
@@ -45,6 +39,9 @@ t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr)
 	return (new_node);
 }
 
+/**
+ * @brief Frees all nodes in the garbage collector list for a given category.
+ */
 void	free_gc_cat(t_egccat cat)
 {
 	t_garbage	*current;
@@ -66,6 +63,9 @@ void	free_gc_cat(t_egccat cat)
 	*gc_list = NULL;
 }
 
+/**
+ * @brief Frees all nodes in the garbage collector list.
+ */
 void	free_gc(void)
 {
 	int	i;
@@ -78,31 +78,33 @@ void	free_gc(void)
 	}
 }
 
-char	*ft_gcstrjoin(t_egccat cat, char *s1, char *s2)
+/**
+ * @brief Frees a pointer and removes it from the garbage collector.
+ */
+void	ft_gcfree(t_egccat cat, void *ptr)
 {
-	char	*word;
-	char	*result;
-	size_t	len1;
-	size_t	len2;
+	t_garbage	**gc_list;
+	t_garbage	*cur;
+	t_garbage	*prev;
 
-	if (!s1 && !s2)
-		return (NULL);
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
-	result = ft_gcmalloc(cat, len1 + len2 + 1);
-	if (!result)
-		return (NULL);
-	word = result;
-	if (s1)
-		while (*s1)
-			*word++ = *s1++;
-	if (s2)
-		while (*s2)
-			*word++ = *s2++;
-	*word = '\0';
-	// if (s1)
-	// 	ft_gcfree(cat, s1);
-	// if (s2)
-	// 	ft_gcfree(cat, s2);
-	return (result);
+	gc_list = get_gc(cat);
+	if (!gc_list || !*gc_list || !ptr)
+		return ;
+	cur = *gc_list;
+	prev = NULL;
+	while (cur)
+	{
+		if (cur->ptr == ptr)
+		{
+			if (prev)
+				prev->next = cur->next;
+			else
+				*gc_list = cur->next;
+			free(cur->ptr);
+			free(cur);
+			return ;
+		}
+		prev = cur;
+		cur = cur->next;
+	}
 }

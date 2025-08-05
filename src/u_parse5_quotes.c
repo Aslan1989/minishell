@@ -1,93 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   u_parse5.c                                         :+:      :+:    :+:   */
+/*   u_parse5_quotes.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/05 15:25:22 by marvin           ###   ########.fr       */
+/*   Updated: 2025/08/05 20:58:40 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char	*ft_getenv(char *var)
+static char	*open_quote_word(char **arg)
 {
-	t_shell	*shell;
-	char	*env_value;
-	int		i;
-	int		len;
-
-	shell = get_shell();
-	if (!shell || !shell->envp)
-		return (NULL);
-	if (ft_strncmp(var, "?", 2) == 0)
-		return (ft_gcstrdup(CAT_ARGS, ft_itoa(shell->last_exit_status)));
-	i = 0;
-	len = ft_strlen(var);
-	env_value = NULL;
-	while (shell->envp[i])
-	{
-		if (ft_strncmp(shell->envp[i], var, len) == 0 && shell->envp[i][len] == '=')
-		{
-			env_value = shell->envp[i] + len + 1;
-			return (ft_gcstrdup(CAT_ARGS, env_value));
-		}
-		i++;
-	}
-	return (ft_gcstrdup(CAT_ARGS, ""));
-}
-
-static char *ft_getwordenv(char **line)
-{
-	char *start;
-
-	start = *line + 1;
-	(*line)++;
-	if (**line == '?')
-	{
-		(*line)++;
-		return (ft_getenv("?"));
-	}
-	while (**line && ft_char_is_good_for_env(**line))
-		(*line)++;
-	return (ft_getenv(ft_gcstrndup(CAT_ARGS, start, *line - start)));
-}
-
-static char *ft_getword(char **line)
-{
-	char	*start;
-
-	start = *line;
-	while (**line && **line != '$')
-		(*line)++;
-	return (ft_gcstrndup(CAT_ARGS, start, *line - start));
-}
-
-static char	*ft_expand_env(char *str)
-{
-	char	*line;
-	char	*sub_line;
 	char	*ret;
-
-	line = str;
-	ret = NULL;
-	while (*line)
-	{
-		if (*line == '$')
-			sub_line = ft_getwordenv(&line);
-		else
-			sub_line = ft_getword(&line);
-		ret = ft_gcstrjoin(CAT_ARGS, ret, sub_line);
-	}
-	return (ret);
-}
-
-static char *open_quote_word(char **arg)
-{
-	char *ret;
-	char *start;
+	char	*start;
 
 	start = *arg;
 	while (**arg && **arg != '"' && **arg != '\'')
@@ -97,10 +25,10 @@ static char *open_quote_word(char **arg)
 	return (ret);
 }
 
-static char *open_quote_single(char **arg)
+static char	*open_quote_single(char **arg)
 {
-	char *ret;
-	char *start;
+	char	*ret;
+	char	*start;
 
 	start = *arg + 1;
 	(*arg)++;
@@ -114,10 +42,10 @@ static char *open_quote_single(char **arg)
 	return (ret);
 }
 
-static char *open_quote_double(char **arg)
+static char	*open_quote_double(char **arg)
 {
-	char *ret;
-	char *start;
+	char	*ret;
+	char	*start;
 
 	start = *arg + 1;
 	(*arg)++;
@@ -151,7 +79,7 @@ void	ft_open_quotes(t_arg *arg)
 				sub_arg = open_quote_double(&line);
 			else
 				sub_arg = open_quote_single(&line);
-			if (ft_strchr(sub_arg, '*'))
+			if (ft_strpbrk(sub_arg, "*?[]"))
 				arg->wildcard = 0;
 		}
 		else

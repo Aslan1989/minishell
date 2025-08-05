@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/05 21:37:14 by marvin           ###   ########.fr       */
+/*   Updated: 2025/08/05 19:49:30 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,6 +198,7 @@ t_shell		*get_shell(void);
 char		*ft_strpbrk(const char *s, const char *accept);
 size_t		ft_strspn(const char *s, const char *accept);
 void		ft_ignore_ac_av(int argc, char **argv);
+int			ft_isnotaword(char c);
 
 //commands
 void		ft_generate_commands(char *line, t_cmd **comms);
@@ -208,6 +209,7 @@ int			ft_redir_add(t_cmd *cmd, t_eredir type, char *filename);
 char		**ft_expand_wildcards(t_arg **args);
 
 void		ft_open_quotes(t_arg *arg);
+char		*ft_expand_env(char *str);
 int			ft_char_is_good_for_env(char c);
 
 //our malloc and garbage collector
