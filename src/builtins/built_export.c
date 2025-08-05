@@ -134,7 +134,7 @@ int	replace_env_var(char **envp, const char *key, const char *value)
  * @param value Value of the new variable.
  * @return int 0 on success, 1 on failure.
  */
-static int	add_env_var(t_shell *shell, const char *key, const char *value)
+int	add_env_var(t_shell *shell, const char *key, const char *value)
 {
 	int		count;
 	int		i;
@@ -184,23 +184,48 @@ int	built_export(t_shell *shell, char **args)
 		print_sorted_env(shell->envp);
 		return (0);
 	}
+
 	i = 1;
 	while (args[i])
 	{
 		equal = ft_strchr(args[i], '=');
-		if (!equal)
+		if (equal)
 		{
-			ft_print_error("minishell: export: invalid format: ");
-			ft_print_error(args[i++]);
-			ft_print_error("\n");
-			continue ;
+			*equal = '\0';
+			key = args[i];
+			value = equal + 1;
+
+			if (!is_valid_identifier(key))
+			{
+				ft_print_error("minishell: export: invalid identifier: ");
+				ft_print_error(key);
+				ft_print_error("\n");
+				*equal = '=';
+				i++;
+				continue;
+			}
+
+			if (!replace_env_var(shell->envp, key, value))
+				add_env_var(shell, key, value);
+
+			*equal = '=';
 		}
-		*equal = '\0';
-		key = args[i];
-		value = equal + 1;
-		if (!replace_env_var(shell->envp, key, value))
-			add_env_var(shell, key, value);
-		*equal = '=';
+		else
+		{
+			// Нет '=', просто ключ
+			key = args[i];
+			if (!is_valid_identifier(key))
+			{
+				ft_print_error("minishell: export: invalid identifier: ");
+				ft_print_error(key);
+				ft_print_error("\n");
+				i++;
+				continue;
+			}
+			// Если переменной нет, добавить с пустым значением
+			if (!replace_env_var(shell->envp, key, ""))
+				add_env_var(shell, key, "");
+		}
 		i++;
 	}
 	return (0);

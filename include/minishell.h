@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/05 15:21:24 by marvin           ###   ########.fr       */
+/*   Updated: 2025/08/05 21:37:14 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,6 +159,11 @@ int			built_exit(void);
 // built_export.c
 char		*make_env_string(const char *key, const char *value);
 int			replace_env_var(char **envp, const char *key, const char *value);
+
+char		*get_env_var(char **envp, const char *name);
+
+int			add_env_var(t_shell *shell, const char *key, const char *value);
+int			is_valid_identifier(const char *key);
 // char	**parse_input(const char *line);
 int			parse_input(t_cmd *node, const char *line);
 
@@ -172,7 +177,7 @@ char		*find_executable(t_shell *shell, const char *cmd);
 //void		setup_redirections(t_cmd *cmd);
 
 //errors
-int			ft_print_error(char *msg);
+int			ft_print_error(const char *msg);
 
 //parser_utils
 int			count_args(const char *line);

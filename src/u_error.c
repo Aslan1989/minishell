@@ -12,7 +12,7 @@
 
 #include <minishell.h>
 
-int	ft_print_error(char *msg)
+int	ft_print_error(const char *msg)
 {
 	int	len;
 

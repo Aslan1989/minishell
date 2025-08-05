@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static int	is_valid_identifier(const char *key)
+int	is_valid_identifier(const char *key)
 {
 	if (!key || !*key || !(ft_isalpha(*key) || *key == '_'))
 		return (0);
