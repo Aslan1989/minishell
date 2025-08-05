@@ -25,5 +25,10 @@
  */
 char	*read_prompt(void)
 {
-	return (readline(COLOR_Y COLOR_BOLD"minishell$ "COLOR_X));
+	t_shell	*shell;
+
+	shell = get_shell();
+	if (shell->is_interactive)
+		return (readline(COLOR_Y COLOR_BOLD"minishell$ "COLOR_X));
+	return (readline(NULL));
 }

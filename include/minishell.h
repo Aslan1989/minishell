@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/04 23:54:40 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/05 14:28:35 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ typedef struct s_shell
 {
 	char	**envp;
 	int		last_exit_status;
+	int		is_interactive;
 }			t_shell;
 
 struct s_cmd
