@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/04 23:39:46 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/05 14:58:47 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ static char *open_quote_word(char **arg)
 		(*arg)++;
 	ret = ft_gcstrndup(CAT_ARGS, start, *arg - start);
 	ret = ft_expand_env(ret);
-	// ft_printf("Extracted word: %s\n", ret); // Debugging line
 	return (ret);
 }
 
@@ -112,7 +111,6 @@ static char *open_quote_single(char **arg)
 	ret = ft_gcstrndup(CAT_ARGS, start, *arg - start);
 	if (**arg == '\'')
 		(*arg)++;
-	// ft_printf("Extracted quote: %s\n", ret); // Debugging line
 	return (ret);
 }
 
@@ -131,7 +129,6 @@ static char *open_quote_double(char **arg)
 	ret = ft_expand_env(ret);
 	if (**arg == '"')
 		(*arg)++;
-	// ft_printf("Extracted double quote: %s\n", ret); // Debugging line
 	return (ret);
 }
 
