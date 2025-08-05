@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   u_parse5.c                                         :+:      :+:    :+:   */
+/*   u_parse5_quotes.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/05 19:48:53 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/05 20:58:40 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void	ft_open_quotes(t_arg *arg)
 				sub_arg = open_quote_double(&line);
 			else
 				sub_arg = open_quote_single(&line);
-			if (ft_strchr(sub_arg, '*'))
+			if (ft_strpbrk(sub_arg, "*?[]"))
 				arg->wildcard = 0;
 		}
 		else
