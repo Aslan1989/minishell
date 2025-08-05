@@ -159,6 +159,8 @@ int			built_exit(void);
 // built_export.c
 char		*make_env_string(const char *key, const char *value);
 int			replace_env_var(char **envp, const char *key, const char *value);
+// built_export_sort.c
+void		print_sorted_env(char **envp);
 
 char		*get_env_var(char **envp, const char *name);
 

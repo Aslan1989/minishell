@@ -37,7 +37,9 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)builtins/built_env.c \
 	$(SRC_DIR)builtins/built_exit.c \
 	$(SRC_DIR)builtins/built_export.c \
+	$(SRC_DIR)builtins/built_export_sort.c \
 	$(SRC_DIR)builtins/built_pwd.c \
+	$(SRC_DIR)builtins/units.c \
 	$(SRC_DIR)executor.c \
 	$(SRC_DIR)find_executable.c \
 	$(SRC_DIR)u_avas.c \

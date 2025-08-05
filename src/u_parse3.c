@@ -62,11 +62,6 @@ char	**ft_expand_wildcards(t_arg **args)
 	count = 0;
 	while (args[i])
 	{
-		if (!args[i]->arg)
-		{
-			i++;
-			continue ;
-		}
 		if (ft_strpbrk(args[i]->arg, "*?[]") == NULL)
 		{
 			result = (char **)ft_gcrealloc(CAT_ARGS, result,
