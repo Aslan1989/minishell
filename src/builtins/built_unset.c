@@ -12,6 +12,19 @@
 
 #include "minishell.h"
 
+static int	is_valid_identifier(const char *key)
+{
+	if (!key || !*key || !(ft_isalpha(*key) || *key == '_'))
+		return (0);
+	while (*key)
+	{
+		if (!(ft_isalnum(*key) || *key == '_'))
+			return (0);
+		key++;
+	}
+	return (1);
+}
+
 static void	ft_filter_env(char **envp, char ***new_env,
 		const char *key, size_t key_len)
 {
@@ -59,6 +72,14 @@ int	built_unset(t_shell *shell, char **args)
 		key = args[i];
 		key_len = ft_strlen(key);
 		count = 0;
+		if (!is_valid_identifier(args[i]))
+		{
+			ft_print_error("minishell: unset: `");
+			ft_print_error(args[i]);
+			ft_print_error("': not a valid identifier\n");
+			i++;
+			continue ;
+		}
 		while (shell->envp[count])
 			count++;
 		new_env = ft_gcmalloc(CAT_ENV, sizeof(char *) * (count + 1));

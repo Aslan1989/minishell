@@ -12,6 +12,50 @@
 
 #include "minishell.h"
 
+static void	print_sorted_env(char **envp)
+{
+	char	**copy;
+	char	*tmp;
+	int		count;
+	int		i;
+	int		j;
+	int		k;
+
+	count = 0;
+	while (envp[count])
+		count++;
+	copy = ft_gcmalloc(CAT_ENV, sizeof(char *) * (count + 1));
+	i = 0;
+	while (i < count)
+	{
+		copy[i] = ft_gcstrdup(CAT_ENV, envp[i]);
+		i++;
+	}
+	copy[count] = NULL;
+	j = 0;
+	while (j < count - 1)
+	{
+		k = 0;
+		while (k < count - j - 1)
+		{
+			if (ft_strcmp(copy[k], copy[k + 1]) > 0)
+			{
+				tmp = copy[k];
+				copy[k] = copy[k + 1];
+				copy[k + 1] = tmp;
+			}
+			k++;
+		}
+		j++;
+	}
+	i = 0;
+	while (i < count)
+	{
+		ft_printf("declare -x %s\n", copy[i]);
+		i++;
+	}
+}
+
 /**
  * @brief Creates a string of format "key=value" from two parts.
  *
@@ -21,7 +65,7 @@
  * @param value Value of the variable.
  * @return char* Newly allocated string in the form key=value.
  */
-static char	*make_env_string(const char *key, const char *value)
+char	*make_env_string(const char *key, const char *value)
 {
 	size_t	key_len;
 	size_t	val_len;
@@ -59,7 +103,7 @@ static char	*make_env_string(const char *key, const char *value)
  * @param value New value to assign.
  * @return int 1 if replaced, 0 if not found.
  */
-static int	replace_env_var(char **envp, const char *key, const char *value)
+int	replace_env_var(char **envp, const char *key, const char *value)
 {
 	size_t	len;
 	int		i;
@@ -135,6 +179,11 @@ int	built_export(t_shell *shell, char **args)
 	const char	*value;
 	char		*equal;
 
+	if (!args[1])
+	{
+		print_sorted_env(shell->envp);
+		return (0);
+	}
 	i = 1;
 	while (args[i])
 	{
