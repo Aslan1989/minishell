@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/04 19:34:25 by marvin           ###   ########.fr       */
+/*   Updated: 2025/08/04 23:17:41 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ static int	calc_arg_len(const char **line)
 	quote = 0;
 	if (len > 0)
 		return (len);
-	while (**line && (!ft_isspace(**line) || in_quote) && !(**line == '$' && len != 0)
+	while (**line && (!ft_isspace(**line) || in_quote)
 			&& **line != '>' && **line != '<')
 	{
 		if ((**line == '"' || **line == '\'') && !in_quote)
@@ -97,51 +97,10 @@ static int	calc_arg_len(const char **line)
 			in_quote = 0;
 			quote = 0;
 		}
-		else
-			len++;
+		len++;
 		(*line)++;
 	}
 	return (len);
-}
-
-/**
- * @brief Copies an argument from the input line into a new string.
- *
- * Handles quotes so that quoted strings are preserved as one argument.
- *
- * @param start Pointer to the start of the argument in the input line.
- * @param len Length of the argument to copy.
- * @param arg Pointer to the destination string where the argument will
- * be copied.
- * @return char* Pointer to the copied argument string (unquoted).
- */
-static char	*copy_arg(const char *start, int len, char *arg)
-{
-	int		i;
-	int		in_quote;
-	char	quote;
-
-	i = 0;
-	in_quote = 0;
-	quote = 0;
-	while (i < len)
-	{
-		if ((*start == '"' || *start == '\'') && !in_quote)
-		{
-			in_quote = 1;
-			quote = *start;
-		}
-		else if (*start == quote && in_quote)
-		{
-			in_quote = 0;
-			quote = 0;
-		}
-		else
-			arg[i++] = *start;
-		start++;
-	}
-	arg[i] = '\0';
-	return (arg);
 }
 
 /**
@@ -156,21 +115,22 @@ static char	*copy_arg(const char *start, int len, char *arg)
  * @return char* The newly allocated string containing the argument
  * (unquoted), or NULL on error.
  */
-char	*extract_arg(const char **line)
+t_arg	*extract_arg(const char **line)
 {
 	const char	*start;
 	int			len;
-	char		*arg;
+	t_arg		*arg;
 
 	while (ft_isspace(**line))
 		(*line)++;
 	start = *line;
 	len = calc_arg_len(line);
-	// printf("Arg length: %d\n", len);
 	if (len <= 0)
 		return (NULL);
-	arg = ft_gcmalloc(CAT_ARGS, len + 1);
+	arg = ft_gcmalloc(CAT_ARGS, sizeof(t_arg));
 	if (!arg)
 		return (NULL);
-	return (copy_arg(start, len, arg));
+	arg->arg = ft_gcstrndup(CAT_ARGS, (char *)start, len);
+	ft_open_quotes(arg);
+	return (arg);
 }

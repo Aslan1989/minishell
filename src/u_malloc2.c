@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:55:49 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/24 14:20:33 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/04 23:56:27 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,4 +76,33 @@ void	free_gc(void)
 		free_gc_cat(i);
 		i++;
 	}
+}
+
+char	*ft_gcstrjoin(t_egccat cat, char *s1, char *s2)
+{
+	char	*word;
+	char	*result;
+	size_t	len1;
+	size_t	len2;
+
+	if (!s1 && !s2)
+		return (NULL);
+	len1 = ft_strlen(s1);
+	len2 = ft_strlen(s2);
+	result = ft_gcmalloc(cat, len1 + len2 + 1);
+	if (!result)
+		return (NULL);
+	word = result;
+	if (s1)
+		while (*s1)
+			*word++ = *s1++;
+	if (s2)
+		while (*s2)
+			*word++ = *s2++;
+	*word = '\0';
+	// if (s1)
+	// 	ft_gcfree(cat, s1);
+	// if (s2)
+	// 	ft_gcfree(cat, s2);
+	return (result);
 }

@@ -6,74 +6,21 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/05 13:46:21 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/04 19:33:59 by marvin           ###   ########.fr       */
+/*   Updated: 2025/08/04 23:23:45 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static char	*ft_getenv(const char *var)
-{
-	t_shell	*shell;
-	char	*env_value;
-	int		i;
-	int		len;
-
-
-	shell = get_shell();
-	if (!shell || !shell->envp)
-		return (NULL);
-	if (ft_strncmp(var, "?", 2) == 0)
-		return (ft_gcstrdup(CAT_ARGS, ft_itoa(shell->last_exit_status)));
-	i = 0;
-	len = ft_strlen(var);
-	env_value = NULL;
-	while (shell->envp[i])
-	{
-		if (ft_strncmp(shell->envp[i], var, len) == 0 && shell->envp[i][len] == '=')
-		{
-			env_value = shell->envp[i] + len + 1;
-			return (ft_gcstrdup(CAT_ARGS, env_value));
-		}
-		i++;
-	}
-	return (NULL);
-}
-
-static void	ft_expand_env(char **args)
-{
-	int i;
-
-	i = 0;
-	while (args[i])
-	{
-		if (args[i][0] == '$')
-		{
-			char *env_value = ft_getenv(args[i] + 1);
-			if (env_value)
-			{
-				ft_gcfree(CAT_ARGS, args[i]);
-				args[i] = env_value;
-			}
-			else
-			{
-				ft_gcfree(CAT_ARGS, args[i]);
-				args[i] = ft_gcstrdup(CAT_ARGS, "");
-			}
-		}
-		i++;
-	}
-}
-
 /**
  * @brief Expands single wildcard
  */
-static void	ft_expand_wildcard(char *token, char ***result, int *count)
+static void	ft_expand_wildcard(t_arg *token, char ***result, int *count)
 {
 	glob_t	globbuf;
 	size_t	i;
 
-	if (glob(token, 0, NULL, &globbuf) == 0)
+	if (token->wildcard == 1 && glob(token->arg, 0, NULL, &globbuf) == 0)
 	{
 		i = 0;
 		while (i < globbuf.gl_pathc)
@@ -89,10 +36,11 @@ static void	ft_expand_wildcard(char *token, char ***result, int *count)
 	{
 		*result = (char **)ft_gcrealloc(CAT_ARGS, *result,
 				sizeof(char*) * (*count + 2));
-		(*result)[*count] = ft_gcstrdup(CAT_ARGS, token);
+		(*result)[*count] = ft_gcstrdup(CAT_ARGS, token->arg);
 		(*count)++;
 	}
-	globfree(&globbuf);
+	if (token->wildcard == 1)
+		globfree(&globbuf);
 }
 
 /**
@@ -103,7 +51,7 @@ static void	ft_expand_wildcard(char *token, char ***result, int *count)
  * @param args The array of arguments to expand.
  * @return char** A new array of arguments with wildcards expanded.
  */
-char	**ft_expand_wildcards(char **args)
+char	**ft_expand_wildcards(t_arg **args)
 {
 	char	**result;
 	int		count;
@@ -114,11 +62,11 @@ char	**ft_expand_wildcards(char **args)
 	count = 0;
 	while (args[i])
 	{
-		if (ft_strpbrk(args[i], "*") == NULL)
+		if (ft_strpbrk(args[i]->arg, "*") == NULL)
 		{
 			result = (char **)ft_gcrealloc(CAT_ARGS, result,
 					sizeof(char*) * (count + 2));
-			result[count++] = ft_gcstrdup(CAT_ARGS, args[i]);
+			result[count++] = ft_gcstrdup(CAT_ARGS, args[i]->arg);
 		}
 		else
 			ft_expand_wildcard(args[i], &result, &count);
@@ -133,7 +81,7 @@ char	**ft_expand_wildcards(char **args)
  */
 static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 {
-	char	*arg;
+	t_arg	*arg;
 	int		check;
 
 	*i = 0;
@@ -141,18 +89,19 @@ static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 	while (*line && *i < argc)
 	{
 		arg = extract_arg(&line);
+		// ft_printf("Extracted arg: %s\n", arg->arg);
 		if (!arg)
 			return (1);
-		if (ft_strcmp(arg, "<") == 0)
-			check = ft_redir_add(node, REDIR_IN, extract_arg(&line));
-		else if (ft_strcmp(arg, ">") == 0)
-			check = ft_redir_add(node, REDIR_OUT, extract_arg(&line));
-		else if (ft_strcmp(arg, ">>") == 0)
-			check = ft_redir_add(node, REDIR_APPEND, extract_arg(&line));
-		else if (ft_strcmp(arg, "<<") == 0)
-			check = ft_redir_add(node, REDIR_HEREDOC, extract_arg(&line));
+		if (ft_strcmp(arg->arg, "<") == 0)
+			check = ft_redir_add(node, REDIR_IN, extract_arg(&line)->arg);
+		else if (ft_strcmp(arg->arg, ">") == 0)
+			check = ft_redir_add(node, REDIR_OUT, extract_arg(&line)->arg);
+		else if (ft_strcmp(arg->arg, ">>") == 0)
+			check = ft_redir_add(node, REDIR_APPEND, extract_arg(&line)->arg);
+		else if (ft_strcmp(arg->arg, "<<") == 0)
+			check = ft_redir_add(node, REDIR_HEREDOC, extract_arg(&line)->arg);
 		else
-			node->commands[(*i)++] = arg;
+			node->args[(*i)++] = arg;
 		if (check)
 			return (1);
 	}
@@ -179,15 +128,17 @@ int	parse_input(t_cmd *node, const char *line)
 		return (node->commands = NULL, 1);
 	argc = count_args(line);
 	node->commands = ft_gcmalloc(CAT_ARGS, sizeof(char *) * (argc + 1));
-	if (!node->commands)
+	node->args = ft_gcmalloc(CAT_ARGS, sizeof(t_arg *) * (argc + 1));
+	if (!node->commands || !node->args)
 		return (1);
 	i = 0;
+	// ft_printf("Parsing input: %s\n", line);
 	if (ft_fillout_commands(node, line, argc, &i))
 		return (1);
-	node->commands[i] = NULL;
+	node->args[i] = NULL;
 	while (i <= argc)
-		node->commands[i++] = NULL;
-	ft_expand_env(node->commands);
-	node->commands = ft_expand_wildcards(node->commands);
+		node->args[i++] = NULL;
+	// ft_expand_env(node->commands);
+	node->commands = ft_expand_wildcards(node->args);
 	return (0);
 }

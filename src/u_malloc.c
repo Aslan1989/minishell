@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/15 16:55:49 by psmolin           #+#    #+#             */
-/*   Updated: 2025/07/24 14:20:29 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/04 23:56:02 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,31 @@ void	*ft_gcmalloc(t_egccat cat, ssize_t size)
 		free(ptr);
 		return (NULL);
 	}
+	new_node->size = size;
 	return (ptr);
+}
+
+size_t		ft_gc_getsize(t_egccat cat, void *ptr)
+{
+	t_garbage	*current;
+
+	if (cat < 0 || cat > CAT_MAX || !ptr)
+		return (0);
+	current = *get_gc(cat);
+	while (current)
+	{
+		if (current->ptr == ptr)
+			return (current->size);
+		current = current->next;
+	}
+	return (0);
 }
 
 void	*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size)
 {
 	void	*new_ptr;
+	ssize_t	old_size;
+	ssize_t copy_size;
 
 	if (cat < 0 || cat > CAT_MAX || size <= 0)
 		return (NULL);
@@ -42,7 +61,12 @@ void	*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size)
 	new_ptr = ft_gcmalloc(cat, size);
 	if (!new_ptr)
 		return (NULL);
-	ft_memcpy(new_ptr, ptr, size);
+	old_size = ft_gc_getsize(cat, ptr);
+	if (size > old_size)
+		copy_size = old_size;
+	else
+		copy_size = size;
+	ft_memcpy(new_ptr, ptr, copy_size);
 	ft_gcfree(cat, ptr);
 	return (new_ptr);
 }

@@ -6,7 +6,7 @@
 #    By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/04 12:19:44 by aisaev            #+#    #+#              #
-#    Updated: 2025/07/31 15:06:36 by psmolin          ###   ########.fr        #
+#    Updated: 2025/08/04 23:53:42 by psmolin          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,6 +52,7 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)u_parse2.c \
 	$(SRC_DIR)u_parse3.c \
 	$(SRC_DIR)u_parse4.c \
+	$(SRC_DIR)u_parse5.c \
 	$(SRC_DIR)u_redir.c \
 	$(SRC_DIR)u_redir2.c \
 	$(SRC_DIR)u_shell.c
