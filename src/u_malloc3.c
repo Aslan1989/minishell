@@ -17,21 +17,18 @@
  */
 char	*ft_gcstrdup(t_egccat cat, char *src)
 {
-	int		i;
 	char	*copy;
+	size_t	len;
+	size_t	i;
 
-	i = 0;
-	while (src[i] != '\0')
-	{
-		i++;
-	}
-	copy = (char *)ft_gcmalloc(cat, sizeof(char) * (i + 1));
-	if (copy == NULL)
-	{
+	if (!src)
 		return (NULL);
-	}
+	len = ft_strlen(src);
+	copy = ft_gcmalloc(cat, len + 1);
+	if (!copy)
+		return (NULL);
 	i = 0;
-	while (src[i] != '\0')
+	while (i < len)
 	{
 		copy[i] = src[i];
 		i++;
