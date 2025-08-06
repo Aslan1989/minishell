@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/05 19:49:30 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/06 03:36:08 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,8 @@ struct	s_token
 void		setup_signals(void);
 void		disable_ctrl_echo(void);
 
-char		*read_prompt(void);
+// char		*read_prompt(void);
+char		*read_full_prompt(void);
 
 int			built_echo(char **args);
 int			built_cd(char **args);

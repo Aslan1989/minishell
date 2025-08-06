@@ -51,7 +51,7 @@ int	main(int argc, char **argv, char **envp)
 	ft_initialize_shell(envp);
 	while (1)
 	{
-		line = read_prompt();
+		line = read_full_prompt();
 		if (!line)
 			break ;
 		if (*line && get_shell()->is_interactive)
