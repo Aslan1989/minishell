@@ -6,7 +6,7 @@
 /*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/04 23:54:40 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/06 03:36:08 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,7 @@ typedef struct s_shell
 {
 	char	**envp;
 	int		last_exit_status;
+	int		is_interactive;
 }			t_shell;
 
 struct s_cmd
@@ -146,7 +147,8 @@ struct	s_token
 void		setup_signals(void);
 void		disable_ctrl_echo(void);
 
-char		*read_prompt(void);
+// char		*read_prompt(void);
+char		*read_full_prompt(void);
 
 int			built_echo(char **args);
 int			built_cd(char **args);
@@ -155,7 +157,16 @@ int			built_export(t_shell *shell, char **args);
 int			built_unset(t_shell *shell, char **args);
 int			built_env(t_shell *shell);
 int			built_exit(void);
+// built_export.c
+char		*make_env_string(const char *key, const char *value);
+int			replace_env_var(char **envp, const char *key, const char *value);
+// built_export_sort.c
+void		print_sorted_env(char **envp);
 
+char		*get_env_var(char **envp, const char *name);
+
+int			add_env_var(t_shell *shell, const char *key, const char *value);
+int			is_valid_identifier(const char *key);
 // char	**parse_input(const char *line);
 int			parse_input(t_cmd *node, const char *line);
 
@@ -166,10 +177,10 @@ char		**copy_env(char **envp);
 void		free_env(char **envp);
 
 char		*find_executable(t_shell *shell, const char *cmd);
-void		setup_redirections(t_cmd *cmd);
+//void		setup_redirections(t_cmd *cmd);
 
 //errors
-int			ft_print_error(char *msg);
+int			ft_print_error(const char *msg);
 
 //parser_utils
 int			count_args(const char *line);
@@ -190,6 +201,7 @@ t_shell		*get_shell(void);
 char		*ft_strpbrk(const char *s, const char *accept);
 size_t		ft_strspn(const char *s, const char *accept);
 void		ft_ignore_ac_av(int argc, char **argv);
+int			ft_isnotaword(char c);
 
 //commands
 void		ft_generate_commands(char *line, t_cmd **comms);
@@ -200,6 +212,7 @@ int			ft_redir_add(t_cmd *cmd, t_eredir type, char *filename);
 char		**ft_expand_wildcards(t_arg **args);
 
 void		ft_open_quotes(t_arg *arg);
+char		*ft_expand_env(char *str);
 int			ft_char_is_good_for_env(char c);
 
 //our malloc and garbage collector

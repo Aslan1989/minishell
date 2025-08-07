@@ -12,62 +12,80 @@
 
 #include "minishell.h"
 
-static void	ft_filter_env(char **envp, char ***new_env,
-		const char *key, size_t key_len)
+int	is_valid_identifier(const char *key)
 {
-	int	j;
-	int	k;
-
-	j = 0;
-	k = 0;
-	while (envp[j])
+	if (!key || !*key || !(ft_isalpha(*key) || *key == '_'))
+		return (0);
+	while (*key)
 	{
-		if (!ft_strncmp(envp[j], key, key_len) && envp[j][key_len] == '=')
-			ft_gcfree(CAT_ENV, envp[j]);
-		else
-			(*new_env)[k++] = envp[j];
-		j++;
+		if (!(ft_isalnum(*key) || *key == '_'))
+			return (0);
+		key++;
 	}
-	(*new_env)[k] = NULL;
+	return (1);
 }
 
-/**
- * @brief Implements the `unset` built-in command.
- *
- * Removes variables from the shell's environment. For each argument passed,
- * it searches for the variable with the same name, and removes it from envp.
- *
- * @param shell Pointer to the shell structure.
- * @param args Array of arguments, where args[0] is "unset", and args[1...]
- * are keys.
- * @return int Always returns 0 on success.
- *
- * @example
- *   unset PATH → removes the PATH variable from envp.
- */
-int	built_unset(t_shell *shell, char **args)
+static int	match_key(const char *env_var, const char *key)
 {
-	int			i;
-	int			count;
-	const char	*key;
-	size_t		key_len;
-	char		**new_env;
+	size_t	len;
+
+	len = ft_strlen(key);
+	return (ft_strncmp(env_var, key, len) == 0 && env_var[len] == '=');
+}
+
+static int	should_remove(char *env_var, char **args)
+{
+	int	i;
 
 	i = 1;
 	while (args[i])
 	{
-		key = args[i];
-		key_len = ft_strlen(key);
-		count = 0;
-		while (shell->envp[count])
-			count++;
-		new_env = ft_gcmalloc(CAT_ENV, sizeof(char *) * (count + 1));
-		if (!new_env)
+		if (is_valid_identifier(args[i]) && match_key(env_var, args[i]))
 			return (1);
-		ft_filter_env(shell->envp, &new_env, key, key_len);
-		ft_gcfree(CAT_ENV, shell->envp);
-		shell->envp = new_env;
 		i++;
 	}
+	return (0);
+}
+
+static void	print_invalid_identifiers(char **args)
+{
+	int	i;
+
+	i = 1;
+	while (args[i])
+	{
+		if (!is_valid_identifier(args[i]))
+		{
+			ft_print_error("minishell: unset: `");
+			ft_print_error((char *)args[i]);
+			ft_print_error("': not a valid identifier\n");
+		}
+		i++;
+	}
+}
+
+int	built_unset(t_shell *shell, char **args)
+{
+	int		i;
+	int		j;
+	char	**new_env;
+
+	print_invalid_identifiers(args);
+	i = 0;
+	while (shell->envp[i])
+		i++;
+	new_env = ft_gcmalloc(CAT_ENV, sizeof(char *) * (i + 1));
+	if (!new_env)
+		return (1);
+	i = 0;
+	j = 0;
+	while (shell->envp[i])
+	{
+		if (!should_remove(shell->envp[i], args))
+			new_env[j++] = shell->envp[i];
+		i++;
+	}
+	new_env[j] = NULL;
+	shell->envp = new_env;
 	return (0);
 }

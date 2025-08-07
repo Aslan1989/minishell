@@ -83,13 +83,11 @@ void	ft_ignore_ac_av(int argc, char **argv)
 	(void)argv;
 }
 
-int	ft_char_is_good_for_env(char c)
+int	ft_isnotaword(char c)
 {
-	if (c == '_')
+	if (ft_isspace(c))
 		return (1);
-	if (ft_isalnum(c))
-		return (1);
-	if (ft_isalpha(c))
+	if (c == '>' || c == '<')
 		return (1);
 	return (0);
 }

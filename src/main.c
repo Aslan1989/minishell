@@ -19,9 +19,13 @@ static void	ft_initialize_shell(char **envp)
 	shell = get_shell();
 	shell->envp = copy_env(envp);
 	shell->last_exit_status = 0;
-	setup_signals();
-	disable_ctrl_echo();
-	ft_print_banner();
+	shell->is_interactive = isatty(STDIN_FILENO);
+	if (shell->is_interactive)
+	{
+		setup_signals();
+		disable_ctrl_echo();
+		ft_print_banner();
+	}
 }
 
 /**
@@ -47,10 +51,10 @@ int	main(int argc, char **argv, char **envp)
 	ft_initialize_shell(envp);
 	while (1)
 	{
-		line = read_prompt();
+		line = read_full_prompt();
 		if (!line)
 			break ;
-		if (*line)
+		if (*line && get_shell()->is_interactive)
 			add_history(line);
 		ft_generate_commands(line, &comms);
 		free(line);

@@ -37,7 +37,9 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)builtins/built_env.c \
 	$(SRC_DIR)builtins/built_exit.c \
 	$(SRC_DIR)builtins/built_export.c \
+	$(SRC_DIR)builtins/built_export_sort.c \
 	$(SRC_DIR)builtins/built_pwd.c \
+	$(SRC_DIR)builtins/units.c \
 	$(SRC_DIR)executor.c \
 	$(SRC_DIR)find_executable.c \
 	$(SRC_DIR)u_avas.c \
@@ -48,11 +50,13 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)u_lib.c \
 	$(SRC_DIR)u_malloc.c \
 	$(SRC_DIR)u_malloc2.c \
+	$(SRC_DIR)u_malloc3.c \
 	$(SRC_DIR)u_parse.c \
 	$(SRC_DIR)u_parse2.c \
 	$(SRC_DIR)u_parse3.c \
 	$(SRC_DIR)u_parse4.c \
-	$(SRC_DIR)u_parse5.c \
+	$(SRC_DIR)u_parse5_quotes.c \
+	$(SRC_DIR)u_parse6_env.c \
 	$(SRC_DIR)u_redir.c \
 	$(SRC_DIR)u_redir2.c \
 	$(SRC_DIR)u_shell.c

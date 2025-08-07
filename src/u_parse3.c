@@ -62,7 +62,7 @@ char	**ft_expand_wildcards(t_arg **args)
 	count = 0;
 	while (args[i])
 	{
-		if (ft_strpbrk(args[i]->arg, "*") == NULL)
+		if (ft_strpbrk(args[i]->arg, "*?[]") == NULL)
 		{
 			result = (char **)ft_gcrealloc(CAT_ARGS, result,
 					sizeof(char*) * (count + 2));
@@ -72,7 +72,8 @@ char	**ft_expand_wildcards(t_arg **args)
 			ft_expand_wildcard(args[i], &result, &count);
 		i++;
 	}
-	result[count] = NULL;
+	if (result)
+		result[count] = NULL;
 	return (result);
 }
 
@@ -89,7 +90,6 @@ static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 	while (*line && *i < argc)
 	{
 		arg = extract_arg(&line);
-		// ft_printf("Extracted arg: %s\n", arg->arg);
 		if (!arg)
 			return (1);
 		if (ft_strcmp(arg->arg, "<") == 0)
@@ -132,13 +132,11 @@ int	parse_input(t_cmd *node, const char *line)
 	if (!node->commands || !node->args)
 		return (1);
 	i = 0;
-	// ft_printf("Parsing input: %s\n", line);
 	if (ft_fillout_commands(node, line, argc, &i))
 		return (1);
 	node->args[i] = NULL;
 	while (i <= argc)
 		node->args[i++] = NULL;
-	// ft_expand_env(node->commands);
 	node->commands = ft_expand_wildcards(node->args);
 	return (0);
 }

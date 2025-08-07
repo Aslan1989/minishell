@@ -26,7 +26,7 @@
  * @example
  * get_env_var(envp, "PATH") → "/usr/bin:/bin"
  */
-static char	*get_env_var(char **envp, const char *name)
+char	*get_env_var(char **envp, const char *name)
 {
 	size_t	len;
 	int		i;
