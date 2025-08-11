@@ -22,7 +22,7 @@
  * Write the string 's' to the given file descriptor 'fd'
  * Check for NULL input to prevent segmentation faults
  */
-void	ft_putstr_fd(char *s, int fd)
+void	ft_putstr_fd(const char *s, int fd)
 {
 	if (!s)
 		return ;

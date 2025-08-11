@@ -12,6 +12,29 @@
 
 #include "minishell.h"
 
+/**
+ * @brief Parse a sequence: expr (';' expr)*
+ */
+t_cmd	*parse_seq(t_token **current)
+{
+	t_cmd	*expr;
+	t_cmd	*right;
+	t_token	*operator;
+
+	expr = parse_or(current);
+	while (ft_p_check(*current, TOK_SEMI))
+	{
+		operator = *current;
+		ft_p_advance(current);
+		right = parse_or(current);
+		expr = ft_p_add_node(operator, expr, right);
+	}
+	return (expr);
+}
+
+/**
+ * @brief Parse OR chain: and_expr ( '||' and_expr )*
+ */
 t_cmd	*parse_or(t_token **current)
 {
 	t_cmd	*expr;
@@ -29,6 +52,9 @@ t_cmd	*parse_or(t_token **current)
 	return (expr);
 }
 
+/**
+ * @brief Parse AND chain: pipe_expr ( '&&' pipe_expr )*
+ */
 t_cmd	*parse_and(t_token **current)
 {
 	t_cmd	*expr;
@@ -46,6 +72,9 @@ t_cmd	*parse_and(t_token **current)
 	return (expr);
 }
 
+/**
+ * @brief Parse pipeline: word ( '|' word )*
+ */
 t_cmd	*parse_pipe(t_token **current)
 {
 	t_cmd	*expr;
@@ -63,30 +92,9 @@ t_cmd	*parse_pipe(t_token **current)
 	return (expr);
 }
 
-static t_cmd	*parse_word_sub(t_token **current)
-{
-	t_cmd	*first;
-	t_cmd	*node;
-	t_cmd	*last;
-	t_token	*token;
-
-	first = NULL;
-	last = NULL;
-	while (ft_p_check(*current, TOK_WORD))
-	{
-		token = (*current);
-		ft_p_advance(current);
-		node = ft_p_add_node(token, NULL, NULL);
-		parse_input(node, token->value);
-		if (!first)
-			first = node;
-		else
-			last->next_a = node;
-		last = node;
-	}
-	return (first);
-}
-
+/**
+ * @brief Parse a command word or a parenthesized subexpression.
+ */
 t_cmd	*parse_word(t_token **current)
 {
 	t_cmd	*node;
@@ -100,8 +108,12 @@ t_cmd	*parse_word(t_token **current)
 	{
 		ft_p_advance(current);
 		node = parse_or(current);
-		if (ft_p_check(*current, TOK_RPAREN))
-			ft_p_advance(current);
+		if (!ft_p_check(*current, TOK_RPAREN))
+		{
+			ft_print_error("minishell: syntax error: unexpected token\n");
+			return (NULL);
+		}
+		ft_p_advance(current);
 		return (node);
 	}
 	return (NULL);

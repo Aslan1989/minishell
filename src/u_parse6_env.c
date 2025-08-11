@@ -3,15 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   u_parse6_env.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
+/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/05 19:49:58 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/09 13:48:14 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/**
+ * @brief Lookup environment variable by name and duplicate value in CAT_ARGS.
+ * Supports the special case `?` → last exit status.
+ */
 static char	*ft_getenv(char *var)
 {
 	t_shell	*shell;
@@ -40,6 +44,9 @@ static char	*ft_getenv(char *var)
 	return (ft_gcstrdup(CAT_ARGS, ""));
 }
 
+/**
+ * @brief Read a $VAR (or $?) token and return its expanded value.
+ */
 static char	*ft_getwordenv(char **line)
 {
 	char	*start;
@@ -56,6 +63,9 @@ static char	*ft_getwordenv(char **line)
 	return (ft_getenv(ft_gcstrndup(CAT_ARGS, start, *line - start)));
 }
 
+/**
+ * @brief Read a literal span until '$' or end.
+ */
 static char	*ft_getword(char **line)
 {
 	char	*start;
@@ -66,6 +76,10 @@ static char	*ft_getword(char **line)
 	return (ft_gcstrndup(CAT_ARGS, start, *line - start));
 }
 
+/**
+ * @brief Expand environment variables in a string.
+ * Concatenates literal and $VAR/$? segments.
+ */
 char	*ft_expand_env(char *str)
 {
 	char	*line;
@@ -85,6 +99,9 @@ char	*ft_expand_env(char *str)
 	return (ret);
 }
 
+/**
+ * @brief Acceptable characters for environment names.
+ */
 int	ft_char_is_good_for_env(char c)
 {
 	if (c == '_')

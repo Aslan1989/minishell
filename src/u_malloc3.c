@@ -15,7 +15,7 @@
 /**
  * @brief Duplicates a string and returns it in the garbage collector.
  */
-char	*ft_gcstrdup(t_egccat cat, char *src)
+char	*ft_gcstrdup(t_egccat cat, const char *src)
 {
 	char	*copy;
 	size_t	len;
@@ -66,7 +66,7 @@ char	*ft_gcstrndup(t_egccat cat, char *src, ssize_t n)
 /**
  * @brief Joins two strings and returns a new string in the garbage collector.
  */
-char	*ft_gcstrjoin(t_egccat cat, char *s1, char *s2)
+char	*ft_gcstrjoin(t_egccat cat, char *s1, const char *s2)
 {
 	char	*word;
 	char	*result;
@@ -75,8 +75,12 @@ char	*ft_gcstrjoin(t_egccat cat, char *s1, char *s2)
 
 	if (!s1 && !s2)
 		return (NULL);
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
+	len1 = 0;
+	if (s1)
+		len1 = ft_strlen(s1);
+	len2 = 0;
+	if (s2)
+		len2 = ft_strlen(s2);
 	result = ft_gcmalloc(cat, len1 + len2 + 1);
 	if (!result)
 		return (NULL);

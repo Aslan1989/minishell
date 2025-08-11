@@ -12,30 +12,17 @@
 
 #include "minishell.h"
 
-/**
- * @brief Implements the `export` built-in command.
- *
- * Adds or updates environment variables in the shell's environment.
- * Example: export VAR=value
- * This function supports syntax checking and safely modifies the internal
- * envp array.
- *
- * @param shell Pointer to the shell structure (contains envp).
- * @param args The array of strings, where args[0] = "export",
- * args[1] = "VAR=value", etc.
- * @return int 0 on success, 1 on invalid format or allocation failure.
- */
-static void	print_invalid_identifier(const char *key)
+static void	print_invalid_identifier(char *key)
 {
-	ft_print_error("minishell: export: invalid identifier: ");
-	ft_print_error(key);
-	ft_print_error("\n");
+	ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+	ft_putstr_fd(key, STDERR_FILENO);
+	ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
 }
 
 static void	process_key_value_with_equal(t_shell *shell, char *arg, char *equal)
 {
-	const char	*key;
-	const char	*value;
+	char	*key;
+	char	*value;
 
 	key = arg;
 	value = equal + 1;
@@ -53,7 +40,7 @@ static void	process_key_value_with_equal(t_shell *shell, char *arg, char *equal)
 
 static void	process_key_value_without_equal(t_shell *shell, char *arg)
 {
-	const char	*key;
+	char	*key;
 
 	key = arg;
 	if (!is_valid_identifier(key))

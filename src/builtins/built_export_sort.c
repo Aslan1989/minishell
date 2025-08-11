@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   built_export_sort.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 22:50:00 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/05 22:50:00 by marvin           ###   ########.fr       */
+/*   Updated: 2025/08/08 17:41:36 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,16 +40,27 @@ static void	bubble_sort(char **arr)
 	}
 }
 
-void	print_env(char **envp)
+static void	print_env_formatted(char **envp)
 {
-	int	i;
+	int		i;
+	char	*eq;
 
 	i = 0;
-	if (!envp)
-		return ;
 	while (envp[i])
 	{
-		ft_printf("declare -x %s\n", envp[i]);
+		ft_putstr_fd("declare -x ", STDOUT_FILENO);
+		eq = ft_strchr(envp[i], '=');
+		if (eq)
+		{
+			*eq = '\0';
+			ft_putstr_fd(envp[i], STDOUT_FILENO);
+			ft_putstr_fd("=\"", STDOUT_FILENO);
+			ft_putstr_fd(eq + 1, STDOUT_FILENO);
+			ft_putendl_fd("\"", STDOUT_FILENO);
+			*eq = '=';
+		}
+		else
+			ft_putendl_fd(envp[i], STDOUT_FILENO);
 		i++;
 	}
 }
@@ -58,7 +69,10 @@ void	print_sorted_env(char **envp)
 {
 	char	**copy;
 
-	copy = copy_env(envp);
+	copy = copy_env_cat(envp, CAT_MEM);
+	if (!copy)
+		return ;
 	bubble_sort(copy);
-	print_env(copy);
+	print_env_formatted(copy);
+	free_gc_cat(CAT_MEM);
 }

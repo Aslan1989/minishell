@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
+/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/06 03:36:08 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/09 17:00:36 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 # include <limits.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+# include <sys/stat.h>
 
 # include <glob.h>
 
@@ -51,6 +52,7 @@ typedef enum e_token
 	TOK_OR,
 	TOK_LPAREN,
 	TOK_RPAREN,
+	TOK_SEMI,
 	TOK_EOF
 }	t_etoken;
 
@@ -90,6 +92,7 @@ struct s_garbage
 {
 	void		*ptr;
 	size_t		size;
+	int			owns;
 	t_garbage	*next;
 };
 
@@ -117,6 +120,7 @@ typedef struct s_shell
 	char	**envp;
 	int		last_exit_status;
 	int		is_interactive;
+	int		envp_allocated;
 }			t_shell;
 
 struct s_cmd
@@ -155,32 +159,52 @@ int			built_cd(char **args);
 int			built_pwd(void);
 int			built_export(t_shell *shell, char **args);
 int			built_unset(t_shell *shell, char **args);
-int			built_env(t_shell *shell);
-int			built_exit(void);
+int			built_env(t_shell *shell, char **args);
+int			built_exit(char **args);
 // built_export.c
 char		*make_env_string(const char *key, const char *value);
 int			replace_env_var(char **envp, const char *key, const char *value);
 // built_export_sort.c
 void		print_sorted_env(char **envp);
 
+// build_cd_helpers.c
+char		*target_from_oldpwd(t_shell *sh);
+char		*search_in_cdpath(t_shell *sh, const char *arg);
+
+// built_unset_helpers.c
+void		env_copy_filtered(char **src, char **args, char **dst);
+char		**env_alloc(int count);
+int			env_count(char **envp);
+int			should_remove(char *env_var, char **args);
+
 char		*get_env_var(char **envp, const char *name);
 
 int			add_env_var(t_shell *shell, const char *key, const char *value);
 int			is_valid_identifier(const char *key);
-// char	**parse_input(const char *line);
 int			parse_input(t_cmd *node, const char *line);
+
+//executor_helpers.c
+int			run_and_node(t_cmd *node);
+int			run_or_node(t_cmd *node);
+int			run_semi_node(t_cmd *node);
+pid_t		fork_pipe_child(t_cmd *cmd, int fd, int p_fd[2], int dup_fd);
+int			get_exit_status(int status);
+// executor_helpers2.c
+int			is_builtin(const char *s);
 
 int			execute_command(t_cmd *command, t_shell *shell, char **args);
 int			ft_run_commands(t_cmd *com);
 
 char		**copy_env(char **envp);
+char		**copy_env_cat(char **envp, t_egccat cat);
 void		free_env(char **envp);
 
 char		*find_executable(t_shell *shell, const char *cmd);
-//void		setup_redirections(t_cmd *cmd);
 
 //errors
 int			ft_print_error(const char *msg);
+void		print_arg_err(const char *arg, const char *msg);
+void		print_errno_for(const char *what);
 
 //parser_utils
 int			count_args(const char *line);
@@ -189,6 +213,7 @@ t_cmd		*parse_or(t_token **current);
 t_cmd		*parse_and(t_token **current);
 t_cmd		*parse_pipe(t_token **current);
 t_cmd		*parse_word(t_token **current);
+t_cmd		*parse_seq(t_token **current);
 t_etoken	ft_p_check(t_token *current, t_etoken type);
 t_token		*ft_p_advance(t_token **current);
 t_cmd		*ft_p_add_node(t_token *token, t_cmd *next_a, t_cmd *next_b);
@@ -211,6 +236,7 @@ int			ft_here_doc_input(char *limiter);
 int			ft_redir_add(t_cmd *cmd, t_eredir type, char *filename);
 char		**ft_expand_wildcards(t_arg **args);
 
+t_cmd		*parse_word_sub(t_token **current);
 void		ft_open_quotes(t_arg *arg);
 char		*ft_expand_env(char *str);
 int			ft_char_is_good_for_env(char c);
@@ -223,11 +249,17 @@ void		ft_gcfree(t_egccat cat, void *ptr);
 size_t		ft_gc_getsize(t_egccat cat, void *ptr);
 void		*ft_gcmalloc(t_egccat cat, ssize_t size);
 void		*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size);
-char		*ft_gcstrdup(t_egccat cat, char *src);
+char		*ft_gcstrdup(t_egccat cat, const char *src);
 char		*ft_gcstrndup(t_egccat cat, char *src, ssize_t n);
 t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr);
-char		*ft_gcstrjoin(t_egccat cat, char *s1, char *s2);
+char		*ft_gcstrjoin(t_egccat cat, char *s1, const char *s2);
 
 void		ft_print_banner(void);
 
+void		parent_stdio_restore(int *save_in, int *save_out);
+int			parent_redirs_apply(t_cmd *cmd, int *save_in, int *save_out);
+
+//u_redir_helpers.c
+int			apply_fds_parent(int fd_in, int fd_out,
+				int *save_in, int *save_out);
 #endif

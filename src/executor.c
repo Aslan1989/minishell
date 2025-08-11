@@ -3,80 +3,101 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
+/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/05 14:13:47 by aisaev            #+#    #+#             */
-/*   Updated: 2025/07/24 13:46:54 by psmolin          ###   ########.fr       */
+/*   Created: 2025/08/08 18:18:18 by aisaev            #+#    #+#             */
+/*   Updated: 2025/08/08 18:18:18 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Handles the execution of a command.
- *
- * This function checks if the command is a built-in that doesn't require
- * special handling (like redirections or pipes). If it is, it calls the
- * appropriate built-in function. It calls `execute_command` for
- * external commands or built-ins that require execution.
- *
- * @param command Pointer to the command structure containing command details.
- * @param args Array of arguments, where args[0] is the command name.
- * @return int Exit status of the executed command.
+ * @brief Call the correct builtin in the parent process (for redirs to apply
+ *        to the shell itself). `exit` does not return.
+ * @param cmd AST node (for redirections).
+ * @param sh Shell state.
+ * @param args Argument vector (NULL-terminated).
+ * @return int Status code returned by builtin.
+ */
+static int	dispatch_builtin(t_cmd *cmd, t_shell *sh, char **args)
+{
+	if (!ft_strcmp(args[0], "cd"))
+		return (built_cd(args));
+	if (!ft_strcmp(args[0], "export"))
+		return (built_export(sh, args));
+	if (!ft_strcmp(args[0], "unset"))
+		return (built_unset(sh, args));
+	if (!ft_strcmp(args[0], "exit"))
+		built_exit(args);
+	if (!ft_strcmp(args[0], "echo"))
+		return (built_echo(args));
+	if (!ft_strcmp(args[0], "pwd"))
+		return (built_pwd());
+	if (!ft_strcmp(args[0], "env"))
+		return (built_env(sh, args));
+	(void)cmd;
+	return (1);
+}
+
+/**
+ * @brief Apply redirections in parent, run builtin, then restore stdio.
+ * @param cmd Node with redirections.
+ * @param sh Shell state.
+ * @param args Arguments.
+ * @return int Builtin status or 1 on redirection errors.
+ */
+static int	run_builtin_parent(t_cmd *cmd, t_shell *sh, char **args)
+{
+	int	save_in;
+	int	save_out;
+	int	status;
+	int	need_restore;
+
+	save_in = -1;
+	save_out = -1;
+	need_restore = 0;
+	if (cmd->redir)
+	{
+		if (parent_redirs_apply(cmd, &save_in, &save_out) != 0)
+			return (1);
+		need_restore = 1;
+	}
+	status = dispatch_builtin(cmd, sh, args);
+	if (need_restore)
+		parent_stdio_restore(&save_in, &save_out);
+	return (status);
+}
+
+/**
+ * @brief Handle a "word" command node: either builtin or external.
+ * @param command Node to execute.
+ * @param args Prepared argv (expanded).
+ * @return int Exit status semantics.
  */
 static int	handle_command(t_cmd *command, char **args)
 {
 	t_shell	*shell;
+	int		status;
 
+	if (!command || !args || !args[0])
+		return (1);
 	shell = get_shell();
-	if (!args || !args[0])
-		return (0);
-	if (!ft_strcmp(args[0], "cd"))
-		return (built_cd(args));
-	else if (!ft_strcmp(args[0], "export"))
-		return (built_export(shell, args));
-	else if (!ft_strcmp(args[0], "unset"))
-		return (built_unset(shell, args));
-	else if (!ft_strcmp(args[0], "exit"))
-		built_exit();
-	else if (ft_strcmp(args[0], "env") == 0
-		|| ft_strcmp(args[0], "echo") == 0 || ft_strcmp(args[0], "pwd") == 0)
-		command->isbuiltin = 1;
-	return (execute_command(command, shell, args));
+	if (!shell)
+		return (1);
+	if (is_builtin(args[0]))
+		status = run_builtin_parent(command, shell, args);
+	else
+		status = execute_command(command, shell, args);
+	shell->last_exit_status = status;
+	return (status);
 }
 
 /**
- * @brief Runs a child process with the specified file descriptors.
- *
- * This function sets up the necessary file descriptors for the child process
- * and then executes the command.
- *
- * @param fd File descriptor to duplicate.
- * @param p_fd Pipe file descriptors.
- * @param command Pointer to the command structure.
- * @param dup_fd File descriptor to duplicate to (e.g., STDOUT_FILENO).
- */
-static void	run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
-{
-	int	status;
-
-	dup2(fd, dup_fd);
-	close(p_fd[0]);
-	close(p_fd[1]);
-	status = ft_run_commands(command);
-	free_gc();
-	exit(status);
-}
-
-/**
- * @brief Handles the execution of a command with pipes.
- *
- * This function creates a pipe, forks two child processes, and sets up
- * the necessary file descriptors for each child to communicate through the pipe.
- *
- * @param command_1 First command structure to execute.
- * @param command_2 Second command structure to execute.
- * @return int Exit status of the second command.
+ * @brief Execute a pipeline A | B.
+ * @param command_1 Left side AST.
+ * @param command_2 Right side AST.
+ * @return int Exit status of the rightmost command (bash semantics).
  */
 static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 {
@@ -88,32 +109,26 @@ static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 
 	if (pipe(p_fd) < 0)
 		return (perror("pipe"), 1);
-	pid_a = fork();
+	pid_a = fork_pipe_child(command_1, p_fd[1], p_fd, STDOUT_FILENO);
 	if (pid_a < 0)
 		return (perror("fork"), close(p_fd[0]), close(p_fd[1]), 1);
-	if (pid_a == 0)
-		run_child_process(p_fd[1], p_fd, command_1, STDOUT_FILENO);
-	pid_b = fork();
+	pid_b = fork_pipe_child(command_2, p_fd[0], p_fd, STDIN_FILENO);
 	if (pid_b < 0)
+	{
+		kill(pid_a, SIGKILL);
 		return (perror("fork"), close(p_fd[0]), close(p_fd[1]), 1);
-	if (pid_b == 0)
-		run_child_process(p_fd[0], p_fd, command_2, STDIN_FILENO);
-	close(p_fd[1]);
+	}
 	close(p_fd[0]);
+	close(p_fd[1]);
 	waitpid(pid_a, &status_a, 0);
 	waitpid(pid_b, &status_b, 0);
-	return (WEXITSTATUS(status_b));
+	return (get_exit_status(status_b));
 }
 
 /**
- * @brief Runs a list of commands, handling pipes and built-ins.
- *
- * This function iterates through the command list, executing each command
- * in the appropriate way (built-in or external). It handles pipes between
- * commands and sets up redirections as needed.
- *
- * @param com Pointer to the first command in the list.
- * @return int Exit status of the last executed command.
+ * @brief Execute the AST recursively with AND/OR/SEMI and PIPE semantics.
+ * @param com Root/current node.
+ * @return int Final exit status according to shell rules.
  */
 int	ft_run_commands(t_cmd *com)
 {
@@ -122,22 +137,22 @@ int	ft_run_commands(t_cmd *com)
 	if (!com)
 		return (0);
 	if (com->type == TOK_WORD)
-		return (handle_command(com, com->commands));
+	{
+		status = handle_command(com, com->commands);
+		get_shell()->last_exit_status = status;
+		return (status);
+	}
 	if (com->type == TOK_PIPE)
-		return (handle_pipe(com->next_a, com->next_b));
+	{
+		status = handle_pipe(com->next_a, com->next_b);
+		get_shell()->last_exit_status = status;
+		return (status);
+	}
 	if (com->type == TOK_AND)
-	{
-		status = ft_run_commands(com->next_a);
-		if (status == 0)
-			return (ft_run_commands(com->next_b));
-		return (status);
-	}
+		return (run_and_node(com));
 	if (com->type == TOK_OR)
-	{
-		status = ft_run_commands(com->next_a);
-		if (status != 0)
-			return (ft_run_commands(com->next_b));
-		return (status);
-	}
+		return (run_or_node(com));
+	if (com->type == TOK_SEMI)
+		return (run_semi_node(com));
 	return (0);
 }

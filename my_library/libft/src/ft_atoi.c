@@ -18,7 +18,7 @@
     - Stops conversion at the first non-digit character.
     - Returns the resulting integer with the correct sign.
 */
-long	ft_atol(const char *str)
+long	ft_atoi(const char *str)
 {
 	long	result;
 	int		sign;
@@ -28,9 +28,7 @@ long	ft_atol(const char *str)
 	sign = 1;
 	result = 0;
 	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-	{
 		i++;
-	}
 	if (str[i] == '+' || str[i] == '-')
 	{
 		if (str[i] == '-')

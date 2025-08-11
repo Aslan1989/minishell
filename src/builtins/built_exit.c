@@ -13,19 +13,78 @@
 #include "minishell.h"
 
 /**
- * @brief Implements the `exit` built-in command.
+ * @brief Return 1 if `str` is a (signed) decimal integer.
  *
- * Terminates the shell process. This is a direct call to `exit(0)`,
- * which stops the program immediately.
- *
- * @return int This function never returns, it exits the program.
- *
- * @example
- *   exit → closes the minishell
+ * @param str Input string.
+ * @return int 1 if numeric, 0 otherwise.
  */
-int	built_exit(void)
+int	ft_is_numeric(const char *str)
+{
+	int	i;
+
+	if (!str || !str[0])
+		return (0);
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+static void	print_too_many_args(void)
+{
+	ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
+}
+
+static void	print_numeric_error(char *arg)
+{
+	ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
+	ft_putstr_fd(arg, STDERR_FILENO);
+	ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+}
+
+static void	cleanup_and_exit(int code)
 {
 	free_gc();
 	clear_history();
-	exit(0);
+	exit(code);
+}
+
+/**
+ * @brief Builtin: exit
+ *
+ * Behaviour:
+ * - No args: exit(0)
+ * - One non-numeric: print error, exit(255)
+ * - One numeric: exit((unsigned char)code)
+ * - More than one arg: print error and return 1 without exiting.
+ *
+ * @param args Command arguments.
+ * @return int 1 on "too many arguments", otherwise does not return.
+ */
+int	built_exit(char **args)
+{
+	long	code;
+
+	if (get_shell()->is_interactive)
+		ft_putendl_fd("exit", STDOUT_FILENO);
+	if (!args || !args[1])
+		cleanup_and_exit(0);
+	if (args[2])
+		return (print_too_many_args(), 1);
+	if (!ft_is_numeric(args[1]))
+	{
+		print_numeric_error(args[1]);
+		cleanup_and_exit(255);
+	}
+	code = ft_atoi(args[1]);
+	cleanup_and_exit((unsigned char)code);
+	return (0);
 }

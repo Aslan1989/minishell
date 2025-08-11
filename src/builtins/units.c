@@ -3,23 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   units.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 23:00:44 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/05 23:00:44 by marvin           ###   ########.fr       */
+/*   Updated: 2025/08/09 14:36:04 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Creates a string of format "key=value" from two parts.
+ * @brief Build "KEY=VALUE" as a GC-managed string.
  *
- * This helper function is used when setting or adding environment variables.
- *
- * @param key Name of the environment variable.
- * @param value Value of the variable.
- * @return char* Newly allocated string in the form key=value.
+ * @param key Key part.
+ * @param value Value part.
+ * @return char* Newly allocated string or NULL.
  */
 char	*make_env_string(const char *key, const char *value)
 {
@@ -49,46 +47,12 @@ char	*make_env_string(const char *key, const char *value)
 }
 
 /**
- * @brief Replaces the value of an existing environment variable.
+ * @brief Append KEY=VALUE at the end of shell->envp.
  *
- * This function searches for a variable by name (e.g., "PATH"), and if found,
- * frees the old value and inserts the new one.
- *
- * @param envp Array of environment strings.
- * @param key Name of the variable to replace.
- * @param value New value to assign.
- * @return int 1 if replaced, 0 if not found.
- */
-int	replace_env_var(char **envp, const char *key, const char *value)
-{
-	size_t	len;
-	int		i;
-
-	len = ft_strlen(key);
-	i = 0;
-	while (envp[i])
-	{
-		if (!ft_strncmp(envp[i], key, len) && envp[i][len] == '=')
-		{
-			ft_gcfree(CAT_ENV, envp[i]);
-			envp[i] = make_env_string(key, value);
-			return (1);
-		}
-		i++;
-	}
-	return (0);
-}
-
-/**
- * @brief Adds a new environment variable to the shell environment.
- *
- * Allocates a new array of strings that is one element larger, copies
- * all old values into it, and appends the new key=value string.
- *
- * @param shell Pointer to shell containing envp.
- * @param key Name of the new variable.
- * @param value Value of the new variable.
- * @return int 0 on success, 1 on failure.
+ * @param shell Shell state (owns envp GC category).
+ * @param key Key to add.
+ * @param value Value to add.
+ * @return int 0 on success, 1 on allocation failure.
  */
 int	add_env_var(t_shell *shell, const char *key, const char *value)
 {

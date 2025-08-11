@@ -13,18 +13,10 @@
 #include "minishell.h"
 
 /**
- * @brief Searches for an environment variable by name and returns its value.
- *
- * For example, if the envp array contains: "PATH=/usr/bin:/bin",
- * and name = "PATH", this function returns the string "/usr/bin:/bin".
- *
- * @param envp Array of strings, each in the form "KEY=VALUE".
- * @param name The name of the variable to find (e.g., "PATH").
- * @return char* Pointer to the value part of the matching variable,
- * or NULL if the variable is not found.
- *
- * @example
- * get_env_var(envp, "PATH") → "/usr/bin:/bin"
+ * @brief Get value of an environment name from envp (no allocation).
+ * @param envp Environment.
+ * @param name Variable name.
+ * @return char* Pointer inside envp string after '=' or NULL.
  */
 char	*get_env_var(char **envp, const char *name)
 {
@@ -43,45 +35,75 @@ char	*get_env_var(char **envp, const char *name)
 }
 
 /**
- * @brief Searches for a command executable file in the system's PATH.
- *
- * When a user types a command like `ls` or `cat`, this function looks
- * through all the directories listed in the PATH environment variable to
- * find where the command file is located (e.g., `/bin/ls`).
- * If it finds a valid file that is executable,
- * it returns its full path so it can be executed using `execve`.
- *
- * @param shell Pointer to the shell structure containing environment variables.
- * @param cmd The command name to search for (e.g., "ls", "grep").
- * @return char* The full path to the executable file, or NULL if not found.
- *
- * @example
- *   find_executable(shell, "ls") → "/bin/ls"
- *   find_executable(shell, "badcmd") → NULL
+ * @brief Join directory and command into CAT_CMD GC.
+ * @param dir PATH entry.
+ * @param cmd Command name.
+ * @return char* GC managed string (CAT_CMD) or NULL.
  */
-char	*find_executable(t_shell *shell, const char *cmd)
+static char	*ft_strjoin_path(const char *dir, const char *cmd)
 {
-	char	**paths;
+	char	*full;
+	char	*with_slash;
+
+	if (!dir || !cmd)
+		return (NULL);
+	with_slash = ft_gcstrjoin(CAT_CMD, (char *)dir, "/");
+	if (!with_slash)
+		return (NULL);
+	full = ft_gcstrjoin(CAT_CMD, with_slash, cmd);
+	return (full);
+}
+
+/**
+ * @brief Search cmd across PATH entries.
+ * @param paths Split PATH array (malloc'ed by ft_split).
+ * @param cmd Command name.
+ * @return char* Full path in CAT_CMD on success, NULL otherwise.
+ */
+static char	*search_in_paths(char **paths, const char *cmd)
+{
 	char	*full_path;
-	char	*candidate;
 	int		i;
 
-	if (!cmd || !*cmd)
-		return (NULL);
-	paths = ft_split(get_env_var(shell->envp, "PATH"), ':');
-	if (!paths)
+	if (!paths || !cmd)
 		return (NULL);
 	i = 0;
 	while (paths[i])
 	{
-		full_path = ft_strjoin(paths[i], "/");
-		candidate = ft_strjoin(full_path, cmd);
-		free(full_path);
-		if (candidate && access(candidate, X_OK) == 0)
-			return (ft_free_split(paths), candidate);
-		free(candidate);
+		full_path = ft_strjoin_path(paths[i], cmd);
+		if (!full_path)
+			return (NULL);
+		if (access(full_path, X_OK) == 0)
+			return (full_path);
+		ft_gcfree(CAT_CMD, full_path);
 		i++;
 	}
-	ft_free_split(paths);
 	return (NULL);
+}
+
+/**
+ * @brief Resolve executable path using PATH if needed.
+ * @param shell Shell (for envp).
+ * @param cmd Command (may be name or contain '/').
+ * @return char* CAT_CMD duplicate of resolved path or NULL if not found.
+ */
+char	*find_executable(t_shell *shell, const char *cmd)
+{
+	char	**paths;
+	char	*path_env;
+	char	*dup;
+
+	if (!cmd)
+		return (NULL);
+	if (ft_strchr(cmd, '/'))
+		return (ft_gcstrdup(CAT_CMD, cmd));
+	path_env = get_env_var(shell->envp, "PATH");
+	if (!path_env)
+		return (NULL);
+	paths = ft_split(path_env, ':');
+	if (!paths)
+		return (NULL);
+	dup = search_in_paths(paths, cmd);
+	ft_free_split(paths);
+	return (dup);
 }

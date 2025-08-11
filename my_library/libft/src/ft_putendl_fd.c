@@ -23,7 +23,7 @@
  * Check for NULL input to avoid segmentation fault
  * Write the string 's' to the given file descriptor 'fd'
  */
-void	ft_putendl_fd(char *s, int fd)
+void	ft_putendl_fd(const char *s, int fd)
 {
 	if (!s)
 		return ;

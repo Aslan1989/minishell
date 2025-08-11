@@ -12,7 +12,8 @@
 
 NAME = minishell
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -fsanitize=address -g3
+
 
 RL_FLAGS = -lreadline
 
@@ -33,7 +34,9 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)signals.c \
 	$(SRC_DIR)builtins/built_echo.c \
 	$(SRC_DIR)builtins/built_unset.c \
+	$(SRC_DIR)builtins/built_unset_helpers.c \
 	$(SRC_DIR)builtins/built_cd.c \
+	$(SRC_DIR)builtins/built_cd_helpers.c \
 	$(SRC_DIR)builtins/built_env.c \
 	$(SRC_DIR)builtins/built_exit.c \
 	$(SRC_DIR)builtins/built_export.c \
@@ -41,6 +44,8 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)builtins/built_pwd.c \
 	$(SRC_DIR)builtins/units.c \
 	$(SRC_DIR)executor.c \
+	$(SRC_DIR)executor_helpers.c \
+	$(SRC_DIR)executor_helpers2.c \
 	$(SRC_DIR)find_executable.c \
 	$(SRC_DIR)u_avas.c \
 	$(SRC_DIR)u_comms.c \
@@ -59,6 +64,8 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)u_parse6_env.c \
 	$(SRC_DIR)u_redir.c \
 	$(SRC_DIR)u_redir2.c \
+	$(SRC_DIR)u_redir_parent.c \
+	$(SRC_DIR)u_redir_helpers.c \
 	$(SRC_DIR)u_shell.c
 
 # Changing all SRC_DIR to OBJ_DIR for objects

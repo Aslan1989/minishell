@@ -32,20 +32,20 @@ int	built_echo(char **args)
 
 	i = 1;
 	newline = 1;
-	while (args[i] && !ft_strncmp(args[i], "-n", 2)
-		&& ft_strspn(args[i] + 2, "n") == ft_strlen(args[i] + 2))
+	while (args[i] && args[i][0] == '-' && args[i][1] == 'n'
+		&& ft_strspn(args[i] + 1, "n") == ft_strlen(args[i] + 1))
 	{
 		newline = 0;
 		i++;
 	}
 	while (args[i])
 	{
-		ft_printf("%s", args[i]);
+		ft_putstr_fd(args[i], STDOUT_FILENO);
 		if (args[i + 1])
-			ft_printf(" ");
+			ft_putchar_fd(' ', STDOUT_FILENO);
 		i++;
 	}
 	if (newline)
-		ft_printf("\n");
+		ft_putchar_fd('\n', STDOUT_FILENO);
 	return (0);
 }

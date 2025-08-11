@@ -25,10 +25,19 @@
  */
 int	built_pwd(void)
 {
+	t_shell	*sh;
+	char	*pwd;
 	char	cwd[PATH_MAX];
 
+	sh = get_shell();
+	pwd = get_env_var(sh->envp, "PWD");
+	if (pwd && *pwd)
+	{
+		ft_putendl_fd(pwd, STDOUT_FILENO);
+		return (0);
+	}
 	if (getcwd(cwd, sizeof(cwd)))
-		ft_printf("%s\n", cwd);
+		ft_putendl_fd(cwd, STDOUT_FILENO);
 	else
 		perror("minishell: pwd");
 	return (0);

@@ -12,11 +12,6 @@
 
 #include "minishell.h"
 
-/**
- * @brief Checks if the line has unclosed quotes.
- * Returns 1 for single quotes, 2 for double quotes,
- * or 0 if all quotes are closed.
- */
 static int	ft_has_unclosed_quotes(const char *line)
 {
 	int		i;
@@ -41,14 +36,6 @@ static int	ft_has_unclosed_quotes(const char *line)
 	return (0);
 }
 
-/**
- * @brief Reads a line from the user in interactive mode.
- *
- * This function displays a custom prompt and waits for user input.
- * It handles multi-line input by checking for unclosed quotes.
- *
- * @return char* The complete user input. Must be freed manually.
- */
 static char	*read_full_line_int(void)
 {
 	char	*line;
@@ -72,12 +59,6 @@ static char	*read_full_line_int(void)
 	return (line);
 }
 
-/**
- * @brief Reads a line from the user in non-interactive mode.
- *
- * This function reads a single line from standard input.
- * It does not handle multi-line input or prompts.
- */
 static char	*read_full_line(void)
 {
 	char	*line;
@@ -101,13 +82,6 @@ EOF while looking for matching `\''\n");
 	return (line);
 }
 
-/**
- * @brief Reads a full prompt from the user.
- *
- * This function checks if the shell is interactive.
- * If it is, it reads a full line with prompts and multi-line support.
- * If not, it reads a single line without prompts.
- */
 char	*read_full_prompt(void)
 {
 	t_shell	*shell;

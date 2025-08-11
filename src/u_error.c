@@ -28,3 +28,18 @@ int	ft_print_error(const char *msg)
 		return (33);
 	}
 }
+
+void	print_arg_err(const char *arg, const char *msg)
+{
+	ft_putstr_fd(arg, STDERR_FILENO);
+	ft_putstr_fd(": ", STDERR_FILENO);
+	ft_putendl_fd(msg, STDERR_FILENO);
+}
+
+void	print_errno_for(const char *what)
+{
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd(what, STDERR_FILENO);
+	ft_putstr_fd(": ", STDERR_FILENO);
+	ft_putendl_fd(strerror(errno), STDERR_FILENO);
+}

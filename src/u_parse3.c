@@ -12,35 +12,20 @@
 
 #include "minishell.h"
 
-/**
- * @brief Expands single wildcard
- */
-static void	ft_expand_wildcard(t_arg *token, char ***result, int *count)
+static int	append_result(char ***res, int *count, const char *s)
 {
-	glob_t	globbuf;
-	size_t	i;
+	char	**r;
 
-	if (token->wildcard == 1 && glob(token->arg, 0, NULL, &globbuf) == 0)
-	{
-		i = 0;
-		while (i < globbuf.gl_pathc)
-		{
-			*result = (char **)ft_gcrealloc(CAT_ARGS, *result,
-					sizeof(char*) * (*count + 2));
-			(*result)[*count] = ft_gcstrdup(CAT_ARGS, globbuf.gl_pathv[i]);
-			(*count)++;
-			i++;
-		}
-	}
-	else
-	{
-		*result = (char **)ft_gcrealloc(CAT_ARGS, *result,
-				sizeof(char*) * (*count + 2));
-		(*result)[*count] = ft_gcstrdup(CAT_ARGS, token->arg);
-		(*count)++;
-	}
-	if (token->wildcard == 1)
-		globfree(&globbuf);
+	r = (char **)ft_gcrealloc(CAT_ARGS, *res, sizeof(char *) * (*count + 2));
+	if (!r)
+		return (1);
+	r[*count] = ft_gcstrdup(CAT_ARGS, s);
+	if (!r[*count])
+		return (1);
+	(*count)++;
+	r[*count] = NULL;
+	*res = r;
+	return (0);
 }
 
 /**
@@ -56,29 +41,38 @@ char	**ft_expand_wildcards(t_arg **args)
 	char	**result;
 	int		count;
 	int		i;
+	size_t	j;
+	glob_t	g;
 
 	result = NULL;
-	i = 0;
 	count = 0;
-	while (args[i])
+	i = 0;
+	while (args && args[i])
 	{
-		if (ft_strpbrk(args[i]->arg, "*?[]") == NULL)
+		if (args[i]->wildcard && ft_strpbrk(args[i]->arg, "*?[]")
+			&& glob(args[i]->arg, 0, NULL, &g) == 0)
 		{
-			result = (char **)ft_gcrealloc(CAT_ARGS, result,
-					sizeof(char*) * (count + 2));
-			result[count++] = ft_gcstrdup(CAT_ARGS, args[i]->arg);
+			j = 0;
+			while (j < g.gl_pathc)
+				if (append_result(&result, &count, g.gl_pathv[j++]))
+					return (globfree(&g), result);
+			globfree(&g);
 		}
-		else
-			ft_expand_wildcard(args[i], &result, &count);
+		else if (append_result(&result, &count, args[i]->arg))
+			return (result);
 		i++;
 	}
-	if (result)
-		result[count] = NULL;
 	return (result);
 }
 
 /**
- * @brief Subfunction to fill out the command structure with arguments.
+ * @brief Fill command->args with parsed t_arg* and redirections.
+ *
+ * @param node Command node to fill.
+ * @param line Original token text.
+ * @param argc Pre-counted number of arguments.
+ * @param i Out: number of non-redirection args collected.
+ * @return int 0 on success, 1 on error.
  */
 static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 {
@@ -123,13 +117,15 @@ int	parse_input(t_cmd *node, const char *line)
 {
 	int		argc;
 	int		i;
+	char	**new_command;
 
+	node->commands = NULL;
+	node->args = NULL;
 	if (!line || !*line)
-		return (node->commands = NULL, 1);
+		return (1);
 	argc = count_args(line);
-	node->commands = ft_gcmalloc(CAT_ARGS, sizeof(char *) * (argc + 1));
 	node->args = ft_gcmalloc(CAT_ARGS, sizeof(t_arg *) * (argc + 1));
-	if (!node->commands || !node->args)
+	if (!node->args)
 		return (1);
 	i = 0;
 	if (ft_fillout_commands(node, line, argc, &i))
@@ -137,6 +133,8 @@ int	parse_input(t_cmd *node, const char *line)
 	node->args[i] = NULL;
 	while (i <= argc)
 		node->args[i++] = NULL;
-	node->commands = ft_expand_wildcards(node->args);
+	new_command = ft_expand_wildcards(node->args);
+	if (new_command)
+		node->commands = new_command;
 	return (0);
 }

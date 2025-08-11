@@ -12,6 +12,10 @@
 
 #include "minishell.h"
 
+/**
+ * @brief Count shell words in a token string (used for allocation sizing).
+ * Splits on whitespace and redirection operators outside quotes.
+ */
 int	count_args(const char *line)
 {
 	int	count;
@@ -41,6 +45,9 @@ int	count_args(const char *line)
 	return (count);
 }
 
+/**
+ * @brief If next chars form a redirection operator, consume and return len.
+ */
 static int	ft_check_redir(const char **line)
 {
 	if (!(**line))
@@ -62,6 +69,9 @@ static int	ft_check_redir(const char **line)
 	return (0);
 }
 
+/**
+ * @brief Compute next argument length (considering quotes/redirections).
+ */
 static int	calc_arg_len(const char **line)
 {
 	int		len;

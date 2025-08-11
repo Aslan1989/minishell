@@ -23,16 +23,24 @@
  * @example
  *   env → prints list like "PATH=/usr/bin", etc.
  */
-int	built_env(t_shell *shell)
+int	built_env(t_shell *shell, char **args)
 {
 	int	i;
 
-	i = 0;
 	if (!shell || !shell->envp)
 		return (1);
+	if (args[1])
+	{
+		ft_putstr_fd("env: ", STDERR_FILENO);
+		ft_putstr_fd(args[1], STDERR_FILENO);
+		ft_putendl_fd(": No such file or directory", STDERR_FILENO);
+		return (127);
+	}
+	i = 0;
 	while (shell->envp[i])
 	{
-		ft_printf("%s\n", shell->envp[i]);
+		if (ft_strchr(shell->envp[i], '='))
+			ft_putendl_fd(shell->envp[i], STDOUT_FILENO);
 		i++;
 	}
 	return (0);

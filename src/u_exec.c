@@ -13,16 +13,11 @@
 #include "minishell.h"
 
 /**
- * @brief Finds the executable path for a command.
- *
- * This function checks if the command is a built-in or an external command.
- * If it's an external command, it searches for the executable in the
- * system's PATH.
- *
- * @param command Pointer to the command structure.
- * @param shell Pointer to the shell structure containing environment variables.
- * @param args Array of arguments, where args[0] is the command name.
- * @return int 0 if the command is found, 127 if not found.
+ * @brief Resolve command->path for external commands, producing 127 on error.
+ * @param command Node where path is stored.
+ * @param shell Shell state (for PATH/envp).
+ * @param args argv (args[0] is the candidate).
+ * @return int 0 on success, 127 on not found.
  */
 static int	find_command(t_cmd *command, t_shell *shell, char **args)
 {
@@ -43,51 +38,70 @@ static int	find_command(t_cmd *command, t_shell *shell, char **args)
 	return (0);
 }
 
-/**
- * @brief Executes a command in a child process.
- *
- * This function sets up the redirections for the command, then uses `execve`
- * to run the command in a child process. If the command is a built-in, it
- * calls the appropriate built-in function instead.
- *
- * @param command Pointer to the command structure containing command details.
- * @param shell Pointer to the shell structure containing
- * environment variables.
- * @param args Array of arguments, where args[0] is the command name.
- */
-static void	execute_child_command(t_cmd *command, t_shell *shell, char **args)
+static void	valid_and_exec_extern(t_cmd *command, t_shell *shell, char **args)
 {
-	setup_redirections(command);
-	if (!command->isbuiltin)
+	struct stat	st;
+
+	if (access(command->path, F_OK) != 0)
 	{
-		execve(command->path, args, shell->envp);
-		perror("execve failed");
+		print_arg_err(args[0], "No such file or directory");
+		exit(127);
 	}
-	else
+	if (stat(command->path, &st) == 0 && S_ISDIR(st.st_mode))
 	{
-		if (!ft_strcmp(args[0], "echo"))
-			built_echo(args);
-		else if (!ft_strcmp(args[0], "pwd"))
-			built_pwd();
-		else if (!ft_strcmp(args[0], "env"))
-			built_env(shell);
-		free_gc();
-		clear_history();
-		exit(0);
+		print_arg_err(args[0], "is a directory");
+		exit(126);
 	}
-	exit(1);
+	if (access(command->path, X_OK) != 0)
+	{
+		print_arg_err(args[0], "Permission denied");
+		exit(126);
+	}
+	execve(command->path, args, shell->envp);
+	perror("minishell");
+	exit(126);
 }
 
 /**
- * @brief Executes an external command (not a built-in).
- *
- * This function uses `fork()` to create a child process, and then calls
- * `execve()` in the child to run the external program. The parent process
- * waits until the child process finishes.
- *
- * @param shell Pointer to shell structure with environment variables.
- * @param args Arguments, where args[0] is the program name, rest are arguments.
- * @return int The exit status returned by the child process.
+ * @brief Code path for forked children: set up redirs and exec or run builtin.
+ * @param command Node (contains redirs and resolved path for external).
+ * @param shell Shell state (envp for execve).
+ * @param args argv.
+ */
+static void	execute_child_command(t_cmd *command, t_shell *shell, char **args)
+{
+	int			status;
+
+	setup_redirections(command);
+	if (!command->path)
+	{
+		ft_putstr_fd("minishell: command not found: ", STDERR_FILENO);
+		ft_putendl_fd(args[0], STDERR_FILENO);
+		exit(127);
+	}
+	if (!command->isbuiltin)
+		valid_and_exec_extern(command, shell, args);
+	else
+	{
+		status = 0;
+		if (!ft_strcmp(args[0], "echo"))
+			status = built_echo(args);
+		else if (!ft_strcmp(args[0], "pwd"))
+			status = built_pwd();
+		else if (!ft_strcmp(args[0], "env"))
+			status = built_env(shell, args);
+		free_gc();
+		clear_history();
+		exit(status);
+	}
+}
+
+/**
+ * @brief Execute external command (or builtin in a child for pipelines).
+ * @param command Node with redirections/argv/path.
+ * @param shell Shell state.
+ * @param args argv.
+ * @return int Collected status according to waitpid.
  */
 int	execute_command(t_cmd *command, t_shell *shell, char **args)
 {
@@ -102,8 +116,6 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 	if (pid == -1)
 	{
 		perror("fork");
-		if (command->path)
-			free(command->path);
 		return (1);
 	}
 	else if (pid == 0)
@@ -111,9 +123,11 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 	else
 	{
 		waitpid(pid, &status, 0);
-		if (command->path)
-			free(command->path);
-		return (WEXITSTATUS(status));
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+		else if (WIFSIGNALED(status))
+			return (128 + WTERMSIG(status));
+		return (1);
 	}
 	return (0);
 }
