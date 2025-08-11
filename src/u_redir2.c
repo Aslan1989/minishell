@@ -20,7 +20,8 @@ static void	close_if_opened(int fd)
 
 static void	close_with_error(char *msg)
 {
-	perror(msg);
+	ft_putstr_fd("bash: No such file or directory", 2);
+	msg = "hi";
 	exit(1);
 }
 
