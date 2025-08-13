@@ -93,10 +93,8 @@ static int	run_interactive_loop(void)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_shell	*sh;
 	int		status;
 
-	sh = get_shell();
 	if (argc >= 3 && strcmp(argv[1], "-c") == 0)
 		return (run_noninteractive(envp, argv[2]));
 	ft_initialize_shell(envp);

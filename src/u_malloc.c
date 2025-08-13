@@ -41,10 +41,10 @@ void	*ft_gcmalloc(t_egccat cat, ssize_t size)
 void	*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size)
 {
 	void	*new_ptr;
-	ssize_t	old_size;
-	ssize_t	copy_size;
+	size_t	old_size;
+	size_t	copy_size;
 
-	if (cat < 0 || cat > CAT_MAX || size <= 0)
+	if (cat < 0 || cat >= CAT_MAX || size <= 0)
 		return (NULL);
 	if (!ptr)
 		return (ft_gcmalloc(cat, size));
@@ -52,12 +52,12 @@ void	*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size)
 	if (!new_ptr)
 		return (NULL);
 	old_size = ft_gc_getsize(cat, ptr);
-	if (size > old_size)
+	if (old_size < (size_t)size)
 		copy_size = old_size;
 	else
-		copy_size = size;
+		copy_size = (size_t)size;
 	size = ft_gc_getsize(cat, ptr);
-	if (size > 0)
+	if (copy_size > 0)
 		ft_memcpy(new_ptr, ptr, size);
 	ft_gcfree(cat, ptr);
 	return (new_ptr);

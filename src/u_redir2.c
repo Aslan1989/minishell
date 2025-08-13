@@ -20,8 +20,13 @@ static void	close_if_opened(int fd)
 
 static void	close_with_error(char *msg)
 {
-	ft_putstr_fd("bash: No such file or directory", 2);
-	msg = "hi";
+	t_shell	*shell;
+
+	shell = get_shell();
+	ft_putstr_fd("minishell: ", 2);
+	perror(msg);
+	if (shell)
+		shell->last_exit_status = 1;
 	exit(1);
 }
 
@@ -70,13 +75,13 @@ void	setup_redirections(t_cmd *cmd)
 	if (cmd->fd_in >= 0)
 	{
 		if (dup2(cmd->fd_in, STDIN_FILENO) < 0)
-			close_with_error("dup2 failed for STDIN");
+			close_with_error("dup2");
 		close(cmd->fd_in);
 	}
 	if (cmd->fd_out >= 0)
 	{
 		if (dup2(cmd->fd_out, STDOUT_FILENO) < 0)
-			close_with_error("dup2 failed for STDOUT");
+			close_with_error("dup2");
 		close(cmd->fd_out);
 	}
 }
