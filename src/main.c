@@ -29,10 +29,6 @@ static void	ft_initialize_shell(char **envp)
 	}
 }
 
-/* already in your file — оставь как есть
-static void ft_initialize_shell(char **envp) { ... }
-*/
-
 /**
  * @brief Run one-shot non-interactive command: minishell -c "cmd".
  * Initializes shell, runs, cleans up, returns exit status.

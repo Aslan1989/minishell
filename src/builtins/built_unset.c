@@ -43,9 +43,9 @@ static void	print_invalid_identifiers(char **args)
 	{
 		if (!is_valid_identifier(args[i]))
 		{
-			ft_print_error("minishell: unset: `");
-			ft_print_error((char *)args[i]);
-			ft_print_error("': not a valid identifier\n");
+			ft_putstr_fd("minishell: unset: `", STDERR_FILENO);
+			ft_putstr_fd(args[i], STDERR_FILENO);
+			ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
 		}
 		i++;
 	}

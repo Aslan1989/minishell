@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 14:31:39 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 14:42:26 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/17 18:33:21 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ char	*search_in_cdpath(t_shell *sh, const char *arg)
 		if (full && is_directory(full))
 		{
 			ft_putendl_fd(full, STDOUT_FILENO);
+			ft_free_split(paths);
 			return (full);
 		}
 		i++;
