@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/17 20:07:43 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/18 14:03:24 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,8 @@ char	*ft_expand_env(char *str)
 			sub_line = ft_getword(&line);
 		ret = ft_gcstrjoin(CAT_ARGS, ret, sub_line);
 	}
+	if (!ret)
+		ret = ft_gcstrdup(CAT_ARGS, "");
 	return (ret);
 }
 

@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/17 19:59:03 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/18 14:02:35 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,12 @@ static char	*open_quote_single(char **arg)
 	while (**arg && **arg != '\'')
 		(*arg)++;
 	if (*arg == start)
-		return (NULL);
+	{
+		ret = ft_gcstrdup(CAT_ARGS, "");
+		if (**arg == '\'')
+			(*arg)++;
+		return (ret);
+	}
 	ret = ft_gcstrndup(CAT_ARGS, start, *arg - start);
 	if (**arg == '\'')
 		(*arg)++;
@@ -61,7 +66,12 @@ static char	*open_quote_double(char **arg)
 	while (**arg && **arg != '"')
 		(*arg)++;
 	if (*arg == start)
-		return (NULL);
+	{
+		ret = ft_gcstrdup(CAT_ARGS, "");
+		if (**arg == '"')
+			(*arg)++;
+		return (ret);
+	}
 	ret = ft_gcstrndup(CAT_ARGS, start, *arg - start);
 	ret = ft_expand_env(ret);
 	if (**arg == '"')
@@ -119,5 +129,7 @@ void	ft_open_quotes(t_arg *arg)
 		new_arg = ft_gcstrjoin(CAT_ARGS, new_arg, piece);
 	}
 	ft_gcfree(CAT_ARGS, arg->arg);
+	if(!new_arg)
+		new_arg = ft_gcstrdup(CAT_ARGS, "");
 	arg->arg = new_arg;
 }
