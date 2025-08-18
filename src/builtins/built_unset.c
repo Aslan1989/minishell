@@ -64,10 +64,24 @@ int	built_unset(t_shell *shell, char **args)
 {
 	int		count;
 	char	**new_env;
+	int		i;
+	int		ret;
 
 	if (!shell || !shell->envp)
 		return (1);
 	print_invalid_identifiers(args);
+	ret = 0;
+	i = 1;
+	while (args[i])
+	{
+		if (args[i][0] == '-' && args[i][1])
+			ret = 2; // приоритетнее
+		else if (!is_valid_identifier(args[i]) && ret == 0)
+			ret = 1;
+		i++;
+	}
+	if (ret == 2)
+		return (2);
 	count = env_count(shell->envp);
 	new_env = env_alloc(count);
 	if (!new_env)
@@ -77,5 +91,5 @@ int	built_unset(t_shell *shell, char **args)
 		ft_gcfree(CAT_ENV, shell->envp);
 	shell->envp = new_env;
 	shell->envp_allocated = 1;
-	return (0);
+	return (ret);
 }
