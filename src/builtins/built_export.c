@@ -63,14 +63,39 @@ static void	process_key_value(t_shell *shell, char *arg)
 		process_key_value_without_equal(shell, arg);
 }
 
+
 int	built_export(t_shell *shell, char **args)
 {
-	int	i;
-
+	int		i;
+	int		ret;
+	char	*eq;
+	char	saved;
 	if (!args[1])
 	{
 		print_sorted_env(shell->envp);
 		return (0);
+	}
+	ret = 0;
+	i = 1;
+	while (args[i])
+	{
+		if (is_option_arg(args[i]))
+			ret = 2;
+		else
+		{
+			eq = ft_strchr(args[i], '=');
+			if (eq)
+			{
+				saved = *eq;
+				*eq = '\0';
+				if (!is_valid_identifier(args[i]) && ret == 0)
+					ret = 1;
+				*eq = saved;
+			}
+			else if (!is_valid_identifier(args[i]) && ret == 0)
+				ret = 1;
+		}
+		i++;
 	}
 	i = 1;
 	while (args[i])
@@ -78,5 +103,5 @@ int	built_export(t_shell *shell, char **args)
 		process_key_value(shell, args[i]);
 		i++;
 	}
-	return (0);
+	return (ret);
 }

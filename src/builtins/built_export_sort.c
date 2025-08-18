@@ -6,11 +6,20 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 22:50:00 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/08 17:41:36 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/18 12:47:30 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	is_option_arg(const char *s)
+{
+	if (!s)
+		return (0);
+	if (s[0] == '-' && s[1] != '\0')
+		return (1);
+	return (0);
+}
 
 static void	bubble_sort(char **arr)
 {
