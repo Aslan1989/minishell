@@ -27,6 +27,11 @@ t_cmd	*parse_seq(t_token **current)
 		operator = *current;
 		ft_p_advance(current);
 		right = parse_or(current);
+		if (!right)
+		{
+			parser_syntax_error(*current ? (*current)->value : NULL);
+			return expr;
+		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
 	return (expr);
@@ -47,6 +52,11 @@ t_cmd	*parse_or(t_token **current)
 		operator = (*current);
 		ft_p_advance(current);
 		right = parse_and(current);
+		if (!right)
+		{
+			parser_syntax_error(*current ? (*current)->value : NULL);
+			return expr;
+		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
 	return (expr);
@@ -67,6 +77,11 @@ t_cmd	*parse_and(t_token **current)
 		operator = (*current);
 		ft_p_advance(current);
 		right = parse_pipe(current);
+		if (!right)
+		{
+			parser_syntax_error(*current ? (*current)->value : NULL);
+			return expr;
+		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
 	return (expr);
@@ -87,6 +102,11 @@ t_cmd	*parse_pipe(t_token **current)
 		operator = (*current);
 		ft_p_advance(current);
 		right = parse_word(current);
+		if (!right)
+		{
+			parser_syntax_error(*current ? (*current)->value : NULL);
+			return expr;
+		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
 	return (expr);
@@ -101,6 +121,11 @@ t_cmd	*parse_word(t_token **current)
 
 	if (!current || !*current)
 		return (NULL);
+	if (ft_p_check(*current, TOK_RPAREN))
+	{
+		parser_syntax_error((*current)->value);
+		return (NULL);
+	}
 	node = parse_word_sub(current);
 	if (node)
 		return (node);
@@ -108,9 +133,14 @@ t_cmd	*parse_word(t_token **current)
 	{
 		ft_p_advance(current);
 		node = parse_or(current);
-		if (!ft_p_check(*current, TOK_RPAREN))
+		if (!node && *current && ft_p_check(*current, TOK_RPAREN))
 		{
-			ft_print_error("minishell: syntax error: unexpected token\n");
+			parser_syntax_error((*current)->value); // ')'
+			return (NULL);
+		}
+		if (!*current || !ft_p_check(*current, TOK_RPAREN))
+		{
+			parser_syntax_error(NULL); // newline
 			return (NULL);
 		}
 		ft_p_advance(current);

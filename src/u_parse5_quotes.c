@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 16:58:56 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/17 19:59:03 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ void	ft_open_quotes(t_arg *arg)
 	char	*new_arg;
 	char	*piece;
 	char	*line;
+	int		quoted;
 
 	if (!arg || !arg->arg)
 		return ;
@@ -109,10 +110,11 @@ void	ft_open_quotes(t_arg *arg)
 	line = arg->arg;
 	while (*line)
 	{
+		quoted = (*line == '"' || *line == '\'');
 		piece = next_piece(&line);
 		if (!piece)
 			continue ;
-		if (ft_strpbrk(piece, "*?[]"))
+		if (quoted && ft_strpbrk(piece, "*?[]"))
 			arg->wildcard = 0;
 		new_arg = ft_gcstrjoin(CAT_ARGS, new_arg, piece);
 	}

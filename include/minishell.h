@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 17:00:36 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/18 11:36:48 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -259,7 +259,11 @@ void		ft_print_banner(void);
 void		parent_stdio_restore(int *save_in, int *save_out);
 int			parent_redirs_apply(t_cmd *cmd, int *save_in, int *save_out);
 
+int			ft_redir_check_next(char *next_token);
+
 //u_redir_helpers.c
 int			apply_fds_parent(int fd_in, int fd_out,
 				int *save_in, int *save_out);
+extern int	g_syntax_error;
+void		parser_syntax_error(const char *tok);
 #endif

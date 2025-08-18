@@ -25,20 +25,16 @@ int	ft_redir_check_next(char *next_token)
 {
 	if (!next_token || !*next_token)
 	{
-		ft_print_error("minishell: syntax error near \
-				unexpected token `newline'");
-		return (1);
+		parser_syntax_error(NULL);
+		return 1;
 	}
-	if (ft_strcmp(next_token, "<") == 0
-		|| ft_strcmp(next_token, ">") == 0
-		|| ft_strcmp(next_token, ">>") == 0
-		|| ft_strcmp(next_token, "<<") == 0)
+	if (!ft_strcmp(next_token, "<") || !ft_strcmp(next_token, ">")
+		|| !ft_strcmp(next_token, ">>") || !ft_strcmp(next_token, "<<")
+		|| !ft_strcmp(next_token, "|")  || !ft_strcmp(next_token, "||")
+		|| !ft_strcmp(next_token, "&&") || !ft_strcmp(next_token, ")"))
 	{
-		ft_print_error("minishell: syntax error near unexpected token `<\
-		'");
-		ft_print_error(next_token);
-		ft_print_error("'\n");
-		return (1);
+		parser_syntax_error(next_token);
+		return 1;
 	}
 	return (0);
 }

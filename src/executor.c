@@ -134,6 +134,11 @@ int	ft_run_commands(t_cmd *com)
 {
 	int	status;
 
+	if (g_syntax_error)
+	{
+		g_syntax_error = 0;
+		return (2);
+	}
 	if (!com)
 		return (0);
 	if (com->type == TOK_WORD)

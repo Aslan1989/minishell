@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <minishell.h>
+#include "minishell.h"
 
 int	ft_print_error(const char *msg)
 {
@@ -42,4 +42,17 @@ void	print_errno_for(const char *what)
 	ft_putstr_fd(what, STDERR_FILENO);
 	ft_putstr_fd(": ", STDERR_FILENO);
 	ft_putendl_fd(strerror(errno), STDERR_FILENO);
+}
+
+int	g_syntax_error = 0;
+
+void parser_syntax_error(const char *tok)
+{
+	g_syntax_error = 1;
+	ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
+	if (tok && *tok)
+		ft_putstr_fd((char *)tok, STDERR_FILENO);
+	else
+		ft_putstr_fd("newline", STDERR_FILENO);
+	ft_putendl_fd("'", STDERR_FILENO);
 }

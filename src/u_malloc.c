@@ -20,7 +20,7 @@ void	*ft_gcmalloc(t_egccat cat, ssize_t size)
 	void		*ptr;
 	t_garbage	*new_node;
 
-	if (cat < 0 || cat > CAT_MAX || size <= 0)
+	if (cat < 0 || cat >= CAT_MAX || size <= 0)
 		return (NULL);
 	ptr = malloc(size);
 	if (!ptr)
@@ -58,7 +58,7 @@ void	*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size)
 		copy_size = (size_t)size;
 	size = ft_gc_getsize(cat, ptr);
 	if (copy_size > 0)
-		ft_memcpy(new_ptr, ptr, size);
+		ft_memcpy(new_ptr, ptr, copy_size);
 	ft_gcfree(cat, ptr);
 	return (new_ptr);
 }
@@ -70,7 +70,7 @@ t_garbage	**get_gc(t_egccat cat)
 {
 	static t_garbage	*gc[CAT_MAX];
 
-	if (cat < 0 || cat > CAT_MAX)
+	if (cat < 0 || cat >= CAT_MAX)
 		return (NULL);
 	return (&gc[cat]);
 }
@@ -82,7 +82,7 @@ size_t	ft_gc_getsize(t_egccat cat, void *ptr)
 {
 	t_garbage	*current;
 
-	if (cat < 0 || cat > CAT_MAX || !ptr)
+	if (cat < 0 || cat >= CAT_MAX || !ptr)
 		return (0);
 	current = *get_gc(cat);
 	while (current)

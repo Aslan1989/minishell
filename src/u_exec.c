@@ -58,6 +58,11 @@ static void	valid_and_exec_extern(t_cmd *command, t_shell *shell, char **args)
 		exit(126);
 	}
 	execve(command->path, args, shell->envp);
+	if (errno == ENOENT)
+	{
+		print_arg_err(args[0], "No such file or directory");
+		exit(127);
+	}
 	perror("minishell");
 	exit(126);
 }
