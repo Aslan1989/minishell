@@ -143,15 +143,15 @@ t_cmd	*parse_pipe(t_token **current)
 		operator = (*current);
 		ft_p_advance(current);
 		right = parse_word(current);
-		if (!right)
-		{
-			parser_syntax_error(curr_tok_value(current));
-			return (expr);
-		}
 		if (!expr)
 		{
 			parser_syntax_error(operator->value);
 			return (NULL);
+		}
+		if (!right)
+		{
+			parser_syntax_error(curr_tok_value(current));
+			return (expr);
 		}
 		expr = ft_p_add_node(operator, expr, right);
 	}

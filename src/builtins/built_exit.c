@@ -73,18 +73,24 @@ int	built_exit(char **args)
 {
 	long	code;
 
-	if (get_shell()->is_interactive)
-		ft_putendl_fd("exit", STDOUT_FILENO);
 	if (!args || !args[1])
+	{
+		if (get_shell()->is_interactive)
+			ft_putendl_fd("exit", STDOUT_FILENO);
 		cleanup_and_exit(0);
-	if (args[2])
-		return (print_too_many_args(), 1);
+	}
 	if (!ft_is_numeric(args[1]))
 	{
+		if (get_shell()->is_interactive)
+			ft_putendl_fd("exit", STDOUT_FILENO);
 		print_numeric_error(args[1]);
 		cleanup_and_exit(255);
 	}
+	if (args[2])
+		return (print_too_many_args(), 1);
 	code = ft_atoi(args[1]);
+	if (get_shell()->is_interactive)
+		ft_putendl_fd("exit", STDOUT_FILENO);
 	cleanup_and_exit((unsigned char)code);
 	return (0);
 }
