@@ -92,9 +92,7 @@ static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 			{
 				next = extract_arg(&line);
 				if (!next || ft_redir_check_next(next->arg))
-				{
-				return (1);
-				}
+					return (1);
 				if (!ft_strcmp(arg->arg, "<"))
 					check = ft_redir_add(node, REDIR_IN, next->arg);
 				else if (!ft_strcmp(arg->arg, ">"))

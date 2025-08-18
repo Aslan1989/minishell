@@ -57,6 +57,8 @@ static int	ft_check_redir(const char **line)
 		(*line)++;
 		if (**line == '<')
 			return ((*line)++, 2);
+		if (**line == '>')
+			return ((*line)++, 2);
 		return (1);
 	}
 	else if ((**line) == '>')

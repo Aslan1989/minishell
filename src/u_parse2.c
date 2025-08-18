@@ -12,6 +12,12 @@
 
 #include "minishell.h"
 
+static const char	*curr_tok_value(t_token **current)
+{
+	if (current && *current)
+		return (*current)->value;
+	return (NULL);
+}
 /**
  * @brief Parse a sequence: expr (';' expr)*
  */
@@ -21,6 +27,11 @@ t_cmd	*parse_seq(t_token **current)
 	t_cmd	*right;
 	t_token	*operator;
 
+	if (ft_p_check(*current, TOK_SEMI))
+	{
+		parser_syntax_error((*current)->value);
+		return (NULL);
+	}
 	expr = parse_or(current);
 	while (ft_p_check(*current, TOK_SEMI))
 	{
@@ -29,8 +40,13 @@ t_cmd	*parse_seq(t_token **current)
 		right = parse_or(current);
 		if (!right)
 		{
-			parser_syntax_error(*current ? (*current)->value : NULL);
-			return expr;
+			parser_syntax_error(curr_tok_value(current));
+			return (expr);
+		}
+		if (!expr)
+		{
+			parser_syntax_error(operator->value);
+			return (NULL);
 		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
@@ -46,6 +62,11 @@ t_cmd	*parse_or(t_token **current)
 	t_cmd	*right;
 	t_token	*operator;
 
+	if (ft_p_check(*current, TOK_OR))
+	{
+		parser_syntax_error((*current)->value);
+		return (NULL);
+	}
 	expr = parse_and(current);
 	while (ft_p_check(*current, TOK_OR))
 	{
@@ -54,8 +75,13 @@ t_cmd	*parse_or(t_token **current)
 		right = parse_and(current);
 		if (!right)
 		{
-			parser_syntax_error(*current ? (*current)->value : NULL);
-			return expr;
+			parser_syntax_error(curr_tok_value(current));
+			return (expr);
+		}
+		if (!expr)
+		{
+			parser_syntax_error(operator->value);
+			return (NULL);
 		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
@@ -71,6 +97,11 @@ t_cmd	*parse_and(t_token **current)
 	t_cmd	*right;
 	t_token	*operator;
 
+	if (ft_p_check(*current, TOK_AND))
+	{
+		parser_syntax_error((*current)->value);
+		return (NULL);
+	}
 	expr = parse_pipe(current);
 	while (ft_p_check(*current, TOK_AND))
 	{
@@ -79,8 +110,13 @@ t_cmd	*parse_and(t_token **current)
 		right = parse_pipe(current);
 		if (!right)
 		{
-			parser_syntax_error(*current ? (*current)->value : NULL);
-			return expr;
+			parser_syntax_error(curr_tok_value(current));
+			return (expr);
+		}
+		if (!expr)
+		{
+			parser_syntax_error(operator->value);
+			return (NULL);
 		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
@@ -96,6 +132,11 @@ t_cmd	*parse_pipe(t_token **current)
 	t_cmd	*right;
 	t_token	*operator;
 
+	if (ft_p_check(*current, TOK_PIPE))
+	{
+		parser_syntax_error((*current)->value); // печатает `|`
+		return (NULL);
+	}
 	expr = parse_word(current);
 	while (ft_p_check(*current, TOK_PIPE))
 	{
@@ -104,8 +145,13 @@ t_cmd	*parse_pipe(t_token **current)
 		right = parse_word(current);
 		if (!right)
 		{
-			parser_syntax_error(*current ? (*current)->value : NULL);
-			return expr;
+			parser_syntax_error(curr_tok_value(current));
+			return (expr);
+		}
+		if (!expr)
+		{
+			parser_syntax_error(operator->value);
+			return (NULL);
 		}
 		expr = ft_p_add_node(operator, expr, right);
 	}
