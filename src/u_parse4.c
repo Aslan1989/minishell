@@ -31,10 +31,10 @@ int	count_args(const char *line)
 	{
 		if ((line[i] == '\'' || line[i] == '"') && !quote)
 			quote = line[i];
-		else if (line[i] == quote && i > 1 && (line[i - 1] != '\\'))
+		else if (line[i] == quote && (i == 0 || line[i - 1] != '\\'))
 			quote = 0;
 		else if (!quote && (line[i] == ' ' || line[i] == '\t' || line[i] == '>'
-				|| line[i] == '<' || line[i] == '$'))
+				|| line[i] == '<'))
 			in_word = 0;
 		else if (!in_word)
 		{
