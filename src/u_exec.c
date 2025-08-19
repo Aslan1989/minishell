@@ -113,14 +113,8 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 	pid_t	pid;
 	int		status;
 
-	if (!args || !args[0])
-		return (1);
-	if (args[0][0] == '\0')
-	{
-		print_arg_err(args[0], "minishell: command not found: ");
-		ft_print_error("\n");
+	if (!args || !args[0] || args[0][0] == '\0')
 		return (127);
-	}
 	if (find_command(command, shell, args) != 0)
 		return (127);
 	pid = fork();

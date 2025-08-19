@@ -102,7 +102,7 @@ static int	update_pwd_vars(t_shell *sh, char *oldpwd)
 	if (r == -1)
 		return (1);
 	if (r == 0 && add_env_var(sh, "PWD", cwd) != 0)
-		return 1;
+		return (1);
 	return (0);
 }
 
