@@ -83,7 +83,12 @@ t_cmd	*ft_parse_tokens(t_token **tokens)
 	t_token	*current;
 
 	current = *tokens;
-	ast = parse_seq(&current);
+	if (current && current->type == TOK_SEMI)
+	{
+		parser_syntax_error(current->value);
+		return (NULL);
+	}
+	ast = parse_or(&current);
 	if (!ast && g_syntax_error)
 		return (NULL);
 	if (current && current->type != TOK_EOF)

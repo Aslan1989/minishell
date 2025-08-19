@@ -157,7 +157,5 @@ int	ft_run_commands(t_cmd *com)
 		return (run_and_node(com));
 	if (com->type == TOK_OR)
 		return (run_or_node(com));
-	if (com->type == TOK_SEMI)
-		return (run_semi_node(com));
 	return (0);
 }

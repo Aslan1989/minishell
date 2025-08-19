@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 15:10:20 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 15:22:23 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/19 19:53:36 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,17 +66,6 @@ int	run_or_node(t_cmd *node)
 	get_shell()->last_exit_status = status;
 	if (status != 0)
 		status = ft_run_commands(node->next_b);
-	get_shell()->last_exit_status = status;
-	return (status);
-}
-
-int	run_semi_node(t_cmd *node)
-{
-	int	status;
-
-	status = ft_run_commands(node->next_a);
-	get_shell()->last_exit_status = status;
-	status = ft_run_commands(node->next_b);
 	get_shell()->last_exit_status = status;
 	return (status);
 }

@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/19 15:06:08 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/19 20:00:15 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,7 +189,6 @@ int			parse_input(t_cmd *node, const char *line);
 //executor_helpers.c
 int			run_and_node(t_cmd *node);
 int			run_or_node(t_cmd *node);
-int			run_semi_node(t_cmd *node);
 pid_t		fork_pipe_child(t_cmd *cmd, int fd, int p_fd[2], int dup_fd);
 int			get_exit_status(int status);
 // executor_helpers2.c
@@ -216,7 +215,6 @@ t_cmd		*parse_or(t_token **current);
 t_cmd		*parse_and(t_token **current);
 t_cmd		*parse_pipe(t_token **current);
 t_cmd		*parse_word(t_token **current);
-t_cmd		*parse_seq(t_token **current);
 t_etoken	ft_p_check(t_token *current, t_etoken type);
 t_token		*ft_p_advance(t_token **current);
 t_cmd		*ft_p_add_node(t_token *token, t_cmd *next_a, t_cmd *next_b);

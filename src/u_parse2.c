@@ -20,41 +20,6 @@ static const char	*curr_tok_value(t_token **current)
 }
 
 /**
- * @brief Parse a sequence: expr (';' expr)*
- */
-t_cmd	*parse_seq(t_token **current)
-{
-	t_cmd	*expr;
-	t_cmd	*right;
-	t_token	*operator;
-
-	if (ft_p_check(*current, TOK_SEMI))
-	{
-		parser_syntax_error((*current)->value);
-		return (NULL);
-	}
-	expr = parse_or(current);
-	while (ft_p_check(*current, TOK_SEMI))
-	{
-		operator = *current;
-		ft_p_advance(current);
-		right = parse_or(current);
-		if (!right)
-		{
-			parser_syntax_error(curr_tok_value(current));
-			return (expr);
-		}
-		if (!expr)
-		{
-			parser_syntax_error(operator->value);
-			return (NULL);
-		}
-		expr = ft_p_add_node(operator, expr, right);
-	}
-	return (expr);
-}
-
-/**
  * @brief Parse OR chain: and_expr ( '||' and_expr )*
  */
 t_cmd	*parse_or(t_token **current)
