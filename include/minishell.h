@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/18 14:22:18 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/19 12:32:01 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,7 @@ void		*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size);
 char		*ft_gcstrdup(t_egccat cat, const char *src);
 char		*ft_gcstrndup(t_egccat cat, char *src, ssize_t n);
 t_garbage	*ft_gc_addback(t_garbage **lst, void *ptr);
-char		*ft_gcstrjoin(t_egccat cat, char *s1, const char *s2);
+char		*ft_gcstrjoin(t_egccat cat, const char *s1, const char *s2);
 
 void		ft_print_banner(void);
 

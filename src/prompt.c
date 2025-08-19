@@ -67,7 +67,6 @@ static char	*read_full_line(void)
 	line = get_next_line(STDIN_FILENO);
 	if (!line)
 		return (NULL);
-	// ft_printf(COLOR_G"%s"COLOR_X, line);
 	line[ft_strlen(line) - 1] = '\0';
 	quotes = ft_has_unclosed_quotes(line);
 	if (quotes == 1 || quotes == 2)

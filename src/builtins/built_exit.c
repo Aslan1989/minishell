@@ -13,10 +13,15 @@
 #include "minishell.h"
 
 /**
- * @brief Return 1 if `str` is a (signed) decimal integer.
+ * @brief Check if the string is a syntactic integer: [+|-] and then digits only.
  *
- * @param str Input string.
- * @return int 1 if numeric, 0 otherwise.
+ * Accepts an optional leading '+' or '-', followed by at least one digit.
+ * No whitespace is allowed and no overflow checks are performed.
+ *
+ * @param str  Input string.
+ * @return int
+ * @retval 1 if syntactically numeric.
+ * @retval 0 otherwise (NULL, empty, sign-only, or contains non-digits).
  */
 int	ft_is_numeric(const char *str)
 {

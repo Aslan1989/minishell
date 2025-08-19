@@ -13,15 +13,20 @@
 #include "minishell.h"
 
 /**
- * @brief Implements the `env` built-in command.
+ * @brief Implement the `env` builtin (print environment).
  *
- * Prints all environment variables currently stored in the shell.
- *
- * @param shell Pointer to the shell structure holding envp.
- * @return int 0 on success, 1 on error.
- *
- * @example
- *   env → prints list like "PATH=/usr/bin", etc.
+ * Prints all entries from the shell environment that contain '='
+ * in the form "KEY=VALUE", one per line, to STDOUT. If any extra
+ * argument is provided, this simplified minishell implementation
+ * does not support `env KEY=VAL ...` or `env cmd` forms: it prints
+ * an error and returns 127.
+ * @param shell  Shell handle containing the environment (shell->envp).
+ * @param args   argv-like array; args[0] is "env", args[1] (if present)
+ *               triggers the error path in this implementation.
+ * @return int
+ * @retval 0   On success (environment printed, possibly empty).
+ * @retval 1   If shell or shell->envp is NULL.
+ * @retval 127 If extra arguments are provided (unsupported usage).
  */
 int	built_env(t_shell *shell, char **args)
 {

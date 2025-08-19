@@ -13,9 +13,13 @@
 #include "minishell.h"
 
 /**
- * @brief Return a GC-managed duplicate of the current working directory.
- *
- * @return char* Newly allocated path on success, NULL on error.
+ * @brief Get the current working directory as a GC-managed string.
+ * Calls getcwd(3) into a PATH_MAX-sized stack buffer and returns a GC-managed
+ * duplicate (CAT_ENV) on success. On failure, prints a diagnostic via perror()
+ * with the "minishell: cd (getcwd)" prefix and returns NULL.
+ * @return char*
+ * @retval non-NULL A GC-managed duplicate of the current directory path.
+ * @retval NULL     If getcwd() fails; an error message is already printed.
  */
 static char	*get_current_dir(void)
 {
@@ -30,13 +34,18 @@ static char	*get_current_dir(void)
 }
 
 /**
- * @brief Resolve what directory `cd` should go to.
- *
- * Handles: no arg / "~" (HOME), "-" (OLDPWD), CDPATH, or raw arg.
- *
- * @param sh Shell state.
- * @param arg User argument (may be NULL).
- * @return char* Target directory (GC) or NULL on error.
+ * @brief Compute the target directory for the `cd` command.
+ * Resolution order:
+ *  - If @p arg is NULL or equals "~", resolve to $HOME (error if unset).
+ *  - If @p arg equals "-", resolve via OLDPWD (may print an error inside).
+ *  - Otherwise, try CDPATH search (applies only when arg has no '/' and
+ *    does not start with '.'); if found, return that directory.
+ *  - Fallback: return a GC-managed duplicate of @p arg.
+ * @param sh   Shell handle (provides access to the environment).
+ * @param arg  User-provided `cd` argument (may be NULL).
+ * @return char*
+ * @retval non-NULL GC-managed path to attempt with chdir().
+ * @retval NULL     if resolution failed (e.g., HOME not set, OLDPWD not set).
  */
 static char	*get_target_dir(t_shell *sh, const char *arg)
 {
@@ -62,58 +71,80 @@ static char	*get_target_dir(t_shell *sh, const char *arg)
 }
 
 /**
- * @brief Update PWD and OLDPWD after a successful chdir.
- *
- * @param sh Shell state.
- * @param oldpwd Previous PWD value.
- * @return int 0 on success, 1 on error.
+ * @brief Update the shell's OLDPWD and PWD after a successful directory change.
+ * Expects @p oldpwd to contain the previous working directory (captured
+ * before chdir()). The function retrieves the current working directory
+ * via get_current_dir() and then:
+ *  - replaces OLDPWD with @p oldpwd or adds it if missing;
+ *  - replaces PWD with the new cwd or adds it if missing.
+ * @param sh     Shell handle with environment.
+ * @param oldpwd Previous working directory (GC-managed string), must not be NULL
+ * @return int
+ * @retval 0 on success.
+ * @retval 1 on failure (e.g., @p oldpwd is NULL or get_current_dir() failed).
  */
 static int	update_pwd_vars(t_shell *sh, char *oldpwd)
 {
 	char	*cwd;
+	int		r;
 
 	if (!oldpwd)
 		return (1);
 	cwd = get_current_dir();
 	if (!cwd)
 		return (1);
-	if (!replace_env_var(sh->envp, "OLDPWD", oldpwd))
-		add_env_var(sh, "OLDPWD", oldpwd);
-	if (!replace_env_var(sh->envp, "PWD", cwd))
-		add_env_var(sh, "PWD", cwd);
+	r = replace_env_var(sh->envp, "OLDPWD", oldpwd);
+	if (r == -1)
+		return (1);
+	if (r == 0 && add_env_var(sh, "OLDPWD", oldpwd) != 0)
+		return (1);
+	r = replace_env_var(sh->envp, "PWD", cwd);
+	if (r == -1)
+		return (1);
+	if (r == 0 && add_env_var(sh, "PWD", cwd) != 0)
+		return 1;
 	return (0);
 }
 
+/**
+ * @brief Print a bash-compatible cd error: "minishell: cd: <arg>: <Message>".
+ *
+ * Captures errno, then prints "minishell: cd: <arg>: <strerror(errno)>" to STDERR.
+ * Do not call any function that could overwrite errno before capturing it.
+ *
+ * @param arg  The path argument that failed (can be NULL; then only the message is printed).
+ */
 static void	cd_print_error(char *arg)
 {
-	char	*msg;
+	int err;
 
-	if (errno == ENOTDIR)
-		msg = "not a directory";
-	else if (errno == ENOENT)
-		msg = "no such file or directory";
-	else if (errno == EACCES)
-		msg = "permission denied";
-	else if (errno == ENAMETOOLONG)
-		msg = "file name too long";
-	else if (errno == ELOOP)
-		msg = "too many levels of symbolic links";
-	else
-		msg = strerror(errno);
-	ft_putstr_fd("cd: ", STDERR_FILENO);
-	ft_putstr_fd(msg, STDERR_FILENO);
-	ft_putstr_fd(": ", STDERR_FILENO);
-	ft_putendl_fd(arg, STDERR_FILENO);
+	err = errno;  /* save immediately */
+	ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
+	if (arg && *arg)
+	{
+		ft_putstr_fd(arg, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+	}
+	ft_putendl_fd(strerror(err), STDERR_FILENO);
 }
 
 /**
- * @brief Builtin: cd
+ * @brief Implement the `cd` builtin.
  *
- * Implements directory change with HOME, OLDPWD, and CDPATH support.
- * Applies POSIX-compatible diagnostic messages.
+ * Semantics:
+ *  - With no args or "~": change to $HOME (error if unset).
+ *  - With "-": change to $OLDPWD (error if unset).
+ *  - Otherwise: if CDPATH applies, resolve via CDPATH, else use the argument.
+ *  - On success, update OLDPWD and PWD to the physical paths.
+ *  - Print the resolved path to STDOUT only when:
+ *      * the argument was "-", or
+ *      * the directory was resolved via CDPATH,
+ *    and only after a successful chdir().
+ *  - With more than one non-option argument, print "too many arguments" and
+ *    return 1 without changing directory.
  *
- * @param args Command arguments (args[1] is the target or special token).
- * @return int 0 on success, 1 on failure.
+ * @param args argv-style array for the command; args[0] == "cd".
+ * @return 0 on success; 1 on error.
  */
 int	built_cd(char **args)
 {

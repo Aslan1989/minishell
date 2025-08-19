@@ -13,17 +13,19 @@
 #include "minishell.h"
 
 /**
- * @brief Implements the `echo` built-in command.
+ * @brief Implement the `echo` builtin with POSIX-like -n handling.
  *
- * Prints strings to the terminal. Supports the `-n` option to suppress the
- * newline.
+ * Parses one or more consecutive -n options (e.g., "-n", "-nnn"). Any token
+ * that starts with '-' but contains characters other than 'n' after the dash
+ * is treated as a normal argument (e.g., "-nfoo" is NOT an option).
+ * Prints all remaining arguments separated by a single space.
+ * If at least one -n was seen, the trailing newline is suppressed.
  *
- * @param args Array of arguments. args[0] is "echo", args[1...] are strings.
- * @return int Always returns 0.
- *
- * @example
- *   echo Hello World → prints "Hello World"
- *   echo -n Hello → prints "Hello" without newline
+ * @param args  argv-like array; args[0] is "echo", args[1..] are arguments.
+ *              Must be NULL-terminated. args may be non-NULL with at least
+ *              args[0] present in normal parser flow.
+ * @return int
+ * @retval 0 Always returns 0 (even on no-arg cases), matching common shell behavior.
  */
 int	built_echo(char **args)
 {

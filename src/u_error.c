@@ -46,10 +46,11 @@ void	print_errno_for(const char *what)
 
 int	g_syntax_error = 0;
 
-void parser_syntax_error(const char *tok)
+void	parser_syntax_error(const char *tok)
 {
 	g_syntax_error = 1;
-	ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
+	ft_putstr_fd("minishell: syntax error near unexpected token `",
+		STDERR_FILENO);
 	if (tok && *tok)
 		ft_putstr_fd((char *)tok, STDERR_FILENO);
 	else

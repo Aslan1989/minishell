@@ -66,7 +66,7 @@ char	*ft_gcstrndup(t_egccat cat, char *src, ssize_t n)
 /**
  * @brief Joins two strings and returns a new string in the garbage collector.
  */
-char	*ft_gcstrjoin(t_egccat cat, char *s1, const char *s2)
+char	*ft_gcstrjoin(t_egccat cat, const char *s1, const char *s2)
 {
 	char	*word;
 	char	*result;
