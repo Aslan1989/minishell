@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/18 14:22:01 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/19 15:00:41 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void	ft_open_quotes(t_arg *arg)
 		new_arg = ft_gcstrjoin(CAT_ARGS, new_arg, piece);
 	}
 	ft_gcfree(CAT_ARGS, arg->arg);
-	if(!new_arg)
+	if (!new_arg)
 		new_arg = ft_gcstrdup(CAT_ARGS, "");
 	arg->arg = new_arg;
 }

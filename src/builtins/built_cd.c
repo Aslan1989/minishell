@@ -109,16 +109,18 @@ static int	update_pwd_vars(t_shell *sh, char *oldpwd)
 /**
  * @brief Print a bash-compatible cd error: "minishell: cd: <arg>: <Message>".
  *
- * Captures errno, then prints "minishell: cd: <arg>: <strerror(errno)>" to STDERR.
+ * Captures errno, then prints "minishell: cd: <arg>: <strerror(errno)>"
+ * to STDERR.
  * Do not call any function that could overwrite errno before capturing it.
  *
- * @param arg  The path argument that failed (can be NULL; then only the message is printed).
+ * @param arg  The path argument that failed (can be NULL; then only
+ * the message is printed).
  */
 static void	cd_print_error(char *arg)
 {
-	int err;
+	int	err;
 
-	err = errno;  /* save immediately */
+	err = errno;
 	ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
 	if (arg && *arg)
 	{

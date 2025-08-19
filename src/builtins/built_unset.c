@@ -75,7 +75,7 @@ int	built_unset(t_shell *shell, char **args)
 	while (args[i])
 	{
 		if (args[i][0] == '-' && args[i][1])
-			ret = 2; // приоритетнее
+			ret = 2;
 		else if (!is_valid_identifier(args[i]) && ret == 0)
 			ret = 1;
 		i++;

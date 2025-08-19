@@ -25,7 +25,8 @@
  *              Must be NULL-terminated. args may be non-NULL with at least
  *              args[0] present in normal parser flow.
  * @return int
- * @retval 0 Always returns 0 (even on no-arg cases), matching common shell behavior.
+ * @retval 0 Always returns 0 (even on no-arg cases),
+ * matching common shell behavior.
  */
 int	built_echo(char **args)
 {

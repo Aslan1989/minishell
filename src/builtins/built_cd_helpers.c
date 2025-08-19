@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 14:31:39 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/19 12:31:35 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/19 14:58:04 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,8 @@ static int	is_directory(const char *path)
 }
 
 /**
- * @brief Join a directory and a file name using '/' and register both buffers in GC.
+ * @brief Join a directory and a file name using '/' and
+ *  register both buffers in GC.
  * Builds "dir/" and then "dir/file" using ft_strjoin(), registering both
  * intermediate and final buffers into the GC list under CAT_ENV. Returns the
  * final "dir/file" pointer.
@@ -92,11 +93,11 @@ static int	is_directory(const char *path)
 static char	*join_path_gc(const char *dir, const char *file)
 {
 	const char	*base;
-	char	*prefix;
-	size_t	n;
+	char		*prefix;
+	size_t		n;
 
 	if (!file)
-		return NULL;
+		return (NULL);
 	if (dir && *dir)
 		base = dir;
 	else
@@ -115,7 +116,8 @@ static char	*join_path_gc(const char *dir, const char *file)
  * @brief Try to resolve a `cd` target using CDPATH and print the resolved path.
  *
  * If $CDPATH is set, @p arg contains no '/' and does not start with '.',
- * iterate over the colon-separated directories in $CDPATH, join each with @p arg,
+ * iterate over the colon-separated directories in $CDPATH,
+ * join each with @p arg,
  * and return the first existing directory. On success, the resolved path is
  * printed to STDOUT (bash-like behavior).
  * @param sh   Shell handle (used to access the environment).

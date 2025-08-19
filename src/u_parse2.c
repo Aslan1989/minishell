@@ -15,9 +15,10 @@
 static const char	*curr_tok_value(t_token **current)
 {
 	if (current && *current)
-		return (*current)->value;
+		return ((*current)->value);
 	return (NULL);
 }
+
 /**
  * @brief Parse a sequence: expr (';' expr)*
  */
@@ -134,7 +135,7 @@ t_cmd	*parse_pipe(t_token **current)
 
 	if (ft_p_check(*current, TOK_PIPE))
 	{
-		parser_syntax_error((*current)->value); // печатает `|`
+		parser_syntax_error((*current)->value);
 		return (NULL);
 	}
 	expr = parse_word(current);
@@ -181,12 +182,12 @@ t_cmd	*parse_word(t_token **current)
 		node = parse_or(current);
 		if (!node && *current && ft_p_check(*current, TOK_RPAREN))
 		{
-			parser_syntax_error((*current)->value); // ')'
+			parser_syntax_error((*current)->value);
 			return (NULL);
 		}
 		if (!*current || !ft_p_check(*current, TOK_RPAREN))
 		{
-			parser_syntax_error(NULL); // newline
+			parser_syntax_error(NULL);
 			return (NULL);
 		}
 		ft_p_advance(current);

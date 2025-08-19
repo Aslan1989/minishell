@@ -99,7 +99,7 @@ static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 				check = ft_redir_add(node, REDIR_OUT, next->arg);
 			else if (!ft_strcmp(arg->arg, ">>"))
 				check = ft_redir_add(node, REDIR_APPEND, next->arg);
-			else /* "<<": heredoc */
+			else
 				check = ft_redir_add(node, REDIR_HEREDOC, next->arg);
 		}
 		else

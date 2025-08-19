@@ -13,28 +13,6 @@
 #include "minishell.h"
 
 /**
- * @brief Get value of an environment name from envp (no allocation).
- * @param envp Environment.
- * @param name Variable name.
- * @return char* Pointer inside envp string after '=' or NULL.
- */
-char	*get_env_var(char **envp, const char *name)
-{
-	size_t	len;
-	int		i;
-
-	len = ft_strlen(name);
-	i = 0;
-	while (envp[i])
-	{
-		if (!ft_strncmp(envp[i], name, len) && envp[i][len] == '=')
-			return (envp[i] + len + 1);
-		i++;
-	}
-	return (NULL);
-}
-
-/**
  * @brief Join directory and command into CAT_CMD GC.
  * @param dir PATH entry.
  * @param cmd Command name.

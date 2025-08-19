@@ -63,13 +63,13 @@ static void	process_key_value(t_shell *shell, char *arg)
 		process_key_value_without_equal(shell, arg);
 }
 
-
 int	built_export(t_shell *shell, char **args)
 {
 	int		i;
 	int		ret;
 	char	*eq;
 	char	saved;
+
 	if (!args[1])
 	{
 		print_sorted_env(shell->envp);

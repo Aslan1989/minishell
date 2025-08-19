@@ -26,15 +26,15 @@ int	ft_redir_check_next(char *next_token)
 	if (!next_token || !*next_token)
 	{
 		parser_syntax_error(NULL);
-		return 1;
+		return (1);
 	}
 	if (!ft_strcmp(next_token, "<") || !ft_strcmp(next_token, ">")
 		|| !ft_strcmp(next_token, ">>") || !ft_strcmp(next_token, "<<")
-		|| !ft_strcmp(next_token, "|")  || !ft_strcmp(next_token, "||")
+		|| !ft_strcmp(next_token, "|") || !ft_strcmp(next_token, "||")
 		|| !ft_strcmp(next_token, "&&") || !ft_strcmp(next_token, ")"))
 	{
 		parser_syntax_error(next_token);
-		return 1;
+		return (1);
 	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/19 12:32:01 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/19 15:06:08 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@
 # define COLOR_W "\033[37m"
 # define COLOR_BOLD "\033[1m"
 # define COLOR_X "\033[0m"
+
+extern int					g_syntax_error;
 
 typedef enum e_token
 {
@@ -265,6 +267,5 @@ int			ft_redir_check_next(char *next_token);
 //u_redir_helpers.c
 int			apply_fds_parent(int fd_in, int fd_out,
 				int *save_in, int *save_out);
-extern int	g_syntax_error;
 void		parser_syntax_error(const char *tok);
 #endif

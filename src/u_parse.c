@@ -86,7 +86,6 @@ t_cmd	*ft_parse_tokens(t_token **tokens)
 	ast = parse_seq(&current);
 	if (!ast && g_syntax_error)
 		return (NULL);
-	// хвостовые токены после корректного выражения → синтакс-ошибка
 	if (current && current->type != TOK_EOF)
 	{
 		parser_syntax_error(current->value);

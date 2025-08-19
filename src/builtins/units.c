@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 23:00:44 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/09 14:36:04 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/19 17:47:31 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,4 +77,26 @@ int	add_env_var(t_shell *shell, const char *key, const char *value)
 	ft_gcfree(CAT_ENV, shell->envp);
 	shell->envp = new_env;
 	return (0);
+}
+
+/**
+ * @brief Get value of an environment name from envp (no allocation).
+ * @param envp Environment.
+ * @param name Variable name.
+ * @return char* Pointer inside envp string after '=' or NULL.
+ */
+char	*get_env_var(char **envp, const char *name)
+{
+	size_t	len;
+	int		i;
+
+	len = ft_strlen(name);
+	i = 0;
+	while (envp[i])
+	{
+		if (!ft_strncmp(envp[i], name, len) && envp[i][len] == '=')
+			return (envp[i] + len + 1);
+		i++;
+	}
+	return (NULL);
 }
