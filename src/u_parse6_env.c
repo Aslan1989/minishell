@@ -6,11 +6,25 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/18 14:03:24 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/20 09:30:53 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+/**
+ * @brief Acceptable characters for environment names.
+ */
+int	ft_char_is_good_for_env(char c)
+{
+	if (c == '_')
+		return (1);
+	if (ft_isalnum(c))
+		return (1);
+	if (ft_isalpha(c))
+		return (1);
+	return (0);
+}
 
 /**
  * @brief Lookup environment variable by name and duplicate value in CAT_ARGS.
@@ -101,16 +115,3 @@ char	*ft_expand_env(char *str)
 	return (ret);
 }
 
-/**
- * @brief Acceptable characters for environment names.
- */
-int	ft_char_is_good_for_env(char c)
-{
-	if (c == '_')
-		return (1);
-	if (ft_isalnum(c))
-		return (1);
-	if (ft_isalpha(c))
-		return (1);
-	return (0);
-}

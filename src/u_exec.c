@@ -124,7 +124,14 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 		return (1);
 	}
 	else if (pid == 0)
+	{
+		if (get_shell()->is_interactive)
+		{
+			signal(SIGINT, SIG_DFL);
+			signal(SIGQUIT, SIG_DFL);
+		}
 		execute_child_command(command, shell, args);
+	}
 	else
 	{
 		waitpid(pid, &status, 0);

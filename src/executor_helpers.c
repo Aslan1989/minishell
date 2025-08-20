@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 15:10:20 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/19 19:53:36 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/20 10:10:16 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,11 @@ static void	run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 {
 	int	status;
 
+	if (get_shell()->is_interactive)
+	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+	}
 	if (dup2(fd, dup_fd) == -1)
 	{
 		perror("dup2");

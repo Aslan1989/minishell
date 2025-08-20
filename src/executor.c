@@ -134,9 +134,9 @@ int	ft_run_commands(t_cmd *com)
 {
 	int	status;
 
-	if (g_syntax_error)
+	if (get_shell()->syntax_error)
 	{
-		g_syntax_error = 0;
+		get_shell()->syntax_error = 0;
 		return (2);
 	}
 	if (!com)

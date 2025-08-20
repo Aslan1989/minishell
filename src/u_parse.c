@@ -89,7 +89,7 @@ t_cmd	*ft_parse_tokens(t_token **tokens)
 		return (NULL);
 	}
 	ast = parse_or(&current);
-	if (!ast && g_syntax_error)
+	if (!ast && get_shell()->syntax_error)
 		return (NULL);
 	if (current && current->type != TOK_EOF)
 	{

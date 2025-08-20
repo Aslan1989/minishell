@@ -21,6 +21,7 @@ static void	ft_initialize_shell(char **envp)
 	shell->last_exit_status = 0;
 	shell->is_interactive = isatty(STDIN_FILENO);
 	shell->envp_allocated = 1;
+	shell->syntax_error = 0;
 	if (shell->is_interactive)
 	{
 		setup_signals();

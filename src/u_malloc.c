@@ -56,7 +56,6 @@ void	*ft_gcrealloc(t_egccat cat, void *ptr, ssize_t size)
 		copy_size = old_size;
 	else
 		copy_size = (size_t)size;
-	size = ft_gc_getsize(cat, ptr);
 	if (copy_size > 0)
 		ft_memcpy(new_ptr, ptr, copy_size);
 	ft_gcfree(cat, ptr);

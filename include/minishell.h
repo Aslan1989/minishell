@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/19 20:00:15 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/20 10:04:30 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,6 @@
 # define COLOR_W "\033[37m"
 # define COLOR_BOLD "\033[1m"
 # define COLOR_X "\033[0m"
-
-extern int					g_syntax_error;
 
 typedef enum e_token
 {
@@ -123,6 +121,7 @@ typedef struct s_shell
 	int		last_exit_status;
 	int		is_interactive;
 	int		envp_allocated;
+	int		syntax_error;
 }			t_shell;
 
 struct s_cmd
@@ -240,7 +239,7 @@ char		**ft_expand_wildcards(t_arg **args);
 t_cmd		*parse_word_sub(t_token **current);
 void		ft_open_quotes(t_arg *arg);
 char		*ft_expand_env(char *str);
-int			ft_char_is_good_for_env(char c);
+//int			ft_char_is_good_for_env(char c);
 
 //our malloc and garbage collector
 t_garbage	**get_gc(t_egccat cat);
