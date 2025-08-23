@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/23 15:00:47 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 18:56:41 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,5 +276,8 @@ void		parser_syntax_error(const char *tok);
 
 //u_parse_helpers.c
 char		*open_quote_word(char **arg);
-char		*open_quote_single(char **arg);
+void		skip_ws(const char **line);
+int			is_redir_word(t_arg *arg);
+int			ensure_capacity(t_cmd *node, int *cap, int next_idx);
+int			append_arg(t_cmd *node, t_arg *arg, int *i, int *cap);
 #endif

@@ -71,7 +71,12 @@ static int	handle_redirection(t_cmd *node, t_arg *arg, const char **line)
 	int		check;
 
 	next = extract_arg(line);
-	if (!next || ft_redir_check_next(next->arg))
+	if (!next)
+	{
+		parser_syntax_error(NULL);
+		return (1);
+	}
+	if (ft_redir_check_next(next->arg))
 		return (1);
 	if (!ft_strcmp(arg->arg, "<"))
 		check = ft_redir_add(node, REDIR_IN, next->arg);
@@ -96,25 +101,26 @@ static int	handle_redirection(t_cmd *node, t_arg *arg, const char **line)
 static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 {
 	t_arg	*arg;
-	int		check;
+	int		cap;
 
 	*i = 0;
-	check = 0;
-	while (*line && *i < argc)
+	cap = argc;
+	if (cap < 1)
+		cap = 1;
+	while (*line)
 	{
+		skip_ws(&line);
+		if (!*line)
+			break ;
 		arg = extract_arg(&line);
 		if (!arg)
 			return (1);
-		if (!arg->quoted && (!ft_strcmp(arg->arg, "<") \
-		|| !ft_strcmp(arg->arg, ">") || !ft_strcmp(arg->arg, ">>") \
-		|| !ft_strcmp(arg->arg, "<<")))
+		if (is_redir_word(arg))
 		{
 			if (handle_redirection(node, arg, &line))
 				return (1);
 		}
-		else
-			node->args[(*i)++] = arg;
-		if (check)
+		else if (append_arg(node, arg, i, &cap))
 			return (1);
 	}
 	return (0);
@@ -149,8 +155,6 @@ int	parse_input(t_cmd *node, const char *line)
 	if (ft_fillout_commands(node, line, argc, &i))
 		return (1);
 	node->args[i] = NULL;
-	while (i <= argc)
-		node->args[i++] = NULL;
 	new_command = ft_expand_wildcards(node->args);
 	if (new_command)
 		node->commands = new_command;
