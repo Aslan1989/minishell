@@ -88,7 +88,7 @@ int	ft_isnotaword(char c)
 	if (ft_isspace(c))
 		return (1);
 	if (c == '>' || c == '<' || c == '|' || c == '&'
-		|| c == ';' || c == '(' || c == ')')
+		|| c == '(' || c == ')')
 		return (1);
 	return (0);
 }

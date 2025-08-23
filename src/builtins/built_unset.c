@@ -51,6 +51,23 @@ static void	print_invalid_identifiers(char **args)
 	}
 }
 
+static int	apply_unset(t_shell *shell, char **args)
+{
+	int		count;
+	char	**new_env;
+
+	count = env_count(shell->envp);
+	new_env = env_alloc(count);
+	if (!new_env)
+		return (1);
+	env_copy_filtered(shell->envp, args, new_env);
+	if (shell->envp_allocated)
+		ft_gcfree(CAT_ENV, shell->envp);
+	shell->envp = new_env;
+	shell->envp_allocated = 1;
+	return (0);
+}
+
 /**
  * @brief Builtin: unset
  *
@@ -62,8 +79,6 @@ static void	print_invalid_identifiers(char **args)
  */
 int	built_unset(t_shell *shell, char **args)
 {
-	int		count;
-	char	**new_env;
 	int		i;
 	int		ret;
 
@@ -82,14 +97,7 @@ int	built_unset(t_shell *shell, char **args)
 	}
 	if (ret == 2)
 		return (2);
-	count = env_count(shell->envp);
-	new_env = env_alloc(count);
-	if (!new_env)
+	if (apply_unset(shell, args) != 0)
 		return (1);
-	env_copy_filtered(shell->envp, args, new_env);
-	if (shell->envp_allocated)
-		ft_gcfree(CAT_ENV, shell->envp);
-	shell->envp = new_env;
-	shell->envp_allocated = 1;
 	return (ret);
 }

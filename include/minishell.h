@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/22 16:31:50 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 15:00:47 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ typedef enum e_token
 	TOK_OR,
 	TOK_LPAREN,
 	TOK_RPAREN,
-	TOK_SEMI,
 	TOK_EOF
 }	t_etoken;
 
@@ -100,7 +99,16 @@ struct s_arg
 {
 	char	*arg;
 	int		wildcard;
+	int		quoted;
 };
+
+typedef struct s_quote_ctx
+{
+	char	*new_arg;
+	char	*line;
+	int		saw_q;
+	int		saw_u;
+}			t_quote_ctx;
 
 /**
  * @brief Custom structure to hold shell state.
@@ -178,7 +186,6 @@ char		*search_in_cdpath(t_shell *sh, const char *arg);
 void		env_copy_filtered(char **src, char **args, char **dst);
 char		**env_alloc(int count);
 int			env_count(char **envp);
-int			should_remove(char *env_var, char **args);
 
 char		*get_env_var(char **envp, const char *name);
 
@@ -266,4 +273,8 @@ int			ft_redir_check_next(char *next_token);
 int			apply_fds_parent(int fd_in, int fd_out,
 				int *save_in, int *save_out);
 void		parser_syntax_error(const char *tok);
+
+//u_parse_helpers.c
+char		*open_quote_word(char **arg);
+char		*open_quote_single(char **arg);
 #endif

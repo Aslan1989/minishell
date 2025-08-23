@@ -74,8 +74,8 @@ static void	ft_add_word(char **line, t_token **head)
 		else if (**line == quote && quote)
 			quote = 0;
 		(*line)++;
-		if (**line == '|' || **line == '&' || **line == '('
-			|| **line == ')' || **line == ';')
+		if (!quote && (**line == '|' || **line == '&' || **line == '(' \
+		|| **line == ')'))
 			break ;
 	}
 	add_token(head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, *line - start));
@@ -93,8 +93,6 @@ static int	try_add_operator(char **line, t_token **head)
 		return (*line += add_token(head, TOK_LPAREN, "("), 1);
 	if (**line == ')')
 		return (*line += add_token(head, TOK_RPAREN, ")"), 1);
-	if (**line == ';')
-		return (*line += add_token(head, TOK_SEMI, ";"), 1);
 	return (0);
 }
 

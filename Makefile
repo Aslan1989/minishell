@@ -61,6 +61,7 @@ SRC = $(SRC_DIR)main.c \
 	$(SRC_DIR)u_parse3.c \
 	$(SRC_DIR)u_parse4.c \
 	$(SRC_DIR)u_parse5_quotes.c \
+	$(SRC_DIR)u_parse_helpers.c \
 	$(SRC_DIR)u_parse6_env.c \
 	$(SRC_DIR)u_redir.c \
 	$(SRC_DIR)u_redir2.c \

@@ -135,10 +135,7 @@ int	ft_run_commands(t_cmd *com)
 	int	status;
 
 	if (get_shell()->syntax_error)
-	{
-		get_shell()->syntax_error = 0;
-		return (2);
-	}
+		return (get_shell()->syntax_error = 0, 2);
 	if (!com)
 		return (0);
 	if (com->type == TOK_WORD)

@@ -67,6 +67,22 @@ static void	valid_and_exec_extern(t_cmd *command, t_shell *shell, char **args)
 	exit(126);
 }
 
+static int	execute_builtin_child(t_shell *shell, char **args)
+{
+	int	status;
+
+	status = 0;
+	if (!ft_strcmp(args[0], "echo"))
+		status = built_echo(args);
+	else if (!ft_strcmp(args[0], "pwd"))
+		status = built_pwd();
+	else if (!ft_strcmp(args[0], "env"))
+		status = built_env(shell, args);
+	else
+		status = 1;
+	return (status);
+}
+
 /**
  * @brief Code path for forked children: set up redirs and exec or run builtin.
  * @param command Node (contains redirs and resolved path for external).
@@ -77,6 +93,11 @@ static void	execute_child_command(t_cmd *command, t_shell *shell, char **args)
 {
 	int			status;
 
+	if (get_shell()->is_interactive)
+	{
+		signal(SIGINT, SIG_DFL);
+		signal(SIGQUIT, SIG_DFL);
+	}
 	setup_redirections(command);
 	if (!command->path)
 	{
@@ -88,13 +109,7 @@ static void	execute_child_command(t_cmd *command, t_shell *shell, char **args)
 		valid_and_exec_extern(command, shell, args);
 	else
 	{
-		status = 0;
-		if (!ft_strcmp(args[0], "echo"))
-			status = built_echo(args);
-		else if (!ft_strcmp(args[0], "pwd"))
-			status = built_pwd();
-		else if (!ft_strcmp(args[0], "env"))
-			status = built_env(shell, args);
+		status = execute_builtin_child(shell, args);
 		free_gc();
 		clear_history();
 		exit(status);
@@ -119,10 +134,7 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 		return (127);
 	pid = fork();
 	if (pid == -1)
-	{
-		perror("fork");
-		return (1);
-	}
+		return (perror("fork"), 1);
 	else if (pid == 0)
 		execute_child_command(command, shell, args);
 	else
@@ -130,8 +142,11 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status))
 			return (WEXITSTATUS(status));
-		else if (WIFSIGNALED(status))
+		else if (WIFSIGNALED(status) && WTERMSIG(status) == SIGQUIT)
+		{
+			ft_putendl_fd("Quit: 3", STDERR_FILENO);
 			return (128 + WTERMSIG(status));
+		}
 		return (1);
 	}
 	return (0);

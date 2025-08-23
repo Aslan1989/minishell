@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 14:03:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 14:15:08 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 12:10:48 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 /**
  * @brief Return 1 if env_var begins with key followed by '='.
+ * Compute the length of key.
+ * Compare the first len chars of env_var to key.
+ * Ensure the next character in env_var is '='
  */
 static int	match_key(const char *env_var, const char *key)
 {
@@ -25,8 +28,11 @@ static int	match_key(const char *env_var, const char *key)
 
 /**
  * @brief Decide whether an env string must be removed based on args list.
+ * For each argument: if it is a valid identifier
+ * and the key matches this env_var, we should remove it.
+ * If no matches, keep it.
  */
-int	should_remove(char *env_var, char **args)
+static int	should_remove(char *env_var, char **args)
 {
 	int	i;
 
@@ -69,10 +75,12 @@ char	**env_alloc(int count)
 
 /**
  * @brief Copy `src` into `dst` skipping keys listed in `args` (unset).
- *
- * For every removed entry we free its GC node via ft_gcfree(CAT_ENV, ...).
- * The destination is always NULL-terminated.
- *
+ * Iterate all source entries.
+ * If a variable must stay, copy its pointer to dst and advance j.
+ * If it must be removed, free that string via GC
+ * (the entry itself, not the whole array).
+ * Null-terminate the destination.
+ * Result: dst reuses surviving entries; removed ones are freed.
  * @param src  Source env array.
  * @param args Unset arguments (args[1..]).
  * @param dst  Destination array (preallocated).

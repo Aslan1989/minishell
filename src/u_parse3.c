@@ -65,6 +65,25 @@ char	**ft_expand_wildcards(t_arg **args)
 	return (result);
 }
 
+static int	handle_redirection(t_cmd *node, t_arg *arg, const char **line)
+{
+	t_arg	*next;
+	int		check;
+
+	next = extract_arg(line);
+	if (!next || ft_redir_check_next(next->arg))
+		return (1);
+	if (!ft_strcmp(arg->arg, "<"))
+		check = ft_redir_add(node, REDIR_IN, next->arg);
+	else if (!ft_strcmp(arg->arg, ">"))
+		check = ft_redir_add(node, REDIR_OUT, next->arg);
+	else if (!ft_strcmp(arg->arg, ">>"))
+		check = ft_redir_add(node, REDIR_APPEND, next->arg);
+	else
+		check = ft_redir_add(node, REDIR_HEREDOC, next->arg);
+	return (check);
+}
+
 /**
  * @brief Fill command->args with parsed t_arg* and redirections.
  *
@@ -77,7 +96,6 @@ char	**ft_expand_wildcards(t_arg **args)
 static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 {
 	t_arg	*arg;
-	t_arg	*next;
 	int		check;
 
 	*i = 0;
@@ -87,20 +105,12 @@ static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 		arg = extract_arg(&line);
 		if (!arg)
 			return (1);
-		if (!ft_strcmp(arg->arg, "<") || !ft_strcmp(arg->arg, ">")
-			|| !ft_strcmp(arg->arg, ">>") || !ft_strcmp(arg->arg, "<<"))
+		if (!arg->quoted && (!ft_strcmp(arg->arg, "<") \
+		|| !ft_strcmp(arg->arg, ">") || !ft_strcmp(arg->arg, ">>") \
+		|| !ft_strcmp(arg->arg, "<<")))
 		{
-			next = extract_arg(&line);
-			if (!next || ft_redir_check_next(next->arg))
+			if (handle_redirection(node, arg, &line))
 				return (1);
-			if (!ft_strcmp(arg->arg, "<"))
-				check = ft_redir_add(node, REDIR_IN, next->arg);
-			else if (!ft_strcmp(arg->arg, ">"))
-				check = ft_redir_add(node, REDIR_OUT, next->arg);
-			else if (!ft_strcmp(arg->arg, ">>"))
-				check = ft_redir_add(node, REDIR_APPEND, next->arg);
-			else
-				check = ft_redir_add(node, REDIR_HEREDOC, next->arg);
 		}
 		else
 			node->args[(*i)++] = arg;
