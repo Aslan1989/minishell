@@ -44,8 +44,6 @@ void	print_errno_for(const char *what)
 	ft_putendl_fd(strerror(errno), STDERR_FILENO);
 }
 
-int	g_syntax_error = 0;
-
 void	parser_syntax_error(const char *tok)
 {
 	get_shell()->syntax_error = 1;

@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/09 13:07:23 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/20 09:30:53 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 11:39:43 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,4 +114,3 @@ char	*ft_expand_env(char *str)
 		ret = ft_gcstrdup(CAT_ARGS, "");
 	return (ret);
 }
-

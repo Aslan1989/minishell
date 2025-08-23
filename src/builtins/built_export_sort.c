@@ -6,11 +6,18 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 22:50:00 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/18 12:47:30 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 11:39:29 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	print_invalid_identifier(char *key)
+{
+	ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+	ft_putstr_fd(key, STDERR_FILENO);
+	ft_putendl_fd("': not a valid identifier", STDERR_FILENO);
+}
 
 int	is_option_arg(const char *s)
 {
@@ -49,6 +56,16 @@ static void	bubble_sort(char **arr)
 	}
 }
 
+/**
+ * @brief Print environment entries in bash-like `declare -x` format.
+ *
+ * For entries of the form KEY=VALUE prints: `declare -x KEY="VALUE"`.
+ * Entries without '=' are printed as `declare -x KEY`.
+ *
+ * @param envp NULL-terminated environment array.
+ * @note Temporarily replaces '=' with '\0' while printing, then restores it.
+ *       This mutates the string contents momentarily but preserves final state.
+ */
 static void	print_env_formatted(char **envp)
 {
 	int		i;
@@ -74,6 +91,13 @@ static void	print_env_formatted(char **envp)
 	}
 }
 
+/**
+ * @brief Copy, sort, and print the environment in `declare -x` format.
+ *
+ * @param envp NULL-terminated environment array.
+ * @note Uses a GC category CAT_MEM via copy_env_cat/free_gc_cat
+ * to manage the copy.
+ */
 void	print_sorted_env(char **envp)
 {
 	char	**copy;

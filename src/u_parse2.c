@@ -29,10 +29,7 @@ t_cmd	*parse_or(t_token **current)
 	t_token	*operator;
 
 	if (ft_p_check(*current, TOK_OR))
-	{
-		parser_syntax_error((*current)->value);
-		return (NULL);
-	}
+		return (parser_syntax_error((*current)->value), NULL);
 	expr = parse_and(current);
 	while (ft_p_check(*current, TOK_OR))
 	{
@@ -64,10 +61,7 @@ t_cmd	*parse_and(t_token **current)
 	t_token	*operator;
 
 	if (ft_p_check(*current, TOK_AND))
-	{
-		parser_syntax_error((*current)->value);
-		return (NULL);
-	}
+		return (parser_syntax_error((*current)->value), NULL);
 	expr = parse_pipe(current);
 	while (ft_p_check(*current, TOK_AND))
 	{
@@ -99,10 +93,7 @@ t_cmd	*parse_pipe(t_token **current)
 	t_token	*operator;
 
 	if (ft_p_check(*current, TOK_PIPE))
-	{
-		parser_syntax_error((*current)->value);
-		return (NULL);
-	}
+		return (parser_syntax_error((*current)->value), NULL);
 	expr = parse_word(current);
 	while (ft_p_check(*current, TOK_PIPE))
 	{
@@ -134,10 +125,7 @@ t_cmd	*parse_word(t_token **current)
 	if (!current || !*current)
 		return (NULL);
 	if (ft_p_check(*current, TOK_RPAREN))
-	{
-		parser_syntax_error((*current)->value);
-		return (NULL);
-	}
+		return (parser_syntax_error((*current)->value), NULL);
 	node = parse_word_sub(current);
 	if (node)
 		return (node);
@@ -146,10 +134,7 @@ t_cmd	*parse_word(t_token **current)
 		ft_p_advance(current);
 		node = parse_or(current);
 		if (!node && *current && ft_p_check(*current, TOK_RPAREN))
-		{
-			parser_syntax_error((*current)->value);
-			return (NULL);
-		}
+			return (parser_syntax_error((*current)->value), NULL);
 		if (!*current || !ft_p_check(*current, TOK_RPAREN))
 		{
 			parser_syntax_error(NULL);

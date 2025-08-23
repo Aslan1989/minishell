@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/20 10:04:30 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/22 16:31:50 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,7 @@ int			replace_env_var(char **envp, const char *key, const char *value);
 // built_export_sort.c
 void		print_sorted_env(char **envp);
 int			is_option_arg(const char *s);
+void		print_invalid_identifier(char *key);
 
 // build_cd_helpers.c
 char		*target_from_oldpwd(t_shell *sh);
