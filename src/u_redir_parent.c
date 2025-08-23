@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/08 18:18:30 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 16:41:37 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 19:29:44 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,8 @@ static int	collect_parent_fds(t_cmd *cmd, int *fd_in, int *fd_out)
 			return (1);
 		else if (cur->type == REDIR_APPEND
 			&& open_outfile(cur->value, 1, fd_out))
+			return (1);
+		else if (cur->type == REDIR_INOUT && open_inout(cur->value, fd_in))   // ← NEW
 			return (1);
 		else if (cur->type == REDIR_HEREDOC)
 		{

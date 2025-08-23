@@ -12,57 +12,40 @@
 
 #include "minishell.h"
 
-static int	append_result(char ***res, int *count, const char *s)
+int	has_wc_token(t_arg *a)
 {
-	char	**r;
-
-	r = (char **)ft_gcrealloc(CAT_ARGS, *res, sizeof(char *) * (*count + 2));
-	if (!r)
+	if (!a || !a->wildcard)
+		return (0);
+	if (ft_strpbrk(a->arg, "*?["))
 		return (1);
-	r[*count] = ft_gcstrdup(CAT_ARGS, s);
-	if (!r[*count])
-		return (1);
-	(*count)++;
-	r[*count] = NULL;
-	*res = r;
 	return (0);
 }
 
-/**
- * @brief Takes an argument list and expands any wildcards.
- *
- * This function uses globbing to expand patterns like `*`, `?`, and `[]`.
- * It replaces the original arguments with the expanded list.
- * @param args The array of arguments to expand.
- * @return char** A new array of arguments with wildcards expanded.
- */
 char	**ft_expand_wildcards(t_arg **args)
 {
-	char	**result;
-	int		count;
+	char	**res;
+	int		cnt;
 	int		i;
-	size_t	j;
-	glob_t	g;
+	int		matched;
+	int		has_slash;
 
-	result = NULL;
-	count = 0;
+	res = NULL;
+	cnt = 0;
 	i = 0;
 	while (args && args[i])
 	{
-		if (args[i]->wildcard && ft_strpbrk(args[i]->arg, "*?[]")
-			&& glob(args[i]->arg, 0, NULL, &g) == 0)
+		has_slash = (ft_strchr(args[i]->arg, '/') != NULL);
+		if (has_wc_token(args[i]) && !has_slash)
 		{
-			j = 0;
-			while (j < g.gl_pathc)
-				if (append_result(&result, &count, g.gl_pathv[j++]))
-					return (globfree(&g), result);
-			globfree(&g);
+			matched = expand_one_pattern(args[i]->arg, &res, &cnt);
+			if (!matched && append_result(&res, &cnt, args[i]->arg))
+				return (res);
 		}
-		else if (append_result(&result, &count, args[i]->arg))
-			return (result);
+		else if (append_result(&res, &cnt, args[i]->arg))
+			return (res);
 		i++;
 	}
-	return (result);
+	return (res);
 }
 
 static int	handle_redirection(t_cmd *node, t_arg *arg, const char **line)
@@ -84,6 +67,8 @@ static int	handle_redirection(t_cmd *node, t_arg *arg, const char **line)
 		check = ft_redir_add(node, REDIR_OUT, next->arg);
 	else if (!ft_strcmp(arg->arg, ">>"))
 		check = ft_redir_add(node, REDIR_APPEND, next->arg);
+	else if (!ft_strcmp(arg->arg, "<>"))
+		check = ft_redir_add(node, REDIR_INOUT, next->arg);
 	else
 		check = ft_redir_add(node, REDIR_HEREDOC, next->arg);
 	return (check);

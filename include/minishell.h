@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/23 18:56:41 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 20:24:11 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@
 # include <fcntl.h>
 # include <sys/stat.h>
 
-# include <glob.h>
+# include <dirent.h>
 
 # define COLOR_R "\033[31m"
 # define COLOR_G "\033[32m"
@@ -70,7 +70,8 @@ typedef enum e_redir
 	REDIR_IN = 0,
 	REDIR_OUT = 1,
 	REDIR_APPEND = 2,
-	REDIR_HEREDOC = 3
+	REDIR_HEREDOC = 3,
+	REDIR_INOUT = 4
 }	t_eredir;
 
 typedef struct s_redir		t_redir;
@@ -273,6 +274,7 @@ int			ft_redir_check_next(char *next_token);
 int			apply_fds_parent(int fd_in, int fd_out,
 				int *save_in, int *save_out);
 void		parser_syntax_error(const char *tok);
+int			open_inout(const char *path, int *fd_in);
 
 //u_parse_helpers.c
 char		*open_quote_word(char **arg);
@@ -280,4 +282,27 @@ void		skip_ws(const char **line);
 int			is_redir_word(t_arg *arg);
 int			ensure_capacity(t_cmd *node, int *cap, int next_idx);
 int			append_arg(t_cmd *node, t_arg *arg, int *i, int *cap);
+
+//u_parse_wildcards_helpers.c
+int			pmatch_qmark(const char **ppat, const char **pstr);
+int			pmatch_char(const char **ppat, const char **pstr);
+int			cc_range_trip(const char *p, char c, int *ok);
+int			match_char_class(const char **pp, char c);
+int			expand_one_pattern(const char *pat, char ***res, int *count);
+
+//u_parse_wildcards_helpers2.c
+int			pmatch_bracket(const char **ppat, const char **pstr);
+int			pmatch_star(const char **ppat, const char *str);
+void		swap_str(char **a, char **b);
+int			arr_len(char **arr);
+int			pmatch(const char *pat, const char *str);
+
+//u_parse_wildcards_helpers3.c
+int			pmatch_after_star(const char *pat, const char *str);
+void		sort_strings(char **arr);
+int			append_result(char ***res, int *count, const char *s);
+int			want_show_hidden(const char *pattern);
+int			scan_entries(DIR *dir, const char *pat, int show_dot,
+				char ***res, int *count, int *matched);
+
 #endif

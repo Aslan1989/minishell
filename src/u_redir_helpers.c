@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 16:37:26 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 16:49:52 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 19:37:19 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,5 +53,15 @@ int	apply_fds_parent(int fd_in, int fd_out, int *save_in, int *save_out)
 	}
 	if (redirect_std(fd_out, STDOUT_FILENO, save_out))
 		return (1);
+	return (0);
+}
+
+int	open_inout(const char *path, int *fd_in)
+{
+	if (*fd_in >= 0)
+		close(*fd_in);
+	*fd_in = open(path, O_RDWR | O_CREAT, 0644);
+	if (*fd_in < 0)
+		return (print_errno_for(path), 1);
 	return (0);
 }

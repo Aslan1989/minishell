@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 14:59:09 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/23 18:56:23 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/23 19:23:28 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ int	is_redir_word(t_arg *arg)
 	if (!ft_strcmp(arg->arg, ">>"))
 		return (1);
 	if (!ft_strcmp(arg->arg, "<<"))
+		return (1);
+	if (!ft_strcmp(arg->arg, "<>"))
 		return (1);
 	return (0);
 }

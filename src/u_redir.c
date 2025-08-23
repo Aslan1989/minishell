@@ -30,6 +30,7 @@ int	ft_redir_check_next(char *next_token)
 	}
 	if (!ft_strcmp(next_token, "<") || !ft_strcmp(next_token, ">")
 		|| !ft_strcmp(next_token, ">>") || !ft_strcmp(next_token, "<<")
+		|| !ft_strcmp(next_token, "<>")
 		|| !ft_strcmp(next_token, "|") || !ft_strcmp(next_token, "||")
 		|| !ft_strcmp(next_token, "&&") || !ft_strcmp(next_token, "(")
 		|| !ft_strcmp(next_token, ")"))
