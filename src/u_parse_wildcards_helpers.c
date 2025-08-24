@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 20:02:53 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/23 20:25:14 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/24 13:10:33 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,7 @@ int	cc_range_trip(const char *p, char c, int *ok)
 	{
 		a = p[0];
 		b = p[2];
-		if ((a <= b && c >= a && c <= b)
-		 || (a >  b && c >= b && c <= a))
+		if ((a <= b && c >= a && c <= b) || (a > b && c >= b && c <= a))
 			*ok = 1;
 		return (3);
 	}
@@ -79,22 +78,24 @@ int	match_char_class(const char **pp, char c)
 
 int	expand_one_pattern(const char *pat, char ***res, int *count)
 {
-	DIR	*dir;
-	int	matched;
-	int	show_dot;
+	DIR			*dir;
+	t_wc_ctx	c;
 
 	dir = opendir(".");
 	if (!dir)
 		return (0);
-	matched = 0;
-	show_dot = want_show_hidden(pat);
-	if (scan_entries(dir, pat, show_dot, res, count, &matched))
+	c.pat = pat;
+	c.show_dot = want_show_hidden(pat);
+	c.res = res;
+	c.count = count;
+	c.matched = 0;
+	if (scan_entries(dir, &c))
 	{
 		closedir(dir);
-		return (matched);
+		return (c.matched);
 	}
 	closedir(dir);
-	if (matched)
+	if (c.matched)
 		sort_strings(*res);
-	return (matched);
+	return (c.matched);
 }

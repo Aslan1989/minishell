@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/23 20:24:11 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/24 13:07:07 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,15 @@ typedef struct s_quote_ctx
 	int		saw_q;
 	int		saw_u;
 }			t_quote_ctx;
+
+typedef struct s_wc_ctx
+{
+	const char	*pat;
+	int			show_dot;
+	char		***res;
+	int			*count;
+	int			matched;
+}				t_wc_ctx;
 
 /**
  * @brief Custom structure to hold shell state.
@@ -302,7 +311,6 @@ int			pmatch_after_star(const char *pat, const char *str);
 void		sort_strings(char **arr);
 int			append_result(char ***res, int *count, const char *s);
 int			want_show_hidden(const char *pattern);
-int			scan_entries(DIR *dir, const char *pat, int show_dot,
-				char ***res, int *count, int *matched);
+int			scan_entries(DIR *dir, t_wc_ctx *ctx);
 
 #endif

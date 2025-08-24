@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 20:13:01 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/23 20:13:42 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/24 13:09:44 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,7 @@ int	want_show_hidden(const char *pattern)
 	return (0);
 }
 
-int	scan_entries(DIR *dir, const char *pat, int show_dot,
-				char ***res, int *count, int *matched)
+int	scan_entries(DIR *dir, t_wc_ctx *ctx)
 {
 	struct dirent	*ent;
 	const char		*name;
@@ -80,11 +79,11 @@ int	scan_entries(DIR *dir, const char *pat, int show_dot,
 	while (ent)
 	{
 		name = ent->d_name;
-		if ((show_dot || name[0] != '.') && pmatch(pat, name))
+		if ((ctx->show_dot || name[0] != '.') && pmatch(ctx->pat, name))
 		{
-			if (append_result(res, count, name))
+			if (append_result(ctx->res, ctx->count, name))
 				return (1);
-			*matched = 1;
+			ctx->matched = 1;
 		}
 		ent = readdir(dir);
 	}
