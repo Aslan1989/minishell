@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 15:10:20 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/24 15:24:21 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/24 15:58:03 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,12 @@ int	run_and_node(t_cmd *node)
 	return (status);
 }
 
+/**
+ * @brief Execute an OR (||) node: run B only if A failed (non-zero exit).
+ *
+ * @param node Command node of type TOK_OR.
+ * @return int Exit status of the last executed command.
+ */
 int	run_or_node(t_cmd *node)
 {
 	int	status;

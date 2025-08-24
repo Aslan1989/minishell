@@ -69,7 +69,6 @@ static char	*get_target_dir(t_shell *sh, const char *arg)
 	return (ft_gcstrdup(CAT_ENV, arg));
 }
 
-
 /**
  * @brief Update PWD and OLDPWD environment variables after a successful chdir().
  *

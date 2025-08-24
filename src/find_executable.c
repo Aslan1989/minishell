@@ -13,10 +13,15 @@
 #include "minishell.h"
 
 /**
- * @brief Join directory and command into CAT_CMD GC.
- * @param dir PATH entry.
- * @param cmd Command name.
- * @return char* GC managed string (CAT_CMD) or NULL.
+ * @brief Join a directory and a command into a single path "dir/command".
+ *
+ * Uses GC-aware string join helper twice:
+ *   1) join dir + "/"  → with_slash
+ *   2) join with_slash + cmd → full
+ *
+ * @param dir Directory path (no trailing slash required).
+ * @param cmd Command name (e.g., "ls").
+ * @return char* Newly allocated "dir/cmd" or NULL on error/invalid input.
  */
 static char	*ft_strjoin_path(const char *dir, const char *cmd)
 {
@@ -25,7 +30,7 @@ static char	*ft_strjoin_path(const char *dir, const char *cmd)
 
 	if (!dir || !cmd)
 		return (NULL);
-	with_slash = ft_gcstrjoin(CAT_CMD, (char *)dir, "/");
+	with_slash = ft_gcstrjoin(CAT_CMD, dir, "/");
 	if (!with_slash)
 		return (NULL);
 	full = ft_gcstrjoin(CAT_CMD, with_slash, cmd);
@@ -33,10 +38,15 @@ static char	*ft_strjoin_path(const char *dir, const char *cmd)
 }
 
 /**
- * @brief Search cmd across PATH entries.
- * @param paths Split PATH array (malloc'ed by ft_split).
- * @param cmd Command name.
- * @return char* Full path in CAT_CMD on success, NULL otherwise.
+ * @brief Search an executable by trying each PATH directory.
+ *
+ * For each directory in `paths`, it builds "dir/cmd" and tests execute access.
+ * Frees rejected candidates; returns the first match with X_OK.
+ *
+ * @param paths NULL-terminated array of directory strings (from PATH split).
+ * @param cmd   Command name to locate (no slash inside).
+ * @return char* Allocated absolute/relative path to an executable,
+ * or NULL if not found or on error.
  */
 static char	*search_in_paths(char **paths, const char *cmd)
 {
@@ -60,10 +70,19 @@ static char	*search_in_paths(char **paths, const char *cmd)
 }
 
 /**
- * @brief Resolve executable path using PATH if needed.
- * @param shell Shell (for envp).
- * @param cmd Command (may be name or contain '/').
- * @return char* CAT_CMD duplicate of resolved path or NULL if not found.
+ * @brief Resolve an executable path for a command name.
+ *
+ * Resolution rules:
+ *  - If cmd contains '/', treat it as a path and just duplicate it.
+ *  - Else, read PATH from the environment, split by ':', and probe each dir.
+ *
+ * Memory:
+ *  - Returned string is GC-allocated (CAT_CMD). Caller uses it directly.
+ *
+ * @param shell Shell state (to access envp / PATH).
+ * @param cmd   Raw command name from argv[0].
+ * @return char* Full path to executable or a duplicate of cmd if it has '/',
+ *               NULL if PATH is missing, split fails, or nothing is found.
  */
 char	*find_executable(t_shell *shell, const char *cmd)
 {

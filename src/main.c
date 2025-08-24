@@ -12,6 +12,24 @@
 
 #include "minishell.h"
 
+/**
+ * @brief Initialize global shell state from inherited environment.
+ *
+ * Copies envp, resets status flags, detects interactive mode (isatty),
+ * and, if interactive, sets up signals, disables ^C echo, and prints a banner.
+ * Get the global shell singleton
+ * Deep-copy environment (owned by our shell)
+ * True if input comes from a terminal
+ * Mark envp as dynamically owned by us
+ * No pending parser error at startup
+ * Extra setup only in interactive mode
+ * Install custom handlers for SIGINT/SIGQUIT
+ * Turn off terminal echo for control chars
+ * Optional greeting/banner
+ *
+ * @param envp Null-terminated environment array inherited
+ * from the parent process.
+ */
 static void	ft_initialize_shell(char **envp)
 {
 	t_shell	*shell;
@@ -31,8 +49,23 @@ static void	ft_initialize_shell(char **envp)
 }
 
 /**
- * @brief Run one-shot non-interactive command: minishell -c "cmd".
- * Initializes shell, runs, cleans up, returns exit status.
+ * @brief Non-interactive execution: run a single command string with "-c".
+ *
+ * Prepares the shell, duplicates the command, builds an AST, executes it,
+ * then performs cleanup. Designed to mirror "bash -c '...'" behavior.
+ * Force non-interactive mode
+ * Initialize env and handlers (banner skipped)
+ * Copy command string into GC (CAT_MEM)
+ * AST root pointer
+ * Tokenize → parse → build AST into `comms`
+ * Execute the AST and get final status
+ * Store it globally for $?
+ * Free all GC-managed memory (all categories)
+ * No history needed in non-interactive, just in case
+ *
+ * @param envp Environment inherited from main().
+ * @param cmd  Command string to execute (single line).
+ * @return int Exit status of the executed command(s).
  */
 static int	run_noninteractive(char **envp, const char *cmd)
 {
@@ -51,14 +84,37 @@ static int	run_noninteractive(char **envp, const char *cmd)
 	ft_generate_commands(line, &comms);
 	status = ft_run_commands(comms);
 	sh->last_exit_status = status;
-	free_gc();
 	clear_history();
+	free_gc();
 	return (status);
 }
 
 /**
- * @brief Interactive REPL loop: read → parse → exec → GC category cleanup.
- * Breaks on EOF (Ctrl-D). Returns last command status.
+ * @brief Interactive REPL loop: read, parse, execute, repeat.
+ *
+ * Reads lines until EOF (Ctrl-D). Adds non-empty lines to history.
+ * After each iteration, frees per-command GC categories to avoid leaks.
+ *
+ * @brief Interactive REPL loop: read, parse, execute, repeat.
+ *
+ * Reads lines until EOF (Ctrl-D). Adds non-empty lines to history.
+ * After each iteration, frees per-command GC categories to avoid leaks.
+ *
+ * @return int Exit status of the last executed command before exit.
+ * Main REPL loop
+ * Show prompt and read a line (may be NULL on EOF)
+ * User pressed Ctrl-D or input closed
+ * Only store non-empty lines
+ * Append to readline history
+ * Build AST for this input line
+ * Free the raw line (AST keeps needed data)
+ * Execute and get exit status
+ * Update $? for the next prompt
+ * Arguments/expanded tokens
+ * Token list
+ * AST nodes
+ *
+ * @return int Exit status of the last executed command before exit.
  */
 static int	run_interactive_loop(void)
 {
@@ -88,6 +144,24 @@ static int	run_interactive_loop(void)
 	return (status);
 }
 
+/**
+ * @brief Program entry point: decides between interactive
+ * and non-interactive modes.
+ *
+ * Usage:
+ *   minishell -c "echo hi"   → non-interactive one-shot
+ *   minishell                 → interactive loop
+ * POSIX-style "-c <cmd>" one-shot
+ * Prepare interactive shell
+ * Enter REPL
+ * Final GC cleanup on exit
+ * Free readline history
+ *
+ * @param argc Argument count.
+ * @param argv Argument vector.
+ * @param envp Inherited environment.
+ * @return int Process exit status.
+ */
 int	main(int argc, char **argv, char **envp)
 {
 	int		status;

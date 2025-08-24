@@ -12,6 +12,21 @@
 
 #include "minishell.h"
 
+/**
+ * @brief Custom handler for SIGINT (Ctrl-C).
+ *
+ * Behavior in interactive mode:
+ *  - Print a newline (so prompt starts on a new line).
+ *  - Reset the readline buffer to empty.
+ *  - Redisplay a clean prompt.
+ * Avoid unused parameter warning
+ * Print newline after Ctrl-C
+ * Tell readline we are on a new line
+ * Clear the current input buffer
+ * Show prompt again
+ *
+ * @param sig Signal number (unused here).
+ */
 static void	handle_sigint(int sig)
 {
 	(void)sig;
@@ -21,12 +36,29 @@ static void	handle_sigint(int sig)
 	rl_redisplay();
 }
 
+/**
+ * @brief Setup signal handlers for interactive shell.
+ *
+ * - SIGINT (Ctrl-C) → calls our custom handler (clears line, new prompt).
+ * - SIGQUIT (Ctrl-\) → ignored (no "Quit" message, like in bash).
+ * Install handler for Ctrl-C
+ * Ignore Ctrl-\ completely
+ */
 void	setup_signals(void)
 {
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, SIG_IGN);
 }
 
+/**
+ * @brief Disable printing of control characters (like "^C") on terminal.
+ *
+ * Modifies terminal attributes so that when Ctrl-C is pressed,
+ * the `^C` is not echoed. This makes behavior match bash/zsh.
+ * Get current terminal attributes
+ * Disable echo of control characters
+ * Apply changes immediately
+ */
 void	disable_ctrl_echo(void)
 {
 	struct termios	term;

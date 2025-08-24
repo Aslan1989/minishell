@@ -13,12 +13,12 @@
 #include "minishell.h"
 
 /**
- * @brief Call the correct builtin in the parent process (for redirs to apply
- *        to the shell itself). `exit` does not return.
- * @param cmd AST node (for redirections).
- * @param sh Shell state.
- * @param args Argument vector (NULL-terminated).
- * @return int Status code returned by builtin.
+ * @brief Dispatch a builtin command (decide which one to call).
+ *
+ * @param cmd  Command node (not always used).
+ * @param sh   Shell state.
+ * @param args Argument vector (args[0] = command name).
+ * @return int Exit status of builtin, or 1 if not recognized.
  */
 static int	dispatch_builtin(t_cmd *cmd, t_shell *sh, char **args)
 {
@@ -41,11 +41,19 @@ static int	dispatch_builtin(t_cmd *cmd, t_shell *sh, char **args)
 }
 
 /**
- * @brief Apply redirections in parent, run builtin, then restore stdio.
- * @param cmd Node with redirections.
- * @param sh Shell state.
- * @param args Arguments.
- * @return int Builtin status or 1 on redirection errors.
+ * @brief Run a builtin command in the parent process (not in a fork).
+ *
+ * This is needed so that changes in the parent state (env, pwd, exit) persist.
+ * Also applies redirections if needed, then restores stdio.
+ * Flag if we need to restore stdio after redirs
+ * If builtin has redirections
+ * Execute builtin directly
+ * Restore original stdin/out
+ *
+ * @param cmd   Command node (may have redirections).
+ * @param sh    Shell state.
+ * @param args  Argument vector.
+ * @return int  Exit status of the builtin.
  */
 static int	run_builtin_parent(t_cmd *cmd, t_shell *sh, char **args)
 {
@@ -70,10 +78,17 @@ static int	run_builtin_parent(t_cmd *cmd, t_shell *sh, char **args)
 }
 
 /**
- * @brief Handle a "word" command node: either builtin or external.
- * @param command Node to execute.
- * @param args Prepared argv (expanded).
- * @return int Exit status semantics.
+ * @brief Handle a single command node.
+ *
+ * - If builtin → run in parent.
+ * - Else → run external command via fork+exec.
+ * Builtins run in parent
+ * External commands → fork/exec
+ * Update global last exit status
+ *
+ * @param command Command node (must be TOK_WORD).
+ * @param args    Argument vector.
+ * @return int    Exit status.
  */
 static int	handle_command(t_cmd *command, char **args)
 {
@@ -94,10 +109,17 @@ static int	handle_command(t_cmd *command, char **args)
 }
 
 /**
- * @brief Execute a pipeline A | B.
- * @param command_1 Left side AST.
- * @param command_2 Right side AST.
- * @return int Exit status of the rightmost command (bash semantics).
+ * @brief Handle a pipe node: cmd1 | cmd2
+ *
+ * - Create a pipe.
+ * - Fork left child: redirect STDOUT → pipe write.
+ * - Fork right child: redirect STDIN ← pipe read.
+ * - Wait for both children.
+ * Left child writes
+ *
+ * @param command_1 Left command node.
+ * @param command_2 Right command node.
+ * @return int Exit status of right command (like bash).
  */
 static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 {
@@ -126,9 +148,18 @@ static int	handle_pipe(t_cmd *command_1, t_cmd *command_2)
 }
 
 /**
- * @brief Execute the AST recursively with AND/OR/SEMI and PIPE semantics.
- * @param com Root/current node.
- * @return int Final exit status according to shell rules.
+ * @brief Main entry: run a command AST.
+ *
+ * Dispatches based on node type:
+ *  - TOK_WORD  → single command.
+ *  - TOK_PIPE  → command1 | command2.
+ *  - TOK_AND   → command1 && command2.
+ *  - TOK_OR    → command1 || command2.
+ *
+ * Also resets syntax_error and returns code 258 if it was set.
+ *
+ * @param com AST command node.
+ * @return int Exit status of last executed command.
  */
 int	ft_run_commands(t_cmd *com)
 {

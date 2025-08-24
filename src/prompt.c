@@ -12,6 +12,24 @@
 
 #include "minishell.h"
 
+/**
+ * @brief Check if a line contains unclosed quotes.
+ *
+ * - Tracks single quotes (') and double quotes (").
+ * - A quote is only toggled if the other type of quote is not currently open.
+ * - Returns 1 if single quotes remain open, 2 if double quotes remain open,
+ *  0 otherwise.
+ * Scan through the line
+ * Toggle single quotes if not inside double quotes
+ * Toggle double quotes if not inside single quotes
+ * Double quotes left open
+ * Single quotes left open
+ * All balanced
+ *
+ * @param line Input line to check.
+ * @return int 0 if no unclosed quotes, 1 if single quotes unclosed,
+ * 2 if double quotes unclosed.
+ */
 static int	ft_has_unclosed_quotes(const char *line)
 {
 	int		i;
@@ -36,6 +54,31 @@ static int	ft_has_unclosed_quotes(const char *line)
 	return (0);
 }
 
+/**
+ * @brief Read a full line interactively (with prompt), handling unclosed quotes.
+ *
+ * If quotes are left open, prints a secondary prompt ("> ") and keeps reading
+ * until all quotes are closed or EOF is reached.
+ * /**
+ * @brief Read a full line interactively (with prompt), handling unclosed quotes.
+ *
+ * If quotes are left open, prints a secondary prompt ("> ") and keeps reading
+ * until all quotes are closed or EOF is reached.
+ *
+ * @return char* Dynamically allocated line string, or NULL on EOF/error.
+ * Current input line
+ * Continuation if quotes are unclosed
+ * Initial prompt
+ * While quotes are open
+ * Secondary prompt
+ * EOF (Ctrl-D)
+ * Add newline between parts
+ * Concatenate the two parts
+ * Free temp buffer
+ * Continue with new combined line
+ *
+ * @return char* Dynamically allocated line string, or NULL on EOF/error.
+ */
 static char	*read_full_line_int(void)
 {
 	char	*line;
@@ -59,6 +102,27 @@ static char	*read_full_line_int(void)
 	return (line);
 }
 
+/**
+ * @brief Read a full line in non-interactive mode (from stdin).
+ *
+ * Uses get_next_line() to read, strips the final newline, and checks for
+ * unclosed quotes. If quotes are left open, prints an error and returns NULL.
+ * /**
+ * @brief Read a full line in non-interactive mode (from stdin).
+ *
+ * Uses get_next_line() to read, strips the final newline, and checks for
+ * unclosed quotes. If quotes are left open, prints an error and returns NULL.
+ *
+ * @return char* Line string without trailing newline, or NULL on EOF/error.
+ * Read one line from stdin
+ * EOF
+ * Strip trailing newline
+ * Check for open quotes
+ * If any are unclosed
+ * Abort line
+ *
+ * @return char* Line string without trailing newline, or NULL on EOF/error.
+ */
 static char	*read_full_line(void)
 {
 	char	*line;
@@ -83,6 +147,25 @@ EOF while looking for matching `\''\n");
 	return (line);
 }
 
+/**
+ * @brief Read input line depending on shell mode
+ * (interactive or non-interactive).
+ *
+ * - Interactive: use readline() with prompt and handle multi-line quotes.
+ * - Non-interactive: use get_next_line() from stdin.
+ * /**
+ * @brief Read input line depending on shell mode
+ * (interactive or non-interactive).
+ *
+ * - Interactive: use readline() with prompt and handle multi-line quotes.
+ * - Non-interactive: use get_next_line() from stdin.
+ *
+ * @return char* Allocated line, or NULL on EOF/error.
+ * Access global shell state
+ * Choose correct input function
+ *
+ * @return char* Allocated line, or NULL on EOF/error.
+ */
 char	*read_full_prompt(void)
 {
 	t_shell	*shell;

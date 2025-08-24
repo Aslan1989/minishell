@@ -6,12 +6,27 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 20:13:01 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/24 13:09:44 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/24 18:52:19 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/**
+ * @brief Try matching the rest of pattern after a '*' against str.
+ *
+ * Implements greedy '*' logic: if pattern ended → success;
+ * otherwise shift str one char at a time and try pmatch() recursively.
+ *
+ * '*' at the end matches everything
+ * Try every suffix of str
+ * If the rest of pattern matches this suffix
+ * Advance one character and try again
+ * No suffix matched
+ * @param pat Pattern starting after one or more '*'.
+ * @param str Candidate string to test.
+ * @return int 1 if matches, 0 otherwise.
+ */
 int	pmatch_after_star(const char *pat, const char *str)
 {
 	if (!*pat)
@@ -25,6 +40,11 @@ int	pmatch_after_star(const char *pat, const char *str)
 	return (0);
 }
 
+/**
+ * @brief In-place bubble sort of a NULL-terminated string array (ascending).
+ *
+ * @param arr Array of strings to sort (argv-like).
+ */
 void	sort_strings(char **arr)
 {
 	int	n;
@@ -46,6 +66,16 @@ void	sort_strings(char **arr)
 	}
 }
 
+/**
+ * @brief Append a string to a growing (GC-managed) argv array.
+ *
+ * Reallocates (*res) to hold one more entry + NULL terminator and copies s.
+ *
+ * @param res   [in/out] Pointer to the argv pointer.
+ * @param count [in/out] Current number of items in *res.
+ * @param s     String to append.
+ * @return int 0 on success, 1 on allocation failure.
+ */
 int	append_result(char ***res, int *count, const char *s)
 {
 	char	**r;
@@ -63,6 +93,15 @@ int	append_result(char ***res, int *count, const char *s)
 	return (0);
 }
 
+/**
+ * @brief Decide whether hidden files (starting with '.') should be matched.
+ *
+ * Like bash (with default options): only match dotfiles if pattern itself
+ * starts with '.'.
+ *
+ * @param pattern The wildcard pattern.
+ * @return int 1 if dotfiles should be considered, 0 otherwise.
+ */
 int	want_show_hidden(const char *pattern)
 {
 	if (pattern && pattern[0] == '.')
@@ -70,6 +109,16 @@ int	want_show_hidden(const char *pattern)
 	return (0);
 }
 
+/**
+ * @brief Scan directory entries and collect names that match a pattern.
+ *
+ * Skips dotfiles unless ctx->show_dot is set.
+ * For every match calls append_result().
+ *
+ * @param dir Open directory handle.
+ * @param ctx Wildcard context (pattern, output array, counters, flags).
+ * @return int 0 on success, 1 on append/allocation failure.
+ */
 int	scan_entries(DIR *dir, t_wc_ctx *ctx)
 {
 	struct dirent	*ent;

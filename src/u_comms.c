@@ -13,17 +13,18 @@
 #include "minishell.h"
 
 /**
- * @brief Append a token at the tail of a doubly-linked token list.
+ * @brief Add a new token node to the end of the token list.
  *
- * Allocates the token node and duplicates `value` into CAT_TOKEN.
- * Returns the number of characters consumed from input (length of value),
- * which the caller adds to its pointer.
+ * Creates a new token with given type and string value, then appends it
+ * to the doubly linked list of tokens. Returns the length of the token value.
  *
- * @param head Pointer to the head of token list (updated on first insert).
- * @param type Token kind.
- * @param value Lexeme string.
- * @return int Number of chars consumed (len(value)), or len even on alloc
- *         error to let the caller progress; head will remain unchanged.
+ * If list empty → this is first
+ * Else go to last node
+ * Link new token at end
+ * @param head  Pointer to the head of the token list.
+ * @param type  Token type (enum t_etoken).
+ * @param value String value for this token.
+ * @return int  Length of the token string.
  */
 static int	add_token(t_token **head, t_etoken type, const char *value)
 {
@@ -53,12 +54,19 @@ static int	add_token(t_token **head, t_etoken type, const char *value)
 }
 
 /**
- * @brief Consume a WORD token possibly spanning quotes (no expansion yet).
+ * @brief Parse and add a "word" token (command or argument).
  *
- * Reads until a metacharacter (| & ( ) ;) not inside quotes.
+ * A word can be a sequence of chars, possibly quoted. The function moves
+ * the line pointer until it reaches a special operator or space.
+ * Start of the word
+ * Loop until operator or space
+ * Opening quote
+ * Closing quote
+ * Stop if we hit operator outside quotes
+ * Save substring as TOK_WORD
  *
- * @param line Address of scanning pointer.
- * @param head Tokens list head.
+ * @param line  Pointer to current input pointer (will advance).
+ * @param head  Token list head pointer (new token is appended here).
  */
 static void	ft_add_word(char **line, t_token **head)
 {
@@ -81,6 +89,16 @@ static void	ft_add_word(char **line, t_token **head)
 	add_token(head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, *line - start));
 }
 
+/**
+ * @brief Try to detect and add an operator token (&&, ||, |, (, )).
+ *
+ * If a match is found, adds the token, moves the line pointer, and returns 1.
+ * If no operator matches, returns 0 (so caller can parse as word).
+ *
+ * @param line Current input pointer (will advance if operator found).
+ * @param head Token list head pointer.
+ * @return int 1 if operator was found and added, 0 otherwise.
+ */
 static int	try_add_operator(char **line, t_token **head)
 {
 	if ((*line)[0] == '&' && (*line)[1] == '&')
@@ -97,9 +115,19 @@ static int	try_add_operator(char **line, t_token **head)
 }
 
 /**
- * @brief Lexical analysis: convert raw input `line` to token list.
- * @param line Input string (owned by caller).
- * @return t_token* Head of tokens list (terminated by TOK_EOF), or NULL.
+ * @brief Tokenize a command line string into a linked list of tokens.
+ *
+ * Skips whitespace, then either:
+ *  - Detects an operator with try_add_operator().
+ *  - Or parses a word with ft_add_word().
+ * At the end, always appends an EOF token.
+ * Scan until end of line
+ * Skip whitespace
+ * End reached
+ * Try operator, else parse as word
+ * Always terminate with EOF token
+ * @param line Input string (modified pointer).
+ * @return t_token* Head of the token linked list.
  */
 static t_token	*ft_tokenize(char *line)
 {
@@ -120,9 +148,18 @@ static t_token	*ft_tokenize(char *line)
 }
 
 /**
- * @brief Top-level entry: tokenize then parse to AST.
- * @param line Raw command line (may embed quotes etc.).
- * @param comms Out parameter: receives AST root.
+ * @brief Parse a line into an AST (Abstract Syntax Tree).
+ *
+ * Step 1: Tokenize line into linked list.
+ * Step 2: Call parser (ft_parse_tokens) to build AST.
+ * Step 3: Store AST pointer in comms.
+ *
+ * Lexical analysis (split into tokens)
+ * On error, just return NULL
+ * Build AST from token list
+ * Return to caller
+ * @param line  Raw command line input.
+ * @param comms Output: pointer to root of AST.
  */
 void	ft_generate_commands(char *line, t_cmd **comms)
 {

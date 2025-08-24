@@ -12,6 +12,17 @@
 
 #include "minishell.h"
 
+/**
+ * @brief Check whether a token is eligible for wildcard expansion.
+ *
+ * Conditions:
+ *  - t_arg exists and its .wildcard flag is set (e.g., not quoted).
+ *  - The string contains at least one of '*', '?', '[' tokens.
+ *
+ * Quoted args typically set wildcard=0
+ * @param a Argument structure with fields: .arg (string), .wildcard (flag).
+ * @return int 1 if it has wildcard tokens, 0 otherwise.
+ */
 int	has_wc_token(t_arg *a)
 {
 	if (!a || !a->wildcard)
@@ -21,6 +32,31 @@ int	has_wc_token(t_arg *a)
 	return (0);
 }
 
+/**
+ * @brief Expand wildcard arguments into a flat argv-like array.
+ *
+ * For each t_arg:
+ *  - If it contains wildcard tokens and no '/' inside the token, call
+ *    expand_one_pattern(). If it matches nothing, append the literal.
+ *  - Otherwise, append the literal as-is.
+ *
+ * Returns a newly allocated (GC) array of char* (NULL-terminated)
+ * or NULL if no args produced (res stays NULL).
+ *
+ * Result argv
+ * Number of items in res
+ * Index in args
+ * Number of matches for a pattern
+ * If the token contains '/'
+ * Iterate all parsed args
+ * Globbing disabled across '/'
+ * Only expand simple filename patterns
+ * On append failure, return what we have
+ * No globbing → append literal
+ * May be NULL if no items were appended
+ * @param args NULL-terminated array of t_arg* (each has .arg and .wildcard).
+ * @return char** Expanded argument vector (may be NULL if empty).
+ */
 char	**ft_expand_wildcards(t_arg **args)
 {
 	char	**res;
@@ -48,6 +84,23 @@ char	**ft_expand_wildcards(t_arg **args)
 	return (res);
 }
 
+/**
+ * @brief Consume the next word as a redirection target and attach it to node.
+ *
+ * Reads the next argument from the input stream and converts current redirection
+ * symbol into a redir node (IN, OUT, APPEND, INOUT, HEREDOC).
+ * If the next token is missing or invalid, sets a syntax error.
+ *
+ * Read the filename / limiter after redir
+ * Missing target → syntax error
+ * Validate the next token (e.g., not another redir)
+ * @param node  Command node being filled.
+ * @param arg   Current token that is a redirection operator
+ * ("<", ">", ">>", "<>", "<<").
+ * @param line  Pointer to current position in the
+ * input (advanced by extract_arg()).
+ * @return int 0 on success; 1 on syntax error or redirection-setup error.
+ */
 static int	handle_redirection(t_cmd *node, t_arg *arg, const char **line)
 {
 	t_arg	*next;
@@ -75,13 +128,31 @@ static int	handle_redirection(t_cmd *node, t_arg *arg, const char **line)
 }
 
 /**
- * @brief Fill command->args with parsed t_arg* and redirections.
+ * @brief Fill t_cmd with parsed positional arguments and redirections.
  *
- * @param node Command node to fill.
- * @param line Original token text.
- * @param argc Pre-counted number of arguments.
- * @param i Out: number of non-redirection args collected.
- * @return int 0 on success, 1 on error.
+ * Iterates over the input line:
+ *  - Skips whitespace.
+ *  - Extracts the next t_arg via extract_arg().
+ *  - If it's a redirection word, handle it; else append to
+ * argv and grow capacity if needed.
+ *
+ * Start filling from index 0
+ * Initial capacity hint
+ * Scan until end of this command segment
+ * Move past spaces/tabs
+ * End reached
+ * Parse the next argument (handles quotes, etc.)
+ * Extraction failed → syntax error
+ * Is this a redirection operator token?
+ * Append to node->args; grow if needed
+ * @param node  Command node to fill (node->args / node->commands).
+ * @param line  Input command segment
+ * (not modified; we pass a pointer copy inside helpers).
+ * @param argc  Pre-counted number of arguments (capacity hint).
+ * @param i     Output: number of args appended into node->args
+ * (index of next slot).
+ * @return int  0 on success, 1 on error
+ * (syntax error, allocation failure, etc.).
  */
 static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 {
@@ -112,15 +183,29 @@ static int	ft_fillout_commands(t_cmd *node, const char *line, int argc, int *i)
 }
 
 /**
- * @brief Parses the input line into a command structure.
+ * @brief Parse a raw command line into t_cmd: build args and expand wildcards.
  *
- * This function takes a line of input, counts the number of arguments,
- * allocates memory for the command structure, and extracts each argument.
- * It also handles redirections like input/output files.
- * @param node Pointer to the command structure to fill.
- * @param line The input line to parse.
- * @return int Returns 0 on success, 1 on error (e.g., memory allocation
- * failure).
+ * Steps:
+ *  1) Validate input and allocate node->args (capacity = count_args(line) + 1).
+ *  2) Fill node->args by iterating tokens; also attach redirections to node.
+ *  3) Null-terminate node->args.
+ *  4) Expand wildcards into node->commands (argv-like char**).
+ *
+ * Clear outputs
+ * Empty input → error for this node
+ * Pre-count args to size the array
+ * Parse args + redirections
+ * NULL-terminate t_arg* array
+ * Expand globs into flat argv
+ * Keep argv only if non-NULL
+ * On success, node->commands receives the expanded argv
+ * (may be NULL if no args),
+ * and node->args remains the structured array of parsed t_arg*.
+ *
+ * @param node Destination command node (fields .args and .commands are set).
+ * @param line Raw command line segment for this node
+ * (e.g., up to operator/pipe boundary).
+ * @return int 0 on success, 1 on error.
  */
 int	parse_input(t_cmd *node, const char *line)
 {

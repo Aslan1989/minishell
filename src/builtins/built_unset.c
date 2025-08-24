@@ -94,7 +94,8 @@ static int	apply_unset(t_shell *shell, char **args)
  * Return codes:
  *  0 → success
  *  1 → fatal error (allocation or shell/env missing)
- *  2 → invalid option (argument starting with '-' and having at least one more char)
+ *  2 → invalid option (argument starting with '-'
+ *   and having at least one more char)
  *
  * @param shell Global shell state carrying envp and metadata.
  * @param args  Argument vector: args[0] = "unset", args[1..] = keys to remove.

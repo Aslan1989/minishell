@@ -12,6 +12,19 @@
 
 #include "minishell.h"
 
+/**
+ * @brief Copy an environment array into a new GC category.
+ *
+ * - Counts the number of entries in envp.
+ * - Allocates space for (count + 1) pointers in the chosen category.
+ * - Duplicates each string into the same category.
+ *
+ * Duplicate each "KEY=VALUE"
+ *
+ * @param envp Original environment array (NULL-terminated).
+ * @param cat  Garbage collector category to allocate in.
+ * @return char** Newly allocated copy, or NULL on error.
+ */
 char	**copy_env_cat(char **envp, t_egccat cat)
 {
 	int		count;
@@ -40,6 +53,15 @@ char	**copy_env_cat(char **envp, t_egccat cat)
 	return (copy);
 }
 
+/**
+ * @brief Copy environment array into the CAT_ENV GC category.
+ *
+ * This is a specialized version of copy_env_cat() that always uses CAT_ENV.
+ *
+ * Duplicate each string
+ * @param envp Original environment array (NULL-terminated).
+ * @return char** New environment copy owned by CAT_ENV.
+ */
 char	**copy_env(char **envp)
 {
 	int		count;
@@ -62,6 +84,14 @@ char	**copy_env(char **envp)
 	return (copy);
 }
 
+/**
+ * @brief Free all environment variables allocated in CAT_ENV.
+ *
+ * Since envp is GC-managed, we do not free each entry manually.
+ * Instead, we free the entire GC category CAT_ENV.
+ *
+ * @param envp Environment array to free (ignored; category is global).
+ */
 void	free_env(char **envp)
 {
 	(void)envp;
