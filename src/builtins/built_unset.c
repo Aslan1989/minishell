@@ -51,6 +51,19 @@ static void	print_invalid_identifiers(char **args)
 	}
 }
 
+/**
+ * @brief Rebuild envp without any variables listed in args.
+ *
+ * Strategy:
+ *  - Count current env entries.
+ *  - Allocate a new environment array with the same capacity.
+ *  - Copy all entries except those whose keys appear in args.
+ *  - Free the old envp if it was GC-owned, then swap in the new one.
+ *
+ * @param shell Shell state holding envp and ownership flag.
+ * @param args  Keys to remove (invalid ones will simply not match anything).
+ * @return int 0 on success, 1 on allocation/copy failure.
+ */
 static int	apply_unset(t_shell *shell, char **args)
 {
 	int		count;
@@ -69,13 +82,23 @@ static int	apply_unset(t_shell *shell, char **args)
 }
 
 /**
- * @brief Builtin: unset
+ * @brief Builtin `unset`: remove variables from the shell environment.
  *
- * Remove keys from the environment if identifiers are valid.
+ * Behavior:
+ *  - Validates input identifiers (letters, digits, underscore;
+ *  - must not start with a digit).
+ *  - Prints warnings for each invalid identifier.
+ *  - Detects option-like args (e.g., "-x") and returns 2 like bash does.
+ *  - If there are only valid identifiers, rebuilds envp without the listed keys.
  *
- * @param shell Shell state.
- * @param args Keys to remove (args[1..]).
- * @return int 0 on success, 1 on fatal allocation errors.
+ * Return codes:
+ *  0 → success
+ *  1 → fatal error (allocation or shell/env missing)
+ *  2 → invalid option (argument starting with '-' and having at least one more char)
+ *
+ * @param shell Global shell state carrying envp and metadata.
+ * @param args  Argument vector: args[0] = "unset", args[1..] = keys to remove.
+ * @return int  See return codes above.
  */
 int	built_unset(t_shell *shell, char **args)
 {

@@ -6,18 +6,26 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 15:10:20 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/20 10:10:16 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/24 15:24:21 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 /**
- * @brief Forked child helper: duplicate one end of a pipe to STDIN/STDOUT.
- * @param fd The end we want to dup.
- * @param p_fd The pipe fds (both closed here).
- * @param command Sub-AST to execute in the child.
- * @param dup_fd Either STDIN_FILENO or STDOUT_FILENO.
+ * @brief Run a child process in a pipeline or standalone execution.
+ *
+ * Steps:
+ *  - Reset signals to default (only if interactive shell).
+ *  - Duplicate one file descriptor onto STDIN or STDOUT.
+ *  - Close unused pipe ends.
+ *  - Execute the command node.
+ *  - Exit with the returned status.
+ *
+ * @param fd     File descriptor to duplicate (read or write end of pipe).
+ * @param p_fd   Array of 2 pipe file descriptors [read, write].
+ * @param command Command node to execute.
+ * @param dup_fd Target (STDIN_FILENO or STDOUT_FILENO).
  */
 static void	run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 {
@@ -41,6 +49,15 @@ static void	run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 	exit(status);
 }
 
+/**
+ * @brief Fork a new child process for a command in a pipeline.
+ *
+ * @param cmd     Command node to execute.
+ * @param fd      File descriptor (pipe end to connect).
+ * @param p_fd    Pipe file descriptors [read, write].
+ * @param dup_fd  Target to redirect fd (STDIN or STDOUT).
+ * @return pid_t  Child process ID, or < 0 on fork failure.
+ */
 pid_t	fork_pipe_child(t_cmd *cmd, int fd, int p_fd[2], int dup_fd)
 {
 	pid_t	pid;
@@ -51,6 +68,12 @@ pid_t	fork_pipe_child(t_cmd *cmd, int fd, int p_fd[2], int dup_fd)
 	return (pid);
 }
 
+/**
+ * @brief Execute an AND (&&) node: run B only if A succeeded (exit code 0).
+ *
+ * @param node Command node of type TOK_AND.
+ * @return int Exit status of the last executed command.
+ */
 int	run_and_node(t_cmd *node)
 {
 	int	status;

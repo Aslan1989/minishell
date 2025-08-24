@@ -34,18 +34,17 @@ static char	*get_current_dir(void)
 }
 
 /**
- * @brief Compute the target directory for the `cd` command.
+ * @brief Resolve the target directory for `cd`.
+ *
  * Resolution order:
- *  - If @p arg is NULL or equals "~", resolve to $HOME (error if unset).
- *  - If @p arg equals "-", resolve via OLDPWD (may print an error inside).
- *  - Otherwise, try CDPATH search (applies only when arg has no '/' and
- *    does not start with '.'); if found, return that directory.
- *  - Fallback: return a GC-managed duplicate of @p arg.
- * @param sh   Shell handle (provides access to the environment).
- * @param arg  User-provided `cd` argument (may be NULL).
- * @return char*
- * @retval non-NULL GC-managed path to attempt with chdir().
- * @retval NULL     if resolution failed (e.g., HOME not set, OLDPWD not set).
+ *  - If arg is NULL or "~": use $HOME (error if not set).
+ *  - If arg is "-": use $OLDPWD (and usually print it in the caller, if needed).
+ *  - If arg is found via $CDPATH: use that path.
+ *  - Otherwise: use arg as-is.
+ *
+ * @param sh  Shell state (access to envp).
+ * @param arg Raw user argument (may be NULL).
+ * @return char* Newly allocated target path, or NULL on error.
  */
 static char	*get_target_dir(t_shell *sh, const char *arg)
 {
@@ -70,18 +69,18 @@ static char	*get_target_dir(t_shell *sh, const char *arg)
 	return (ft_gcstrdup(CAT_ENV, arg));
 }
 
+
 /**
- * @brief Update the shell's OLDPWD and PWD after a successful directory change.
- * Expects @p oldpwd to contain the previous working directory (captured
- * before chdir()). The function retrieves the current working directory
- * via get_current_dir() and then:
- *  - replaces OLDPWD with @p oldpwd or adds it if missing;
- *  - replaces PWD with the new cwd or adds it if missing.
- * @param sh     Shell handle with environment.
- * @param oldpwd Previous working directory (GC-managed string), must not be NULL
- * @return int
- * @retval 0 on success.
- * @retval 1 on failure (e.g., @p oldpwd is NULL or get_current_dir() failed).
+ * @brief Update PWD and OLDPWD environment variables after a successful chdir().
+ *
+ * Logic:
+ *  - Get the new CWD (absolute).
+ *  - Replace or add OLDPWD with the provided oldpwd.
+ *  - Replace or add PWD with the new CWD.
+ *
+ * @param sh     Shell state with envp and env helpers.
+ * @param oldpwd The previous working directory (must be a valid string).
+ * @return int 0 on success, 1 on any failure.
  */
 static int	update_pwd_vars(t_shell *sh, char *oldpwd)
 {
@@ -131,22 +130,17 @@ static void	cd_print_error(char *arg)
 }
 
 /**
- * @brief Implement the `cd` builtin.
+ * @brief Builtin `cd`: change the current working directory.
  *
- * Semantics:
- *  - With no args or "~": change to $HOME (error if unset).
- *  - With "-": change to $OLDPWD (error if unset).
- *  - Otherwise: if CDPATH applies, resolve via CDPATH, else use the argument.
- *  - On success, update OLDPWD and PWD to the physical paths.
- *  - Print the resolved path to STDOUT only when:
- *      * the argument was "-", or
- *      * the directory was resolved via CDPATH,
- *    and only after a successful chdir().
- *  - With more than one non-option argument, print "too many arguments" and
- *    return 1 without changing directory.
+ * Steps:
+ *  1) Remember current directory (for OLDPWD).
+ *  2) Resolve the target directory from args and env
+ * 	   (HOME, OLDPWD, CDPATH, "~", "-").
+ *  3) chdir() to the target.
+ *  4) Update PWD and OLDPWD in the environment.
  *
- * @param args argv-style array for the command; args[0] == "cd".
- * @return 0 on success; 1 on error.
+ * @param args Command arguments. args[1] is the desired target path.
+ * @return int 0 on success, 1 on error.
  */
 int	built_cd(char **args)
 {
@@ -159,7 +153,7 @@ int	built_cd(char **args)
 	cwd = get_current_dir();
 	if (!cwd)
 		return (1);
-	oldpwd = ft_gcstrdup(CAT_ENV, cwd);
+	oldpwd = cwd;
 	if (!oldpwd)
 		return (1);
 	target = get_target_dir(sh, args[1]);
