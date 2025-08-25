@@ -40,9 +40,9 @@ static int	find_command(t_cmd *command, t_shell *shell, char **args)
 			command->path = find_executable(shell, args[0]);
 		if (!command->path)
 		{
-			ft_print_error("minishell: command not found: ");
+			ft_print_error("minishell: ");
 			ft_print_error(args[0]);
-			ft_print_error("\n");
+			ft_print_error(": command not found\n");
 			return (127);
 		}
 	}
@@ -159,8 +159,9 @@ static void	execute_child_command(t_cmd *command, t_shell *shell, char **args)
 	setup_redirections(command);
 	if (!command->path)
 	{
-		ft_putstr_fd("minishell: command not found: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putendl_fd(args[0], STDERR_FILENO);
+		ft_putendl_fd(": command not found", STDERR_FILENO);
 		exit(127);
 	}
 	if (!command->isbuiltin)
