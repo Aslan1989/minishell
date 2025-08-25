@@ -59,11 +59,6 @@ static int	ft_has_unclosed_quotes(const char *line)
  *
  * If quotes are left open, prints a secondary prompt ("> ") and keeps reading
  * until all quotes are closed or EOF is reached.
- * /**
- * @brief Read a full line interactively (with prompt), handling unclosed quotes.
- *
- * If quotes are left open, prints a secondary prompt ("> ") and keeps reading
- * until all quotes are closed or EOF is reached.
  *
  * @return char* Dynamically allocated line string, or NULL on EOF/error.
  * Current input line
@@ -103,11 +98,6 @@ static char	*read_full_line_int(void)
 }
 
 /**
- * @brief Read a full line in non-interactive mode (from stdin).
- *
- * Uses get_next_line() to read, strips the final newline, and checks for
- * unclosed quotes. If quotes are left open, prints an error and returns NULL.
- * /**
  * @brief Read a full line in non-interactive mode (from stdin).
  *
  * Uses get_next_line() to read, strips the final newline, and checks for
@@ -153,13 +143,7 @@ EOF while looking for matching `\''\n");
  *
  * - Interactive: use readline() with prompt and handle multi-line quotes.
  * - Non-interactive: use get_next_line() from stdin.
- * /**
- * @brief Read input line depending on shell mode
- * (interactive or non-interactive).
- *
- * - Interactive: use readline() with prompt and handle multi-line quotes.
- * - Non-interactive: use get_next_line() from stdin.
- *
+ * 
  * @return char* Allocated line, or NULL on EOF/error.
  * Access global shell state
  * Choose correct input function
