@@ -42,9 +42,9 @@ static void	ft_initialize_shell(char **envp)
 	shell->syntax_error = 0;
 	if (shell->is_interactive)
 	{
+		ft_print_banner();
 		setup_signals();
 		disable_ctrl_echo();
-		ft_print_banner();
 	}
 }
 
@@ -166,8 +166,16 @@ int	main(int argc, char **argv, char **envp)
 {
 	int		status;
 
-	if (argc >= 3 && strcmp(argv[1], "-c") == 0)
+	if (argc >= 2 && strcmp(argv[1], "-c") == 0)
+	{
+		if (argc < 3)
+		{
+			ft_putendl_fd("minishell: -c: option requires an argument", \
+				STDERR_FILENO);
+			return (2);
+		}
 		return (run_noninteractive(envp, argv[2]));
+	}
 	ft_initialize_shell(envp);
 	status = run_interactive_loop();
 	free_gc();
