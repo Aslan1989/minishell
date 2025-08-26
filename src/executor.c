@@ -167,8 +167,6 @@ int	ft_run_commands(t_cmd *com)
 
 	if (get_shell()->syntax_error)
 		return (get_shell()->syntax_error = 0, 258);
-	if (get_shell()->heredoc_interrupted)
-		return (get_shell()->heredoc_interrupted = 0, 130);
 	if (!com)
 		return (0);
 	if (com->type == TOK_WORD)

@@ -157,13 +157,6 @@ static void	execute_child_command(t_cmd *command, t_shell *shell, char **args)
 		signal(SIGQUIT, SIG_DFL);
 	}
 	setup_redirections(command);
-	if (!command->path)
-	{
-		ft_putstr_fd("minishell: ", STDERR_FILENO);
-		ft_putendl_fd(args[0], STDERR_FILENO);
-		ft_putendl_fd(": command not found", STDERR_FILENO);
-		exit(127);
-	}
 	if (!command->isbuiltin)
 		valid_and_exec_extern(command, shell, args);
 	else
@@ -204,6 +197,10 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 	int		rc;
 
 	rc = precheck_command(command, shell, args);
+	if (rc != 0)
+	{
+		return (rc);
+	}
 	parent_signals_exec_begin();
 	pid = fork();
 	if (pid == -1)
