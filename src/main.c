@@ -67,27 +67,6 @@ static void	ft_initialize_shell(char **envp)
  * @param cmd  Command string to execute (single line).
  * @return int Exit status of the executed command(s).
  */
-static int	run_noninteractive(char **envp, const char *cmd)
-{
-	t_shell	*sh;
-	char	*line;
-	t_cmd	*comms;
-	int		status;
-
-	sh = get_shell();
-	sh->is_interactive = 0;
-	ft_initialize_shell(envp);
-	line = ft_gcstrdup(CAT_MEM, cmd);
-	if (!line)
-		return (1);
-	comms = NULL;
-	ft_generate_commands(line, &comms);
-	status = ft_run_commands(comms);
-	sh->last_exit_status = status;
-	clear_history();
-	free_gc();
-	return (status);
-}
 
 /**
  * @brief Interactive REPL loop: read, parse, execute, repeat.
@@ -161,15 +140,11 @@ int	main(int argc, char **argv, char **envp)
 {
 	int		status;
 
-	if (argc >= 2 && strcmp(argv[1], "-c") == 0)
+	(void)argv;
+	if (argc >= 2)
 	{
-		if (argc < 3)
-		{
-			ft_putendl_fd("minishell: -c: option requires an argument", \
-				STDERR_FILENO);
-			return (2);
-		}
-		return (run_noninteractive(envp, argv[2]));
+		ft_putendl_fd("minishell: too many arguments", STDERR_FILENO);
+		return (2);
 	}
 	ft_initialize_shell(envp);
 	status = run_interactive_loop();

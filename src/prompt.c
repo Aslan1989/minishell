@@ -143,7 +143,7 @@ EOF while looking for matching `\''\n");
  *
  * - Interactive: use readline() with prompt and handle multi-line quotes.
  * - Non-interactive: use get_next_line() from stdin.
- * 
+ *
  * @return char* Allocated line, or NULL on EOF/error.
  * Access global shell state
  * Choose correct input function
