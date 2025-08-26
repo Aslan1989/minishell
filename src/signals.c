@@ -30,6 +30,7 @@
 static void	handle_sigint(int sig)
 {
 	(void)sig;
+	get_shell()->last_exit_status = 1;
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
@@ -48,6 +49,21 @@ void	setup_signals(void)
 {
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, SIG_IGN);
+}
+
+void	parent_signals_exec_begin(void)
+{
+	if (get_shell()->is_interactive)
+	{
+		signal(SIGINT, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
+	}
+}
+
+void	parent_signals_exec_end(void)
+{
+	if (get_shell()->is_interactive)
+		setup_signals();
 }
 
 /**

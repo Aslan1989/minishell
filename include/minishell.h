@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/25 12:31:38 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/26 13:40:38 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ typedef struct s_shell
 	int		is_interactive;
 	int		envp_allocated;
 	int		syntax_error;
+	int		heredoc_interrupted;
 }			t_shell;
 
 struct s_cmd
@@ -210,9 +211,15 @@ pid_t		fork_pipe_child(t_cmd *cmd, int fd, int p_fd[2], int dup_fd);
 int			get_exit_status(int status);
 // executor_helpers2.c
 int			is_builtin(const char *s);
+int			precheck_command(t_cmd *command, t_shell *shell, char **args);
+
+int			find_command(t_cmd *command, t_shell *shell, char **args);
 
 int			execute_command(t_cmd *command, t_shell *shell, char **args);
 int			ft_run_commands(t_cmd *com);
+
+void		parent_signals_exec_begin(void);
+void		parent_signals_exec_end(void);
 
 char		**copy_env(char **envp);
 char		**copy_env_cat(char **envp, t_egccat cat);

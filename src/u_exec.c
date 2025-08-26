@@ -30,7 +30,7 @@
  * @param args    argv for the command; args[0] is the name.
  * @return int 0 on success (or builtin), 127 if command not found.
  */
-static int	find_command(t_cmd *command, t_shell *shell, char **args)
+int	find_command(t_cmd *command, t_shell *shell, char **args)
 {
 	if (!command->isbuiltin)
 	{
@@ -201,27 +201,27 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 {
 	pid_t	pid;
 	int		status;
+	int		rc;
 
-	if (!args || !args[0] || args[0][0] == '\0')
-		return (127);
-	if (find_command(command, shell, args) != 0)
-		return (127);
+	rc = precheck_command(command, shell, args);
+	parent_signals_exec_begin();
 	pid = fork();
 	if (pid == -1)
-		return (perror("fork"), 1);
-	else if (pid == 0)
-		execute_child_command(command, shell, args);
-	else
 	{
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-		else if (WIFSIGNALED(status) && WTERMSIG(status) == SIGQUIT)
-		{
-			ft_putendl_fd("Quit: 3", STDERR_FILENO);
-			return (128 + WTERMSIG(status));
-		}
-		return (1);
+		parent_signals_exec_end();
+		return (perror("fork"), 1);
 	}
-	return (0);
+	if (pid == 0)
+		execute_child_command(command, shell, args);
+	waitpid(pid, &status, 0);
+	parent_signals_exec_end();
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	if (WIFSIGNALED(status))
+	{
+		if (WTERMSIG(status) == SIGQUIT)
+			ft_putendl_fd("Quit: 3", STDERR_FILENO);
+		return (128 + WTERMSIG(status));
+	}
+	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 15:19:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/09 15:28:35 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/26 13:12:26 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,13 @@ int	get_exit_status(int status)
 	if (WIFSIGNALED(status))
 		return (128 + WTERMSIG(status));
 	return (1);
+}
+
+int	precheck_command(t_cmd *command, t_shell *shell, char **args)
+{
+	if (!args || !args[0] || args[0][0] == '\0')
+		return (127);
+	if (find_command(command, shell, args) != 0)
+		return (127);
+	return (0);
 }
