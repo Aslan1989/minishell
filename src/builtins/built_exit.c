@@ -78,7 +78,7 @@ int	built_exit(char **args)
 {
 	long	code;
 
-	if (!args || !args[1])
+	if (!args[1])
 	{
 		if (get_shell()->is_interactive)
 			ft_putendl_fd("exit", STDOUT_FILENO);

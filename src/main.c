@@ -95,11 +95,6 @@ static int	run_noninteractive(char **envp, const char *cmd)
  * Reads lines until EOF (Ctrl-D). Adds non-empty lines to history.
  * After each iteration, frees per-command GC categories to avoid leaks.
  *
- * @brief Interactive REPL loop: read, parse, execute, repeat.
- *
- * Reads lines until EOF (Ctrl-D). Adds non-empty lines to history.
- * After each iteration, frees per-command GC categories to avoid leaks.
- *
  * @return int Exit status of the last executed command before exit.
  * Main REPL loop
  * Show prompt and read a line (may be NULL on EOF)

@@ -198,16 +198,11 @@ int	execute_command(t_cmd *command, t_shell *shell, char **args)
 
 	rc = precheck_command(command, shell, args);
 	if (rc != 0)
-	{
 		return (rc);
-	}
 	parent_signals_exec_begin();
 	pid = fork();
 	if (pid == -1)
-	{
-		parent_signals_exec_end();
 		return (perror("fork"), 1);
-	}
 	if (pid == 0)
 		execute_child_command(command, shell, args);
 	waitpid(pid, &status, 0);
