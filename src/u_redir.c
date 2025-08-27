@@ -69,7 +69,9 @@ int	ft_here_doc_input(char *limiter)
 	{
 		signal(SIGINT, SIG_DFL);
 		close(pipe_fd[0]);
-		while (1)
+		ft_printf(COLOR_Y "> " COLOR_X);
+			line = get_next_line(0);
+		while (*line)
 		{
 			ft_printf(COLOR_Y "> " COLOR_X);
 			line = get_next_line(0);
@@ -84,6 +86,11 @@ int	ft_here_doc_input(char *limiter)
 	}
 	close(pipe_fd[1]);
 	waitpid(pid, &status, 0);
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
+	{
+		close(pipe_fd[0]);
+		return (-1);
+	}
 	return (pipe_fd[0]);
 }
 
@@ -113,13 +120,13 @@ int	ft_redir_add(t_cmd *cmd, t_eredir type, char *next_token)
 		return (1);
 	if (type == REDIR_HEREDOC)
 		new_redir->fd = ft_here_doc_input(next_token);
+	if (new_redir->fd == -1)
+		return (-1);
 	new_redir->type = type;
 	new_redir->value = ft_gcstrdup(CAT_CMD, next_token);
 	new_redir->next = NULL;
 	if (!cmd->redir)
-	{
 		cmd->redir = new_redir;
-	}
 	else
 	{
 		last = cmd->redir;

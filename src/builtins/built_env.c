@@ -30,7 +30,8 @@
  */
 int	built_env(t_shell *shell, char **args)
 {
-	int	i;
+	int		i;
+	char	*eq;
 
 	if (!shell || !shell->envp)
 		return (1);
@@ -44,7 +45,8 @@ int	built_env(t_shell *shell, char **args)
 	i = 0;
 	while (shell->envp[i])
 	{
-		if (ft_strchr(shell->envp[i], '='))
+		eq = ft_strchr(shell->envp[i], '=');
+		if (eq && eq[1])
 			ft_putendl_fd(shell->envp[i], STDOUT_FILENO);
 		i++;
 	}

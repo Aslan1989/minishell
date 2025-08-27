@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 22:50:00 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/23 11:39:29 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/27 17:43:23 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,9 +80,13 @@ static void	print_env_formatted(char **envp)
 		{
 			*eq = '\0';
 			ft_putstr_fd(envp[i], STDOUT_FILENO);
-			ft_putstr_fd("=\"", STDOUT_FILENO);
-			ft_putstr_fd(eq + 1, STDOUT_FILENO);
-			ft_putendl_fd("\"", STDOUT_FILENO);
+			if (eq[1])
+			{
+				ft_putstr_fd("=\"", STDOUT_FILENO);
+				ft_putstr_fd(eq + 1, STDOUT_FILENO);
+				ft_putstr_fd("\"", STDOUT_FILENO);
+			}
+			ft_putstr_fd("\n", STDOUT_FILENO);
 			*eq = '=';
 		}
 		else
