@@ -55,6 +55,8 @@ int	ft_here_doc_input(char *limiter)
 {
 	int		pipe_fd[2];
 	char	*line;
+	pid_t	pid;
+	int		status;
 
 	line = NULL;
 	if (pipe(pipe_fd) < 0)
@@ -62,21 +64,25 @@ int	ft_here_doc_input(char *limiter)
 		perror("pipe");
 		exit(1);
 	}
-	ft_printf(COLOR_Y "> " COLOR_X);
-	line = get_next_line(0);
-	while (line)
+	pid = fork();
+	if (pid == 0)
 	{
-		if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
-			&& line[ft_strlen(limiter)] == '\n')
-			break ;
-		write(pipe_fd[1], line, ft_strlen(line));
-		ft_printf(COLOR_Y "> " COLOR_X);
-		free(line);
-		line = get_next_line(0);
+		signal(SIGINT, SIG_DFL);
+		close(pipe_fd[0]);
+		while (1)
+		{
+			ft_printf(COLOR_Y "> " COLOR_X);
+			line = get_next_line(0);
+			if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
+				&& line[ft_strlen(limiter)] == '\n')
+				break ;
+			write(pipe_fd[1], line, ft_strlen(line));
+			write(pipe_fd[1], "\n", 1);
+			free(line);
+		}
 	}
-	if (line)
-		free(line);
 	close(pipe_fd[1]);
+	waitpid(pid, &status, 0);
 	return (pipe_fd[0]);
 }
 

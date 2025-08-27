@@ -40,6 +40,7 @@ static void	ft_initialize_shell(char **envp)
 	shell->is_interactive = isatty(STDIN_FILENO);
 	shell->envp_allocated = 1;
 	shell->syntax_error = 0;
+	shell->heredoc_interrupted = 0;
 	if (shell->is_interactive)
 	{
 		ft_print_banner();
@@ -47,26 +48,6 @@ static void	ft_initialize_shell(char **envp)
 		disable_ctrl_echo();
 	}
 }
-
-/**
- * @brief Non-interactive execution: run a single command string with "-c".
- *
- * Prepares the shell, duplicates the command, builds an AST, executes it,
- * then performs cleanup. Designed to mirror "bash -c '...'" behavior.
- * Force non-interactive mode
- * Initialize env and handlers (banner skipped)
- * Copy command string into GC (CAT_MEM)
- * AST root pointer
- * Tokenize → parse → build AST into `comms`
- * Execute the AST and get final status
- * Store it globally for $?
- * Free all GC-managed memory (all categories)
- * No history needed in non-interactive, just in case
- *
- * @param envp Environment inherited from main().
- * @param cmd  Command string to execute (single line).
- * @return int Exit status of the executed command(s).
- */
 
 /**
  * @brief Interactive REPL loop: read, parse, execute, repeat.

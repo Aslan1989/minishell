@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/26 13:51:24 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/27 13:21:55 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ typedef struct s_shell
 	int		is_interactive;
 	int		envp_allocated;
 	int		syntax_error;
+	int		heredoc_interrupted;
 }			t_shell;
 
 struct s_cmd
