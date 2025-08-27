@@ -54,7 +54,7 @@ static void	process_key_value_with_equal(t_shell *shell, char *arg, char *equal)
 static void	process_key_value_without_equal(t_shell *shell, char *arg)
 {
 	char	*key;
-	(void)shell;
+
 	key = arg;
 	if (!is_valid_identifier(key))
 	{

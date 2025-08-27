@@ -41,6 +41,26 @@ int	ft_redir_check_next(char *next_token)
 	return (0);
 }
 
+static void	ft_here_child(int pipe_fd[2], char *limiter)
+{
+	char	*line;
+
+	signal(SIGINT, SIG_DFL);
+	while (1)
+	{
+		ft_printf(COLOR_Y "> " COLOR_X);
+		line = get_next_line(0);
+		if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
+			&& line[ft_strlen(limiter)] == '\n')
+			break ;
+		write(pipe_fd[1], line, ft_strlen(line));
+		free(line);
+	}
+	if (line)
+		free (line);
+	close(pipe_fd[1]);
+}
+
 /**
  * @brief Handles input for a heredoc redirection.
  *
@@ -54,11 +74,9 @@ int	ft_redir_check_next(char *next_token)
 int	ft_here_doc_input(char *limiter)
 {
 	int		pipe_fd[2];
-	char	*line;
 	pid_t	pid;
 	int		status;
 
-	line = NULL;
 	if (pipe(pipe_fd) < 0)
 	{
 		perror("pipe");
@@ -67,30 +85,14 @@ int	ft_here_doc_input(char *limiter)
 	pid = fork();
 	if (pid == 0)
 	{
-		signal(SIGINT, SIG_DFL);
 		close(pipe_fd[0]);
-		ft_printf(COLOR_Y "> " COLOR_X);
-			line = get_next_line(0);
-		while (*line)
-		{
-			ft_printf(COLOR_Y "> " COLOR_X);
-			line = get_next_line(0);
-			if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
-				&& line[ft_strlen(limiter)] == '\n')
-				break ;
-			write(pipe_fd[1], line, ft_strlen(line));
-			free(line);
-		}
-		close(pipe_fd[1]);
+		ft_here_child(pipe_fd, limiter);
 		exit(0);
 	}
 	close(pipe_fd[1]);
 	waitpid(pid, &status, 0);
 	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-	{
-		close(pipe_fd[0]);
-		return (-1);
-	}
+		return (close(pipe_fd[0]), -1);
 	return (pipe_fd[0]);
 }
 

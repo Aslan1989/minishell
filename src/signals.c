@@ -30,7 +30,7 @@
 static void	handle_sigint(int sig)
 {
 	(void)sig;
-	//get_shell()->last_exit_status = 1;
+	get_shell()->last_exit_status = 1;
 	write(1, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
