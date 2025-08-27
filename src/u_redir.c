@@ -77,9 +77,10 @@ int	ft_here_doc_input(char *limiter)
 				&& line[ft_strlen(limiter)] == '\n')
 				break ;
 			write(pipe_fd[1], line, ft_strlen(line));
-			write(pipe_fd[1], "\n", 1);
 			free(line);
 		}
+		close(pipe_fd[1]);
+		exit(0);
 	}
 	close(pipe_fd[1]);
 	waitpid(pid, &status, 0);
