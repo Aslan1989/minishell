@@ -28,14 +28,14 @@ t_cmd	*parse_or(t_token **current)
 	t_cmd	*right;
 	t_token	*operator;
 
-	if (ft_p_check(*current, TOK_OR))
+	if (ft_p_check(*current, TOK_AND) || ft_p_check(*current, TOK_OR))
 		return (parser_syntax_error((*current)->value), NULL);
-	expr = parse_and(current);
-	while (ft_p_check(*current, TOK_OR))
+	expr = parse_pipe(current);
+	while (ft_p_check(*current, TOK_AND) || ft_p_check(*current, TOK_OR))
 	{
 		operator = (*current);
 		ft_p_advance(current);
-		right = parse_and(current);
+		right = parse_pipe(current);
 		if (!right)
 		{
 			parser_syntax_error(curr_tok_value(current));

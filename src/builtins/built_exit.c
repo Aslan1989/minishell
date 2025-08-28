@@ -58,7 +58,7 @@ static void	print_numeric_error(char *arg)
 static void	cleanup_and_exit(int code)
 {
 	free_gc();
-	clear_history();
+	rl_clear_history();
 	exit(code);
 }
 

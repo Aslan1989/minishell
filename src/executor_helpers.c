@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_helpers.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
+/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 15:10:20 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/28 09:08:02 by psmolin          ###   ########.fr       */
+/*   Updated: 2025/08/28 11:43:16 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ static void	run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 	if (dup2(fd, dup_fd) == -1)
 	{
 		perror("dup2");
+		rl_clear_history();
 		exit(1);
 	}
 	close(fd);
@@ -46,6 +47,7 @@ static void	run_child_process(int fd, int p_fd[2], t_cmd *command, int dup_fd)
 	close(p_fd[1]);
 	status = ft_run_commands(command);
 	free_gc();
+	rl_clear_history();
 	exit(status);
 }
 
@@ -120,6 +122,7 @@ int	run_paren_node(t_cmd *node)
 	{
 		ret = ft_run_commands(node->next_a);
 		free_gc();
+		rl_clear_history();
 		exit(ret);
 	}
 	waitpid(pid, &status, 0);

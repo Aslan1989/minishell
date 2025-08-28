@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 20:13:01 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/28 10:50:29 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/28 11:03:44 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,21 +114,21 @@ int	scan_entries(DIR *dir, t_wc_ctx *ctx)
 }
 
 /**
- * @brief Expand a single wildcard pattern in the current directory.
+ * @brief Expand a wildcard pattern in the current directory.
  *
- * Opens ".", filters entries using pmatch(), respects dotfile rule,
- * appends matches to (*res), sorts them if any, and returns number of matches.
+ * Scans entries in ".", matches them against the given pattern, and appends
+ * the matching names into the result array. If no matches are found, nothing
+ * is appended. When matches are found, they are sorted alphabetically.
  *
- * Scan current directory
- * Can't open → no matches
- * Only include dotfiles if pattern starts with '.'
- * Append all matches
- * Return number already collected on error
- * Keep expansion results sorted (like bash)
- * @param pat   Pattern to expand (e.g., "*.c").
- * @param res   [in/out] Pointer to argv-like result array.
- * @param count [in/out] Number of items stored in *res.
- * @return int Number of matches (0 if none or error opening dir).
+ * @param pat   The wildcard pattern to expand (supports *, ?, [..] etc).
+ * @param res   Address of a NULL-terminated array of strings (char ***).
+ *              Matches will be appended here; memory is grown with GC helpers.
+ * @param count Pointer to the current number of elements in @p res.
+ *              Updated with the number of new matches added.
+ *
+ * @return int  Non-zero if any matches were found, 0 otherwise.
+ *
+ * @note The caller owns @p res, which is managed with your GC allocator.
  */
 int	expand_one_pattern(const char *pat, char ***res, int *count)
 {

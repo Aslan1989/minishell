@@ -40,6 +40,7 @@ static void	ft_initialize_shell(char **envp)
 	shell->is_interactive = isatty(STDIN_FILENO);
 	shell->envp_allocated = 1;
 	shell->syntax_error = 0;
+	shell->line = NULL;
 	if (shell->is_interactive)
 	{
 		ft_print_banner();
@@ -125,6 +126,6 @@ int	main(int argc, char **argv, char **envp)
 	ft_initialize_shell(envp);
 	status = run_interactive_loop();
 	free_gc();
-	clear_history();
+	rl_clear_history();
 	return (status);
 }

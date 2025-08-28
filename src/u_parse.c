@@ -73,7 +73,7 @@ t_cmd	*ft_p_add_node(t_token *token, t_cmd *next_a, t_cmd *next_b)
 }
 
 /**
- * @brief Parse entry point: sequence (handles ';').
+ * @brief Parse entry point: sequence
  * @param tokens Pointer to token stream.
  * @return t_cmd* AST root.
  */

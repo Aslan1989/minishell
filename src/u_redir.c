@@ -40,16 +40,30 @@ int	ft_redir_check_next(char *next_token)
 	}
 	return (0);
 }
+static void ft_child_sigint(int signo)
+{
+	(void)signo;
+	ft_printf("\n");
+	rl_clear_history();
+	if (get_shell()->line)
+		free (get_shell()->line);
+	free_gc();
+	kill(0, SIGINT);
+}
 
 static void	ft_here_child(int pipe_fd[2], char *limiter)
 {
 	char	*line;
 
-	signal(SIGINT, SIG_DFL);
+	signal(SIGINT, ft_child_sigint);
+	line = NULL;
+	get_shell()->line = line;
 	while (1)
 	{
 		ft_printf(COLOR_Y "> " COLOR_X);
 		line = get_next_line(0);
+		if (!line)
+			break ;
 		if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
 			&& line[ft_strlen(limiter)] == '\n')
 			break ;
@@ -80,6 +94,8 @@ int	ft_here_doc_input(char *limiter)
 	if (pipe(pipe_fd) < 0)
 	{
 		perror("pipe");
+		rl_clear_history();
+		free_gc();
 		exit(1);
 	}
 	pid = fork();
@@ -87,6 +103,8 @@ int	ft_here_doc_input(char *limiter)
 	{
 		close(pipe_fd[0]);
 		ft_here_child(pipe_fd, limiter);
+		rl_clear_history();
+		free_gc();
 		exit(0);
 	}
 	close(pipe_fd[1]);
