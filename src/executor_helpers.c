@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_helpers.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
+/*   By: psmolin <psmolin@student.42heilbronn.de    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 15:10:20 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/24 15:58:03 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/28 09:08:02 by psmolin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,4 +102,26 @@ int	run_or_node(t_cmd *node)
 		status = ft_run_commands(node->next_b);
 	get_shell()->last_exit_status = status;
 	return (status);
+}
+
+int	run_paren_node(t_cmd *node)
+{
+	pid_t	pid;
+	int		status;
+	int		ret;
+
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("fork");
+		return (1);
+	}
+	if (pid == 0)
+	{
+		ret = ft_run_commands(node->next_a);
+		free_gc();
+		exit(ret);
+	}
+	waitpid(pid, &status, 0);
+	return (get_exit_status(status));
 }

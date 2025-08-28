@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/04 12:50:59 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/28 10:48:14 by aisaev           ###   ########.fr       */
+/*   Created: 2025/08/28 10:59:09 by aisaev            #+#    #+#             */
+/*   Updated: 2025/08/28 10:59:15 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,8 +206,10 @@ int			parse_input(t_cmd *node, const char *line);
 //executor_helpers.c
 int			run_and_node(t_cmd *node);
 int			run_or_node(t_cmd *node);
+int			run_paren_node(t_cmd *node);
 pid_t		fork_pipe_child(t_cmd *cmd, int fd, int p_fd[2], int dup_fd);
 int			get_exit_status(int status);
+
 // executor_helpers2.c
 int			is_builtin(const char *s);
 int			precheck_command(t_cmd *command, t_shell *shell, char **args);
