@@ -40,22 +40,22 @@ int	ft_redir_check_next(char *next_token)
 	}
 	return (0);
 }
-static void ft_child_sigint(int signo)
-{
-	(void)signo;
-	ft_printf("\n");
-	rl_clear_history();
-	if (get_shell()->line)
-		free (get_shell()->line);
-	free_gc();
-	kill(0, SIGINT);
-}
+// static void ft_child_sigint(void)
+// {
+// 	//(void)signo;
+
+// 	// rl_clear_history();
+// 	// if (get_shell()->line)
+// 	// 	free (get_shell()->line);
+// 	// free_gc();
+// 	signal(SIGINT, SIG_DFL);
+// }
 
 static void	ft_here_child(int pipe_fd[2], char *limiter)
 {
 	char	*line;
 
-	signal(SIGINT, ft_child_sigint);
+	signal(SIGINT, SIG_DFL);
 	line = NULL;
 	get_shell()->line = line;
 	while (1)
@@ -71,7 +71,7 @@ static void	ft_here_child(int pipe_fd[2], char *limiter)
 		free(line);
 	}
 	if (line)
-		free (line);
+		free(line);
 	close(pipe_fd[1]);
 }
 
