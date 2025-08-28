@@ -40,7 +40,6 @@ static void	ft_initialize_shell(char **envp)
 	shell->is_interactive = isatty(STDIN_FILENO);
 	shell->envp_allocated = 1;
 	shell->syntax_error = 0;
-	shell->heredoc_interrupted = 0;
 	if (shell->is_interactive)
 	{
 		ft_print_banner();
@@ -103,10 +102,6 @@ static int	run_interactive_loop(void)
  * @brief Program entry point: decides between interactive
  * and non-interactive modes.
  *
- * Usage:
- *   minishell -c "echo hi"   → non-interactive one-shot
- *   minishell                 → interactive loop
- * POSIX-style "-c <cmd>" one-shot
  * Prepare interactive shell
  * Enter REPL
  * Final GC cleanup on exit

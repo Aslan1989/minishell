@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 20:13:01 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/24 18:52:19 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/28 10:50:29 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,32 +38,6 @@ int	pmatch_after_star(const char *pat, const char *str)
 		str++;
 	}
 	return (0);
-}
-
-/**
- * @brief In-place bubble sort of a NULL-terminated string array (ascending).
- *
- * @param arr Array of strings to sort (argv-like).
- */
-void	sort_strings(char **arr)
-{
-	int	n;
-	int	i;
-	int	j;
-
-	n = arr_len(arr);
-	i = 0;
-	while (i < n - 1)
-	{
-		j = 0;
-		while (j < n - 1 - i)
-		{
-			if (ft_strcmp(arr[j], arr[j + 1]) > 0)
-				swap_str(&arr[j], &arr[j + 1]);
-			j++;
-		}
-		i++;
-	}
 }
 
 /**
@@ -137,4 +111,47 @@ int	scan_entries(DIR *dir, t_wc_ctx *ctx)
 		ent = readdir(dir);
 	}
 	return (0);
+}
+
+/**
+ * @brief Expand a single wildcard pattern in the current directory.
+ *
+ * Opens ".", filters entries using pmatch(), respects dotfile rule,
+ * appends matches to (*res), sorts them if any, and returns number of matches.
+ *
+ * Scan current directory
+ * Can't open → no matches
+ * Only include dotfiles if pattern starts with '.'
+ * Append all matches
+ * Return number already collected on error
+ * Keep expansion results sorted (like bash)
+ * @param pat   Pattern to expand (e.g., "*.c").
+ * @param res   [in/out] Pointer to argv-like result array.
+ * @param count [in/out] Number of items stored in *res.
+ * @return int Number of matches (0 if none or error opening dir).
+ */
+int	expand_one_pattern(const char *pat, char ***res, int *count)
+{
+	DIR			*dir;
+	t_wc_ctx	c;
+	int			start;
+
+	dir = opendir(".");
+	if (!dir)
+		return (0);
+	start = *count;
+	c.pat = pat;
+	c.show_dot = want_show_hidden(pat);
+	c.res = res;
+	c.count = count;
+	c.matched = 0;
+	if (scan_entries(dir, &c))
+	{
+		closedir(dir);
+		return (c.matched);
+	}
+	closedir(dir);
+	if (c.matched)
+		sort_strings_range(*res, start, *count - 1);
+	return (c.matched);
 }

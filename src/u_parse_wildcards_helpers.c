@@ -6,7 +6,7 @@
 /*   By: aisaev <aisaev@student.42heilbronn.de>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/23 20:02:53 by aisaev            #+#    #+#             */
-/*   Updated: 2025/08/24 18:52:29 by aisaev           ###   ########.fr       */
+/*   Updated: 2025/08/28 10:50:05 by aisaev           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,43 +126,23 @@ int	match_char_class(const char **pp, char c)
 	return (ok);
 }
 
-/**
- * @brief Expand a single wildcard pattern in the current directory.
- *
- * Opens ".", filters entries using pmatch(), respects dotfile rule,
- * appends matches to (*res), sorts them if any, and returns number of matches.
- *
- * Scan current directory
- * Can't open → no matches
- * Only include dotfiles if pattern starts with '.'
- * Append all matches
- * Return number already collected on error
- * Keep expansion results sorted (like bash)
- * @param pat   Pattern to expand (e.g., "*.c").
- * @param res   [in/out] Pointer to argv-like result array.
- * @param count [in/out] Number of items stored in *res.
- * @return int Number of matches (0 if none or error opening dir).
- */
-int	expand_one_pattern(const char *pat, char ***res, int *count)
+void	sort_strings_range(char **arr, int start, int end)
 {
-	DIR			*dir;
-	t_wc_ctx	c;
+	int	i;
+	int	j;
 
-	dir = opendir(".");
-	if (!dir)
-		return (0);
-	c.pat = pat;
-	c.show_dot = want_show_hidden(pat);
-	c.res = res;
-	c.count = count;
-	c.matched = 0;
-	if (scan_entries(dir, &c))
+	if (!arr || start < 0 || end <= start)
+		return ;
+	i = start;
+	while (i < end)
 	{
-		closedir(dir);
-		return (c.matched);
+		j = start;
+		while (j < end - (i - start))
+		{
+			if (ft_strcmp(arr[j], arr[j + 1]) > 0)
+				swap_str(&arr[j], &arr[j + 1]);
+			j++;
+		}
+		i++;
 	}
-	closedir(dir);
-	if (c.matched)
-		sort_strings(*res);
-	return (c.matched);
 }
