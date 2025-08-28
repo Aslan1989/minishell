@@ -121,6 +121,7 @@ t_cmd	*parse_pipe(t_token **current)
 t_cmd	*parse_word(t_token **current)
 {
 	t_cmd	*node;
+	t_token	*paren_token;
 
 	if (!current || !*current)
 		return (NULL);
@@ -131,16 +132,15 @@ t_cmd	*parse_word(t_token **current)
 		return (node);
 	if (ft_p_check(*current, TOK_LPAREN))
 	{
+		paren_token = (*current);
 		ft_p_advance(current);
 		node = parse_or(current);
 		if (!node && *current && ft_p_check(*current, TOK_RPAREN))
 			return (parser_syntax_error((*current)->value), NULL);
 		if (!*current || !ft_p_check(*current, TOK_RPAREN))
-		{
-			parser_syntax_error(NULL);
-			return (NULL);
-		}
+			return (parser_syntax_error(NULL), NULL);
 		ft_p_advance(current);
+		node = ft_p_add_node(paren_token, node, NULL);
 		return (node);
 	}
 	return (NULL);

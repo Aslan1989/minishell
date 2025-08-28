@@ -82,8 +82,8 @@ static void	ft_add_word(char **line, t_token **head)
 		else if (**line == quote && quote)
 			quote = 0;
 		(*line)++;
-		if (!quote && (**line == '|' || **line == '&' || **line == '(' \
-		|| **line == ')'))
+		if (!quote && (**line == '|' || **line == '&' || **line == '('
+				|| **line == ')'))
 			break ;
 	}
 	add_token(head, TOK_WORD, ft_gcstrndup(CAT_TOKEN, start, *line - start));
